@@ -2,6 +2,8 @@
 
 #include "Game.h"
 
+
+
 GameObject* GameObject_New(Point position, Vector2 scale, Image* image, void* start, void* update)
 {
 	GameObject* self = (GameObject*)malloc(sizeof(GameObject));
@@ -95,6 +97,8 @@ void delete_game_object_at(GameObjectList * list, int index)
 		list->List[i] = list->List[i + 1];
 
 	list->Count--;
+
+	list->List = (GameObject**)realloc(list->List, list->Count * sizeof(GameObject*));
 }
 
 void delete_game_object_from_list(GameObjectList * list, GameObject* game_object)
