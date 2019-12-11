@@ -35,8 +35,10 @@ int size = 0;
 Image* image;
 
 int next = 0;
-const int fps = 5;
+const int fps = 12;
 int fps_sayac = 0;
+
+int x = 100;
 
 void Render()
 {
@@ -63,7 +65,7 @@ void Render()
 	//	size = 8;
 	//}
 
-	//DrawClipImage(image, create_rect(100, 200, 60, 85), create_rect(0, 0, 60, 85), next);
+	//DrawClipImage(image, create_rect(x+=2, 200, 120, 170), create_rect(0, 0, 60, 85), next);
 	//fps_sayac++;
 	//if (fps_sayac >= fps)
 	//{
