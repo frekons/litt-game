@@ -1,4 +1,4 @@
-.vs/
+
 [Dd]ebug/
 sdl-game/Debug/
 *.obj
@@ -9,3 +9,5 @@ sdl-game/Debug/
 *.tlog
 *.lastbuildstate
 *.log
+
+.vs/
