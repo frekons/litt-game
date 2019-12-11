@@ -9,6 +9,8 @@
 
 Image* LoadTexture(char* path);
 
+Image** SplitTexture(Image* texture, Vector2 split_size);
+
 void DrawImage(Image* image, Rect rect);
 
 #endif // !IMAGE_H
