@@ -1,3 +1,0 @@
-yapılacak kısımların yanına "TO DO" ekledim, dosyaların içinde aratarak bulabilirsiniz
-
-bunun dışında eklenecekler var, benim aklıma şimdilik kişilerin kitapları ödünç alması, türkçe karakter desteği geliyor
