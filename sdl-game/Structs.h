@@ -17,7 +17,7 @@ typedef struct SSize Size;
 
 typedef struct SDL_Rect Rect;
 
-typedef struct SDL_Point Point;
+typedef struct SDL_FPoint Point;
 
 
 Rect create_rect(int x, int y, int w, int h);
