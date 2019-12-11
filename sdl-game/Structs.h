@@ -9,6 +9,8 @@ typedef struct Vector2 {
 	float x, y;
 }Vector2;
 
+Vector2 create_vec2(float x, float y);
+
 struct SSize {
 	int w, h;
 };

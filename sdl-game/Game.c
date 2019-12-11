@@ -31,7 +31,12 @@ void Start()
 
 }
 
+int size = 0;
+Image* image;
 
+int next = 0;
+const int fps = 5;
+int fps_sayac = 0;
 
 void Render()
 {
@@ -49,4 +54,23 @@ void Render()
 
 	}
 
+
+
+	//if (size == 0)
+	//{
+	//	image = LoadTexture("resources/players/spritePlayer.png");
+
+	//	size = 8;
+	//}
+
+	//DrawClipImage(image, create_rect(100, 200, 60, 85), create_rect(0, 0, 60, 85), next);
+	//fps_sayac++;
+	//if (fps_sayac >= fps)
+	//{
+	//	next++;
+	//	fps_sayac = 0;
+	//}
+
+	//if (next >= size - 1)
+	//	next = 0;
 }

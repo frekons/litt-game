@@ -9,8 +9,9 @@
 
 Image* LoadTexture(char* path);
 
-Image** SplitTexture(Image* texture, Vector2 split_size);
+//SDL_Texture** SplitTexture(Image* texture, Vector2 split_size, int *size);
 
 void DrawImage(Image* image, Rect rect);
+void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index);
 
 #endif // !IMAGE_H
