@@ -5,6 +5,8 @@
 #include "GameObject.h"
 #include "Image.h"
 
+#include <time.h>
+
 
 void localplayer_start(GameObject* self)
 {
@@ -13,7 +15,7 @@ void localplayer_start(GameObject* self)
 
 void localplayer_update(GameObject* self)
 {
-	self->transform->position.x += 3.0f;
+	self->transform->position.x += 100.0f * deltaTime;
 }
 
 
@@ -27,7 +29,7 @@ void Start()
 	Point spawn_position = { 50,50 };
 	Vector2 spawn_scale = { 1,1 };
 
-	GameObject* gameObject = GameObject_New( spawn_position , spawn_scale, image, &localplayer_start, &localplayer_update); // spawning local player
+	GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, image, &localplayer_start, &localplayer_update); // spawning local player
 
 }
 

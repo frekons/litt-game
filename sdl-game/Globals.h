@@ -4,6 +4,7 @@
 #define GLOBALS_H
 
 #include "Structs.h"
+#include <time.h>
 
 #include <SDL2/SDL.h>
 
@@ -25,6 +26,11 @@ Color get_render_color();
 void set_render_color(Color color);
 
 void set_up_things();
+
+
+double deltaTime;
+
+
 
 
 #endif // !GLOBALS_H
