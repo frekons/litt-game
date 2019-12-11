@@ -13,7 +13,7 @@ void localplayer_start(GameObject* self)
 
 void localplayer_update(GameObject* self)
 {
-	
+	self->transform->position.x += 1;
 }
 
 
