@@ -1,3 +1,11 @@
 .vs/
 [Dd]ebug/
 sdl-game/Debug/
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.tlog
+*.tlog
+*.lastbuildstate
+*.log
