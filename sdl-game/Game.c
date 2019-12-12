@@ -17,13 +17,11 @@ void localplayer_start(GameObject* self)
 
 void localplayer_update(GameObject* self)
 {
-	//self->transform->position.x += 100.0f * deltaTime;
 
 	if (GetAsyncKeyState('A') || GetAsyncKeyState('D'))
 		strcpy(self->current_state, "run");
 	else
 		strcpy(self->current_state, "idle");
-		
 
 }
 
@@ -75,14 +73,7 @@ void Start()
 
 }
 
-int size = 0;
-Image* image;
 
-int next = 0;
-const int fps = 12;
-int fps_sayac = 0;
-
-int x = 100;
 
 void Render()
 {
@@ -100,23 +91,4 @@ void Render()
 
 	}
 
-
-
-	//if (size == 0)
-	//{
-	//	image = LoadTexture("resources/players/spritePlayer.png");
-
-	//	size = 8;
-	//}
-
-	//DrawClipImage(image, create_rect(x+=2, 200, 120, 170), create_rect(0, 0, 60, 85), next);
-	//fps_sayac++;
-	//if (fps_sayac >= fps)
-	//{
-	//	next++;
-	//	fps_sayac = 0;
-	//}
-
-	//if (next >= size - 1)
-	//	next = 0;
 }
