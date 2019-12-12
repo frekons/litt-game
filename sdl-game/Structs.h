@@ -5,6 +5,20 @@
 
 #include <SDL2/SDL.h>
 
+struct SIntList {
+
+	int Count;
+	int* List;
+
+};
+
+typedef struct SIntList IntList;
+
+void initialize_int_list(IntList * list);
+
+void add_int_to_list(IntList * list, int member);
+
+
 typedef struct Vector2 {
 	float x, y;
 }Vector2;
