@@ -13,7 +13,7 @@
 struct STransform {
 	Point position;
 	Vector2 scale;
-
+	bool left;
 	//GameObject* gameObject;
 };
 
@@ -22,6 +22,8 @@ typedef struct STransform Transform;
 typedef struct Animation {
 	char state_name[32];
 	IntList sprites;
+
+	bool loop;
 
 	int current_index;
 	int wait_frame, current_frame;
@@ -54,6 +56,7 @@ struct SGameObject {
 	void* start;
 	void* update;
 
+	int health;
 };
 
 

@@ -14,6 +14,7 @@ GameObject* GameObject_New(Point position, Vector2 scale, Image* image, bool is_
 	//transform->gameObject = self;
 	transform->position = position;
 	transform->scale = scale;
+	transform->left = false;
 
 	self->transform = transform;
 
@@ -80,7 +81,7 @@ void GameObject_Draw(GameObject* self)
 	if (!self->sprite_sheet)
 	{
 
-		DrawImage(self->image, rect);
+		DrawImage(self->image, rect, self->transform->left);
 	}
 	else
 	{
@@ -88,16 +89,16 @@ void GameObject_Draw(GameObject* self)
 
 		if (animation == NULL) {
 
-			SDL_Log("ANIMATION IS NULL!");
+			SDL_Log("No animation found named '%s'!", self->current_state);
 
 			return;
 		}
 
 
 		if (animation->current_index >= animation->sprites.Count)
-			animation->current_index = 0;
+			animation->current_index = animation->loop ? 0 : animation->sprites.Count - 1;
 
-		DrawClipImage(self->image, rect, create_rect(0,0, self->clip_size.x, self->clip_size.y), animation->sprites.List[animation->current_index]);
+		DrawClipImage(self->image, rect, create_rect(0,0, self->clip_size.x, self->clip_size.y), animation->sprites.List[animation->current_index], self->transform->left);
 
 		if (++animation->current_frame >= animation->wait_frame)
 		{

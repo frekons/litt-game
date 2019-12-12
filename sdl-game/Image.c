@@ -5,6 +5,7 @@
 #include <SDL2/SDL_image.h>
 
 
+
 Image* LoadTexture(const char* path)
 {
 	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
@@ -26,14 +27,14 @@ Image* LoadTexture(const char* path)
 }
 
 
-void DrawImage(Image* image, Rect rect)
+void DrawImage(Image* image, Rect rect, bool left)
 {
 	if (image == NULL) return;
 
-	SDL_RenderCopy(renderer, image->texture, NULL, &rect);
+	SDL_RenderCopyEx(renderer, image->texture, NULL, &rect, 0, NULL, left ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
-void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index)
+void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index, bool left)
 {
 	if (image == NULL) return;
 
@@ -53,7 +54,7 @@ void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index)
 	clipRect.x = x_offset * clipRect.w;
 	clipRect.y = y_offset * clipRect.h;
 
-	SDL_RenderCopy(renderer, image->texture, &clipRect, &rect);
+	SDL_RenderCopyEx(renderer, image->texture, &clipRect, &rect, 0, NULL, left ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 
