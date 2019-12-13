@@ -14,7 +14,7 @@ Point vec2_lerp(Point point1, Point point2, float time) // time is between 0, 1
 
 	float magn = magnitude(diff);
 
-	if (magn <= 0.001f)
+	if (magn <= 0.25f)
 		return point2;
 
 	to_return.x = point1.x * (1 - time) + point2.x * time;;

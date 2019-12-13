@@ -183,9 +183,9 @@ void localplayer_update(GameObject* self)
 
 	Point camera_pos;
 	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2 + local_player_velocity.x * 150.0f;
-	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2 + local_player_velocity.y;
+	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2 + local_player_velocity.y - 75;
 
-	camera->position = vec2_lerp(camera->position, camera_pos, deltaTime * 5.0f);
+	camera->position = vec2_lerp(camera->position, camera_pos, 0.12f); // deltaTime should be used? (deltaTime causes screen shakes)
 
 	self->transform->position.x += local_player_velocity.x * player_speed;
 	self->transform->position.y += local_player_velocity.y;
