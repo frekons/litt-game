@@ -22,15 +22,20 @@ Vector2 local_player_velocity = { 0,0 };
 
 int wait_time = 0;
 
+bool ignore_movement;
+
 bool compare_animator_state(GameObject* self, char* state) // time is in seconds
 {
 	return strcmp(self->current_state, state) == 0;
 }
 
-void set_animator_state(GameObject* self, char* state, float time) // time is in seconds
+void set_animator_state(GameObject* self, char* state, float time, bool ignore_move) // time is in seconds
 {
 	if (compare_animator_state(self, state))
 		return;
+
+	if (ignore_move) // logical
+		ignore_movement = true;
 
 	Uint32 current_time = SDL_GetTicks();
 
@@ -138,18 +143,20 @@ void localplayer_update(GameObject* self)
 
 	Uint32 current_time = SDL_GetTicks();
 
-	//if (wait_time > current_time) return;
+	if (ignore_movement && wait_time > current_time) return;
+
+	ignore_movement = false;
 
 	const Uint8* keystate = SDL_GetKeyboardState(NULL);
 	
 	//if (keystate[SDL_SCANCODE_G])
 	//{
-	//	set_animator_state(self, "die", 5.0f);
+	//	set_animator_state(self, "die", 5.0f, true);
 	//}
 
-	if (keystate[SDL_SCANCODE_F] && attack_timer <= current_time )
+	if ( keystate[SDL_SCANCODE_F] && attack_timer <= current_time )
 	{
-		set_animator_state(self, "attack", 0.525f);
+		set_animator_state(self, "attack", 0.525f, true);
 
 		play_sound("resources/sounds/attack.wav");
 
@@ -177,7 +184,7 @@ void localplayer_update(GameObject* self)
 		local_player_velocity.x += deltaTime * player_accel;
 		local_player_velocity.x = clamp(local_player_velocity.x, -1, 1);
 
-		set_animator_state(self, "run", 0);
+		set_animator_state(self, "run", 0, false);
 	}
 	else if(keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_LEFT])
 	{
@@ -187,13 +194,13 @@ void localplayer_update(GameObject* self)
 		local_player_velocity.x = clamp(local_player_velocity.x, -1, 1);
 
 
-		set_animator_state(self, "run", 0);
+		set_animator_state(self, "run", 0, false);
 	}
 	else
 	{
 		local_player_velocity.x -= local_player_velocity.x * deltaTime * player_accel;
 
-		set_animator_state(self, "idle", 0);
+		set_animator_state(self, "idle", 0, false);
 	}
 
 	Point camera_pos;
