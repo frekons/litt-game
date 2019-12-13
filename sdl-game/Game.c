@@ -16,7 +16,7 @@ GameObject* local_player = NULL;
 
 float gravity = 20.0f;
 
-float jump_force = 7.0f, player_speed = 5.0f, player_accel = 12.0f;
+float jump_force = 350.0f, player_speed = 5.0f, player_accel = 12.0f;
 
 Vector2 local_player_velocity = { 0,0 };
 
@@ -170,7 +170,7 @@ void localplayer_update(GameObject* self)
 	{
 		if (on_ground)
 		{
-			local_player_velocity.y = -jump_force;
+			local_player_velocity.y = -jump_force * deltaTime;
 
 			play_sound("resources/sounds/jump.wav");
 		}
