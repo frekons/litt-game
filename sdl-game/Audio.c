@@ -111,13 +111,13 @@ void terminate_music()
 
 // SOUND EFFECT FUNCTIONS
 
-Mix_Chunk* load_sound(const char* sound_effect_file_dir)
+Mix_Chunk* load_sound(char* sound_effect_file_dir)
 {
-	Mix_Chunk* sound_effect = find_in_list(&music_list, sound_effect_file_dir);
+	Music* music = find_in_list(&music_list, sound_effect_file_dir);
 
-	if (!sound_effect)
+	if (!music)
 	{
-		sound_effect = Mix_LoadWAV(sound_effect_file_dir);
+		Mix_Chunk* sound_effect = Mix_LoadWAV(sound_effect_file_dir);
 
 		if (sound_effect == NULL)
 		{
@@ -125,16 +125,16 @@ Mix_Chunk* load_sound(const char* sound_effect_file_dir)
 			return NULL;
 		}
 
-		Music* music = (Music*)malloc(sizeof(Music));
+		music = (Music*)malloc(sizeof(Music));
 
 		strcpy(music->file_name, sound_effect_file_dir);
 		music->music = sound_effect;
 
-		add_music_to_list(&music_list, sound_effect);
+		add_music_to_list(&music_list, music);
 	}
 
 		
-	return sound_effect;
+	return music->music;
 }
 
 int play_sound(const char* sound_effect_file_dir)
