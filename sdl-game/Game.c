@@ -305,7 +305,12 @@ void Start()
 
 void Render()
 {
+	// UI things
 
+
+
+
+	////////////
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* gameObject = GameObjects.List[i];
