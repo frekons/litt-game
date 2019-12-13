@@ -9,5 +9,6 @@ sdl-game/Debug/
 *.tlog
 *.lastbuildstate
 *.log
+*.vcxproj
 
 .vs/
