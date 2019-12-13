@@ -2,9 +2,23 @@
 
 #include "Game.h"
 
+#include "Image.h"
+
+Camera* create_camera(int screen_width, int screen_height)
+{
+	Camera* cam = (Camera*)malloc(sizeof(Camera));
+
+	cam->position.x = 0;
+	cam->position.y = 0;
+
+	cam->width = screen_width;
+	cam->height = screen_height;
+
+	return cam;
+}
 
 
-GameObject* GameObject_New(Point position, Vector2 scale, Image* image, bool is_sprite_sheet, Vector2 clip_size, Animation *animations, int animations_size, void* start, void* update)
+GameObject* GameObject_New(Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation *animations, int animations_size, void* start, void* update)
 {
 	GameObject* self = (GameObject*)malloc(sizeof(GameObject));
 
@@ -18,12 +32,12 @@ GameObject* GameObject_New(Point position, Vector2 scale, Image* image, bool is_
 
 	self->transform = transform;
 
+	self->collider = collider;
 
 	self->image = image;
-	
-	self->sprite_sheet = is_sprite_sheet;
 
-	self->clip_size = clip_size;
+	self->layer = layer;
+	
 
 	strcpy(self->current_state, "idle");
 
@@ -71,20 +85,24 @@ void GameObject_Draw(GameObject* self)
 {
 	if (self == NULL || self->image == NULL) return;
 
-	Rect rect = self->image->rect;
-	rect.x = self->transform->position.x;
-	rect.y = self->transform->position.y;
+	Rect rect;
+	rect.x = self->transform->position.x - (camera->position.x - camera->width / 2);
+	rect.y = self->transform->position.y - (camera->position.y - camera->height / 2);
 
-	rect.w *= self->transform->scale.x;
-	rect.h *= self->transform->scale.y;
-
-	if (!self->sprite_sheet)
+	if (!self->image->sprite_sheet)
 	{
+		rect.w = self->image->rect.w * self->transform->scale.x;
+		rect.h = self->image->rect.h *  self->transform->scale.y;
 
 		DrawImage(self->image, rect, self->transform->left);
 	}
 	else
 	{
+		rect.w = self->image->clip_size.x *self->transform->scale.x;
+		rect.h = self->image->clip_size.y *  self->transform->scale.y;
+
+
+
 		Animation* animation = get_animation_sprites(self, self->current_state);
 
 		if (animation == NULL) {
@@ -98,7 +116,7 @@ void GameObject_Draw(GameObject* self)
 		if (animation->current_index >= animation->sprites.Count)
 			animation->current_index = animation->loop ? 0 : animation->sprites.Count - 1;
 
-		DrawClipImage(self->image, rect, create_rect(0,0, self->clip_size.x, self->clip_size.y), animation->sprites.List[animation->current_index], self->transform->left);
+		DrawClipImage(self->image, rect, create_rect(0,0, self->image->clip_size.x, self->image->clip_size.y), animation->sprites.List[animation->current_index], self->transform->left);
 
 		if (++animation->current_frame >= animation->wait_frame)
 		{

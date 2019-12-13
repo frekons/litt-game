@@ -5,10 +5,16 @@
 #include "GameObject.h"
 #include "Image.h"
 
+#include "Utils.h"
+
+#include "Collision.h"
+
 
 GameObject* local_player = NULL;
 
-float jump_force = 4.0f, player_speed = 5.0f, player_accel = 12.0f;
+float gravity = 15.0f;
+
+float jump_force = 5.0f, player_speed = 5.0f, player_accel = 12.0f;
 
 Vector2 local_player_velocity = { 0,0 };
 
@@ -49,6 +55,61 @@ float clamp(float value, float min, float max)
 	return value;
 }
 
+bool float_compare(float one, float two, float tolerance)
+{
+	if (one > two - tolerance && one < two + tolerance)
+		return true;
+
+	return false;
+}
+
+GameObject* is_on_platform(GameObject* self)
+{
+
+	GameObjectList list = GetInteracts(self);
+
+	for (int i = 0; i < list.Count; i++)
+		if (LAYER_GROUND == list.List[i]->layer)
+		{
+			float foot_y = self->transform->position.y + self->image->clip_size.y * self->transform->scale.y;
+
+			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
+
+			if (float_compare(foot_y, ground_y, 10)) // eðer ayaðýn platformun üstündeyse
+			{
+				self->transform->position.y = ground_y - self->image->clip_size.y * self->transform->scale.y;
+
+				return list.List[i];
+			}
+				
+		}
+			
+
+		
+
+	return NULL;
+}
+
+
+bool is_collides_except(GameObject* self, GameObject* except)
+{
+	GameObjectList list = GetInteracts(self);
+
+	bool result = false;
+
+	for (int i = 0; i < list.Count; i++)
+	{
+		if (list.List[i] == except)
+			return;
+
+		result = true;
+		break;
+	}
+	
+
+	return result;
+}
+
 void localplayer_start(GameObject* self)
 {
 	local_player = self;
@@ -60,25 +121,43 @@ void localplayer_start(GameObject* self)
 
 void localplayer_update(GameObject* self)
 {
+	Point camera_pos;
+	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2;
+	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2;
+
+	camera->position = vec2_lerp(camera->position, camera_pos, deltaTime * 10.0f);
+
+	GameObject* on_ground = is_on_platform(self);
+
+	if (!on_ground)
+		local_player_velocity.y += deltaTime * gravity;
+	else
+	{
+		local_player_velocity.y = 0;
+	}
+		
+
 	//Uint32 current_time = SDL_GetTicks();
 
 	//if (wait_time > current_time) return;
 
-	Uint8* keystate = SDL_GetKeyboardState(NULL);
+	const Uint8* keystate = SDL_GetKeyboardState(NULL);
 	
-	if (keystate[SDL_SCANCODE_G])
-	{
-		set_animator_state(self, "die", 5.0f);
-	}
+	//if (keystate[SDL_SCANCODE_G])
+	//{
+	//	set_animator_state(self, "die", 5.0f);
+	//}
 
 	if (keystate[SDL_SCANCODE_F])
 	{
 		set_animator_state(self, "attack", 0.525f);
+
+		// TO DO, search for enemy and damage it
 	}
 
 	if (keystate[SDL_SCANCODE_SPACE] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_UP])
 	{
-		//if(is_on_platform(self))
+		if(on_ground)
 			local_player_velocity.y = -jump_force;
 	}
 
@@ -108,14 +187,18 @@ void localplayer_update(GameObject* self)
 		set_animator_state(self, "idle", 0);
 	}
 
-	//if(!is_on_platform(self))
-		//local_player_velocity.y += deltaTime * 5.0;
-	//else
-	//	local_player_velocity.y = 0;
-
 
 	self->transform->position.x += local_player_velocity.x * player_speed;
 	self->transform->position.y += local_player_velocity.y;
+
+	GameObjectList list = GetInteractsExceptLayer(self, LAYER_GROUND);
+
+	
+	if (list.Count > 0 || (!is_on_platform(self) && GetInteracts(self).Count > 0))
+	{
+		self->transform->position.x -= local_player_velocity.x * player_speed;
+	}
+
 }
 
 
@@ -123,92 +206,98 @@ void Start()
 {
 	initialize_game_object_list(&GameObjects);
 	//
-
-	Image* image = LoadTexture("resources/players/spritePlayer.png");
-
-	Point spawn_position = { 50,500 };
-	Vector2 spawn_scale = { 0.5f, 0.5f };
-
-	int animation_count = 4;
-
-	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
-
-	strcpy(animations[0].state_name, "idle");
+	
+	Image* image = LoadTexture("resources/players/spritePlayer.png", true, create_vec2(32, 32)); // local_player creation
 	{
-		initialize_int_list(&animations[0].sprites);
+		Point spawn_position = { 50,400 };
+		Vector2 spawn_scale = { 2.0f, 2.0f };
 
-		add_int_to_list(&animations[0].sprites, 0);
-		add_int_to_list(&animations[0].sprites, 1);
-		add_int_to_list(&animations[0].sprites, 2);
-		add_int_to_list(&animations[0].sprites, 3);
-		add_int_to_list(&animations[0].sprites, 4);
+		int animation_count = 4;
 
-		animations[0].loop = true;
+		Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
 
-		animations[0].current_index = 0;
-		animations[0].current_frame = 0;
-		animations[0].wait_frame = 6;
-	}
+		strcpy(animations[0].state_name, "idle");
+		{
+			initialize_int_list(&animations[0].sprites);
 
-	strcpy(animations[1].state_name, "run");
-	{
-		initialize_int_list(&animations[1].sprites);
+			add_int_to_list(&animations[0].sprites, 0);
+			add_int_to_list(&animations[0].sprites, 1);
+			add_int_to_list(&animations[0].sprites, 2);
+			add_int_to_list(&animations[0].sprites, 3);
+			add_int_to_list(&animations[0].sprites, 4);
 
-		add_int_to_list(&animations[1].sprites, 8);
-		add_int_to_list(&animations[1].sprites, 9);
-		add_int_to_list(&animations[1].sprites, 10);
-		add_int_to_list(&animations[1].sprites, 11);
-		add_int_to_list(&animations[1].sprites, 12);
-		add_int_to_list(&animations[1].sprites, 13);
-		add_int_to_list(&animations[1].sprites, 14);
-		add_int_to_list(&animations[1].sprites, 15);
+			animations[0].loop = true;
 
-		animations[1].loop = true;
+			animations[0].current_index = 0;
+			animations[0].current_frame = 0;
+			animations[0].wait_frame = 6;
+		}
 
-		animations[1].current_index = 0;
-		animations[1].current_frame = 0;
-		animations[1].wait_frame = 6;
-	}
+		strcpy(animations[1].state_name, "run");
+		{
+			initialize_int_list(&animations[1].sprites);
 
-	strcpy(animations[2].state_name, "attack");
-	{
-		initialize_int_list(&animations[2].sprites);
+			add_int_to_list(&animations[1].sprites, 8);
+			add_int_to_list(&animations[1].sprites, 9);
+			add_int_to_list(&animations[1].sprites, 10);
+			add_int_to_list(&animations[1].sprites, 11);
+			add_int_to_list(&animations[1].sprites, 12);
+			add_int_to_list(&animations[1].sprites, 13);
+			add_int_to_list(&animations[1].sprites, 14);
+			add_int_to_list(&animations[1].sprites, 15);
 
-		add_int_to_list(&animations[2].sprites, 16);
-		add_int_to_list(&animations[2].sprites, 17);
-		add_int_to_list(&animations[2].sprites, 18);
-		add_int_to_list(&animations[2].sprites, 19);
-		add_int_to_list(&animations[2].sprites, 20);
-		add_int_to_list(&animations[2].sprites, 21);
-		add_int_to_list(&animations[2].sprites, 22);
+			animations[1].loop = true;
 
-		animations[2].loop = true;
+			animations[1].current_index = 0;
+			animations[1].current_frame = 0;
+			animations[1].wait_frame = 6;
+		}
 
-		animations[2].current_index = 0;
-		animations[2].current_frame = 0;
-		animations[2].wait_frame = 6;
-	}
+		strcpy(animations[2].state_name, "attack");
+		{
+			initialize_int_list(&animations[2].sprites);
 
-	strcpy(animations[3].state_name, "die");
-	{
-		initialize_int_list(&animations[3].sprites);
+			add_int_to_list(&animations[2].sprites, 16);
+			add_int_to_list(&animations[2].sprites, 17);
+			add_int_to_list(&animations[2].sprites, 18);
+			add_int_to_list(&animations[2].sprites, 19);
+			add_int_to_list(&animations[2].sprites, 20);
+			add_int_to_list(&animations[2].sprites, 21);
+			add_int_to_list(&animations[2].sprites, 22);
 
-		add_int_to_list(&animations[3].sprites, 32);
-		add_int_to_list(&animations[3].sprites, 33);
-		add_int_to_list(&animations[3].sprites, 34);
-		add_int_to_list(&animations[3].sprites, 35);
-		add_int_to_list(&animations[3].sprites, 36);
-		add_int_to_list(&animations[3].sprites, 37);
-		add_int_to_list(&animations[3].sprites, 38);
+			animations[2].loop = true;
 
-		animations[3].loop = false;
+			animations[2].current_index = 0;
+			animations[2].current_frame = 0;
+			animations[2].wait_frame = 6;
+		}
 
-		animations[3].current_index = 0;
-		animations[3].current_frame = 0;
-		animations[3].wait_frame = 6;
-	}
+		strcpy(animations[3].state_name, "die");
+		{
+			initialize_int_list(&animations[3].sprites);
 
-	GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, image, true, create_vec2(32,32), animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+			add_int_to_list(&animations[3].sprites, 32);
+			add_int_to_list(&animations[3].sprites, 33);
+			add_int_to_list(&animations[3].sprites, 34);
+			add_int_to_list(&animations[3].sprites, 35);
+			add_int_to_list(&animations[3].sprites, 36);
+			add_int_to_list(&animations[3].sprites, 37);
+			add_int_to_list(&animations[3].sprites, 38);
+
+			animations[3].loop = false;
+
+			animations[3].current_index = 0;
+			animations[3].current_frame = 0;
+			animations[3].wait_frame = 6;
+		}
+
+		
+		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider){0,0, image->clip_size.x, image->clip_size.y}, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+	} 
+
+	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
+
+	GameObject_New(create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 20, image->rect.w, image->rect.h - 20 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef DRAWS_H
-#define DRAWS_H
+//#ifndef DRAWS_H
+//#define DRAWS_H
 
 #include "Structs.h"
 
@@ -10,4 +10,4 @@ void DrawFilledRectangle(Rect rect, Color color);
 
 void DrawLine(Point A, Point B, Color color);
 
-#endif // !DRAWS_H
+//#endif // !DRAWS_H

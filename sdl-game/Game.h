@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GAME_H
-#define GAME_H
+//#ifndef GAME_H
+//#define GAME_H
 
 #include "GameObject.h"
 
@@ -12,4 +12,4 @@ void Start();
 void Render();
 
 
-#endif // !GAME_H
+//#endif // !GAME_H
