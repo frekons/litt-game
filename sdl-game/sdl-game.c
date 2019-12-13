@@ -5,6 +5,8 @@
 
 #include "Game.h"
 
+#include "Audio.h"
+
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
@@ -26,7 +28,7 @@ int main(int argc, char* argv[])
 
 	Start(); // don't use Game::GameObjects before this!
 
-	
+	MusicInitialize();
 
 	SDL_Event event;
 	while (true)

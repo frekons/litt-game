@@ -9,12 +9,14 @@
 
 #include "Collision.h"
 
+#include "Audio.h"
+
 
 GameObject* local_player = NULL;
 
-float gravity = 15.0f;
+float gravity = 20.0f;
 
-float jump_force = 5.0f, player_speed = 5.0f, player_accel = 12.0f;
+float jump_force = 7.0f, player_speed = 5.0f, player_accel = 12.0f;
 
 Vector2 local_player_velocity = { 0,0 };
 
@@ -119,6 +121,9 @@ void localplayer_start(GameObject* self)
 	self->health = 100;
 }
 
+Uint32 attack_cooldown = 700, attack_timer = 0;
+
+
 void localplayer_update(GameObject* self)
 {
 	GameObject* on_ground = is_on_platform(self);
@@ -131,7 +136,7 @@ void localplayer_update(GameObject* self)
 	}
 		
 
-	//Uint32 current_time = SDL_GetTicks();
+	Uint32 current_time = SDL_GetTicks();
 
 	//if (wait_time > current_time) return;
 
@@ -142,18 +147,27 @@ void localplayer_update(GameObject* self)
 	//	set_animator_state(self, "die", 5.0f);
 	//}
 
-	if (keystate[SDL_SCANCODE_F])
+	if (keystate[SDL_SCANCODE_F] && attack_timer <= current_time )
 	{
 		set_animator_state(self, "attack", 0.525f);
 
+		play_sound("resources/sounds/attack.wav");
+
+		attack_timer = current_time + attack_cooldown;
+
 		// GetInteractsOfCollider(box_col)
-		// TO DO, search for enemy and damage it
+		// TO DO, look for enemy and damage it
 	}
 
 	if (keystate[SDL_SCANCODE_SPACE] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_UP])
 	{
-		if(on_ground)
+		if (on_ground)
+		{
 			local_player_velocity.y = -jump_force;
+
+			play_sound("resources/sounds/jump.wav");
+		}
+			
 	}
 
 	if (keystate[SDL_SCANCODE_D] || keystate[SDL_SCANCODE_RIGHT])
@@ -193,10 +207,16 @@ void localplayer_update(GameObject* self)
 
 	GameObjectList list = GetInteractsExceptLayer(self, LAYER_GROUND);
 
-	
-	if (list.Count > 0 || (!is_on_platform(self) && GetInteracts(self).Count > 0))
+	GameObject* later_on_ground = is_on_platform(self);
+
+	if (list.Count > 0 || (!later_on_ground && GetInteracts(self).Count > 0))
 	{
 		self->transform->position.x -= local_player_velocity.x * player_speed;
+	}
+
+	if (!on_ground && later_on_ground)
+	{
+		play_sound("resources/sounds/landing.wav");
 	}
 
 }
