@@ -11,3 +11,4 @@ sdl-game/Debug/
 *.log
 
 .vs/
+*.vcxproj
