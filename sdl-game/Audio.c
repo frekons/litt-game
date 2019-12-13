@@ -11,6 +11,7 @@ Mix_Music* loadMusic(const char* music_file_dir)
 	{
 		printf("Failed to load music! Error: %s\n", Mix_GetError());
 	}
+
 	return main_music;
 }
 
@@ -67,10 +68,13 @@ Mix_Chunk* load_sound_effect(const char* sound_effect_file_dir)
 	}
 	return sound_effect;
 }
-void play_sound_effect(Mix_Chunk* sound_effect, const char* sound_effect_file_dir)
+
+Mix_Chunk* play_sound_effect(const char* sound_effect_file_dir)
 {
-	sound_effect = load_sound_effect(sound_effect_file_dir);
+	Mix_Chunk* sound_effect = load_sound_effect(sound_effect_file_dir);
 	Mix_PlayChannel(-1, sound_effect, 0);
+
+	return sound_effect;
 }
 
 void close_sound_effect(Mix_Chunk* sound_effect)

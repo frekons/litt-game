@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 
 
 //The music that will be played
@@ -25,7 +25,7 @@ void terminate_music();	// sanirim muzigi durdurmakla ayni islemi yapan bir fonk
 
 
 // SOUND EFFECTS
-void play_sound_effect(Mix_Chunk* sound_effect, const char* sound_effect_file_dir);
+Mix_Chunk* play_sound_effect(const char* sound_effect_file_dir);
 Mix_Chunk* load_sound_effect(const char* sound_effect_file_dir);	// play_sound_effect's subfunction
 void close_sound_effect(Mix_Chunk* sound_effect);	// free function
 
