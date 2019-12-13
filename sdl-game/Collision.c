@@ -3,7 +3,7 @@
 
 #include "Draws.h"
 
-#define DEBUG_COLLISION
+//#define DEBUG_COLLISION
 
 bool IsInteractingPoint(BoxCollider col, Point point) {
 	// offset is used as position
@@ -63,10 +63,13 @@ GameObjectList GetInteracts(GameObject* object)
 	col1.offset.y += object->transform->position.y;
 	col1.size.x *= object->transform->scale.x;
 	col1.size.y *= object->transform->scale.y;
+
+#ifdef DEBUG_COLLISION
 	DrawRectangle((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
+#endif
 
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
@@ -121,10 +124,13 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
 	col1.offset.y += object->transform->position.y;
 	col1.size.x *= object->transform->scale.x;
 	col1.size.y *= object->transform->scale.y;
+
+#ifdef DEBUG_COLLISION
 	DrawRectangle((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
+#endif
 
 	for (int i = 0; i < GameObjects.Count; i++)
 	{

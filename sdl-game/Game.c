@@ -121,12 +121,6 @@ void localplayer_start(GameObject* self)
 
 void localplayer_update(GameObject* self)
 {
-	Point camera_pos;
-	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2;
-	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2;
-
-	camera->position = vec2_lerp(camera->position, camera_pos, deltaTime * 10.0f);
-
 	GameObject* on_ground = is_on_platform(self);
 
 	if (!on_ground)
@@ -187,6 +181,11 @@ void localplayer_update(GameObject* self)
 		set_animator_state(self, "idle", 0);
 	}
 
+	Point camera_pos;
+	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2 + local_player_velocity.x * 150.0f;
+	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2 + local_player_velocity.y;
+
+	camera->position = vec2_lerp(camera->position, camera_pos, deltaTime * 5.0f);
 
 	self->transform->position.x += local_player_velocity.x * player_speed;
 	self->transform->position.y += local_player_velocity.y;
