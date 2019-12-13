@@ -12,3 +12,4 @@ sdl-game/Debug/
 *.vcxproj
 
 .vs/
+*.vcxproj
