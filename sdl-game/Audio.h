@@ -25,8 +25,8 @@ void terminate_music();	// sanirim muzigi durdurmakla ayni islemi yapan bir fonk
 
 
 // SOUND EFFECTS
-int play_sound(const char* sound_effect_file_dir);
-Mix_Chunk* load_sound(const char* sound_effect_file_dir);	// play_sound_effect's subfunction
+int play_sound(char* sound_effect_file_dir);
+Mix_Chunk* load_sound(char* sound_effect_file_dir);	// play_sound_effect's subfunction
 void close_sound_effect(Mix_Chunk* sound_effect);	// free function
 
 

@@ -107,7 +107,7 @@ bool is_collides_except(GameObject* self, GameObject* except)
 	for (int i = 0; i < list.Count; i++)
 	{
 		if (list.List[i] == except)
-			return;
+			return false;
 
 		result = true;
 		break;

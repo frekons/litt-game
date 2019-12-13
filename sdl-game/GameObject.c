@@ -55,6 +55,8 @@ GameObject* GameObject_New(Point position, Vector2 scale, BoxCollider collider, 
 	add_game_object_to_list(&GameObjects, self);
 
 	GameObject_Start(self);
+
+	return self;
 }
 
 void GameObject_Start(GameObject* self)

@@ -137,7 +137,7 @@ Mix_Chunk* load_sound(char* sound_effect_file_dir)
 	return music->music;
 }
 
-int play_sound(const char* sound_effect_file_dir)
+int play_sound(char* sound_effect_file_dir)
 {
 	Mix_Chunk* sound_effect = load_sound(sound_effect_file_dir);
 
