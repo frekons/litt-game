@@ -146,6 +146,7 @@ void localplayer_update(GameObject* self)
 	{
 		set_animator_state(self, "attack", 0.525f);
 
+		// GetInteractsOfCollider(box_col)
 		// TO DO, search for enemy and damage it
 	}
 
