@@ -1,9 +1,11 @@
 #pragma once
 
-#ifndef STRUCTS_H
-#define STRUCTS_H
+//#ifndef STRUCTS_H
+//#define STRUCTS_H
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
+
 
 struct SIntList {
 
@@ -19,7 +21,7 @@ void initialize_int_list(IntList * list);
 void add_int_to_list(IntList * list, int member);
 
 
-typedef struct Vector2 {
+typedef struct SVector2 {
 	float x, y;
 }Vector2;
 
@@ -34,6 +36,8 @@ typedef struct SSize Size;
 typedef struct SDL_Rect Rect;
 
 typedef struct SDL_FPoint Point;
+
+Point create_point(float x, float y);
 
 
 Rect create_rect(int x, int y, int w, int h);
@@ -50,14 +54,99 @@ typedef struct SColor Color;
 Color create_color(int r, int g, int b, int a);
 
 
-
-struct SImage {
+typedef struct SImage {
 	SDL_Texture* texture;
 	Rect rect;
+
+	bool sprite_sheet;
+	Vector2 clip_size;
+}Image;
+
+
+struct SBoxCollider
+{
+	Vector2 offset, size;
 };
 
-typedef struct SImage Image;
+typedef struct SBoxCollider BoxCollider;
 
 
+struct STransform {
+	Point position;
+	Vector2 scale;
+	bool left;
+	//GameObject* gameObject;
+};
 
-#endif
+typedef struct STransform Transform;
+
+typedef struct Animation {
+	char state_name[32];
+	IntList sprites;
+
+	bool loop;
+
+	int current_index;
+	int wait_frame, current_frame;
+}Animation;
+
+struct SAnimationList {
+
+	int Count;
+	Animation** List;
+
+};
+typedef struct SAnimationList AnimationList;
+
+
+typedef struct SCamera {
+
+	Point position;
+	int width, height;
+
+}Camera;
+
+typedef struct SGameObject {
+
+	int id;
+
+	Transform* transform;
+
+	BoxCollider collider;
+
+	Image *image;
+
+	AnimationList animations;
+
+	char current_state[32];
+
+	void* start;
+
+	void* update;
+
+	int layer;
+	int health;
+}GameObject;
+
+
+struct SGameObjectList {
+
+	int Count;
+	GameObject** List;
+
+};
+
+
+typedef struct SGameObjectList GameObjectList;
+
+
+typedef enum {
+
+	LAYER_NONE,
+	LAYER_GROUND,
+	LAYER_PLAYER
+
+};
+
+
+//#endif

@@ -6,7 +6,7 @@
 
 
 
-Image* LoadTexture(const char* path)
+Image* LoadTexture(const char* path, bool sprite_sheet, Vector2 clip_size)
 {
 	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
 	Rect rect;
@@ -18,6 +18,9 @@ Image* LoadTexture(const char* path)
 		Image* image = (Image*)malloc(sizeof(Image));
 		image->rect = rect;
 		image->texture = texture;
+
+		image->sprite_sheet = sprite_sheet;
+		image->clip_size = clip_size;
 
 		return image;
 	}
@@ -53,6 +56,8 @@ void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index, bool left)
 
 	clipRect.x = x_offset * clipRect.w;
 	clipRect.y = y_offset * clipRect.h;
+
+	
 
 	SDL_RenderCopyEx(renderer, image->texture, &clipRect, &rect, 0, NULL, left ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }

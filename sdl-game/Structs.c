@@ -1,5 +1,14 @@
 #include "Structs.h"
 
+
+Point create_point(float x, float y)
+{
+	Point vec2 = { x,y };
+
+	return vec2;
+}
+
+
 Vector2 create_vec2(float x, float y)
 {
 	Vector2 vec2 = { x,y };

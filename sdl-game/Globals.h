@@ -1,12 +1,11 @@
 #pragma once
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
-
-#include "Structs.h"
-#include <time.h>
+//#ifndef GLOBALS_H
+//#define GLOBALS_H
 
 #include <SDL2/SDL.h>
+
+#include "Structs.h"
 
 
 SDL_Window* game_window;
@@ -33,4 +32,4 @@ double deltaTime;
 
 
 
-#endif // !GLOBALS_H
+//#endif // !GLOBALS_H

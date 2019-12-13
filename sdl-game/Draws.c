@@ -11,6 +11,7 @@ void DrawRectangle(Rect rect, Color color)
 	SDL_RenderDrawRect(renderer, &rect);
 
 	set_render_color(temp_color);
+	
 }
 
 void DrawFilledRectangle(Rect rect, Color color)

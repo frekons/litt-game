@@ -1,6 +1,17 @@
-#include "Globals.h"
+#include "Common.h"
 
-#include <time.h>
+void GetDesktopResolution(int* horizontal, int* vertical) // https://stackoverflow.com/questions/8690619/how-to-get-screen-resolution-in-c
+{
+	RECT desktop;
+
+	const HWND hDesktop = GetDesktopWindow();
+
+	GetWindowRect(hDesktop, &desktop);
+
+	*horizontal = desktop.right;
+	*vertical = desktop.bottom;
+}
+
 
 void set_window_rect(int x, int y, int w, int h) {
 
@@ -38,9 +49,16 @@ void set_up_things()
 
 	SDL_Init(SDL_INIT_VIDEO);
 
-	set_window_rect(50, 50, 800, 600);
+	int screen_width = 800, screen_height = 600;
+
+	int windows_resolution_width, windows_resolution_height;
+	GetDesktopResolution(&windows_resolution_width, &windows_resolution_height);
+
+	set_window_rect(windows_resolution_width / 2 - screen_width / 2, windows_resolution_height / 2 - screen_height / 2, screen_width, screen_height);
 
 	game_window = SDL_CreateWindow("SDL-Game", window_rect.x, window_rect.y, window_rect.w, window_rect.h, SDL_WINDOW_OPENGL);
 
 	renderer = SDL_CreateRenderer(game_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+	camera = create_camera(screen_width, screen_height);
 }
