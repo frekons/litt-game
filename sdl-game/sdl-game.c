@@ -7,8 +7,6 @@
 
 #include "Audio.h"
 
-#include "Editor.h"
-
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
@@ -33,15 +31,12 @@ int main(int argc, char* argv[])
 
 	MusicInitialize();
 
-	//SDL_Surface* s = load_image("resources/environment/test.png");
-
 	SDL_Event event;
 	while (true)
 	{
 
 		__int64 time1, time2;
 		QueryPerformanceCounter((LARGE_INTEGER*)&time1);
-
 	
 		if (SDL_PollEvent(&event))
 		{
@@ -54,8 +49,6 @@ int main(int argc, char* argv[])
 		
 		// draw processes
 		renderable_state = true;
-
-		//process_pixel_data(s);
 
 		Render();
 
@@ -72,8 +65,6 @@ int main(int argc, char* argv[])
 
 		//SDL_Log("fps: %f\n", fps);
 	}
-
-	//SDL_FreeSurface(s);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game_window);

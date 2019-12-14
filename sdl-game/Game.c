@@ -111,7 +111,7 @@ void localplayer_update(GameObject* self)
 		{
 			self->velocity.y = 0;
 
-			if(keystate[SDL_SCANCODE_SPACE])
+			if (keystate[SDL_SCANCODE_SPACE])
 				self->velocity.y = -jump_force;
 
 		}
@@ -175,7 +175,7 @@ void localplayer_update(GameObject* self)
 void test_start(GameObject* self) {
 
 	self->health = 20;
-	
+
 	self->velocity = (Vector2) { 0, 0 };
 
 	self->attack_force = 20;
@@ -190,7 +190,7 @@ void test_start(GameObject* self) {
 
 
 void test_update(GameObject * self) {
-	
+
 
 }
 
@@ -316,7 +316,7 @@ void Render()
 
 
 	////////////
-	for (int i = (int)pow(2, sizeof(LAYERS)-1); i != 1; i/=2)
+	for (int i = (int)pow(2, sizeof(LAYERS) - 1); i != 1; i /= 2)
 	{
 		GameObjectList list = GetObjectsOfLayer(i);
 
