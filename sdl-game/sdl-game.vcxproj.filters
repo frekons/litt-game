@@ -45,7 +45,7 @@
     <ClInclude Include="Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor.h">
+    <ClInclude Include="Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,7 +80,7 @@
     <ClCompile Include="Audio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editor.c">
+    <ClCompile Include="Time.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

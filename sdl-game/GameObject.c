@@ -4,6 +4,8 @@
 
 #include "Image.h"
 
+#include "Time.h"
+
 Camera* create_camera(int screen_width, int screen_height)
 {
 	Camera* cam = (Camera*)malloc(sizeof(Camera));
@@ -169,7 +171,7 @@ void delete_game_object_at(GameObjectList * list, int index)
 {
 	if (index < 0 || index >= list->Count) return;
 
-	free(list->List[index]);
+	GameObject* addr = list->List[index];
 
 	for (int i = index; i < list->Count - 1; i++)
 		list->List[i] = list->List[i + 1];
@@ -177,6 +179,8 @@ void delete_game_object_at(GameObjectList * list, int index)
 	list->Count--;
 
 	list->List = (GameObject**)realloc(list->List, list->Count * sizeof(GameObject*));
+
+	free(addr);
 }
 
 void delete_game_object_from_list(GameObjectList * list, GameObject* game_object)
@@ -207,4 +211,35 @@ void add_animation_to_list(AnimationList * list, Animation* game_object)
 	list->List = (Animation**)realloc(list->List, list->Count * sizeof(Animation*));
 
 	list->List[list->Count - 1] = game_object;
+}
+
+
+bool compare_animator_state(GameObject* self, char* state) // time is in seconds
+{
+	return strcmp(self->current_state, state) == 0;
+}
+
+
+bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move) // time is in seconds
+{
+	if (compare_animator_state(self, state))
+		return false;
+
+	if (ignore_move) // logical
+		self->ignore_movement = true;
+
+	float current_time = get_time();
+
+	if (self->ignore_movement_time > current_time) return false;
+
+	self->ignore_movement_time = current_time + time;
+
+	Animation* animation = get_animation_sprites(self, state);
+
+	if (animation)
+		animation->current_index = 0;
+
+	strcpy(self->current_state, state);
+
+	return true;
 }

@@ -25,6 +25,11 @@ Camera* create_camera(int screen_width, int screen_height);
 Animation * get_animation_sprites(GameObject* self, char* state);
 
 
+bool compare_animator_state(GameObject* self, char* state); // time is in seconds
+
+bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move); // time is in seconds
+
+
 
 GameObject* GameObject_New(Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update);
 

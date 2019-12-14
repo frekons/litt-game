@@ -23,4 +23,12 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask);
 
 Vector2 collider_center(BoxCollider col);
 
+
+GameObject* is_on_platform(GameObject* self, int platform_layermask, float tolerance);
+GameObject* is_on_something(GameObject* self, int platform_layermask, float tolerance);
+
+
+bool is_collides_except(GameObject* self, GameObject* except);
+
+
 //#endif

@@ -129,6 +129,14 @@ typedef struct SGameObject {
 	int health;
 
 	Vector2 velocity;
+
+	bool ignore_movement;
+	float ignore_movement_time;
+
+	int attack_force;
+	float attack_in_seconds, attack_in_seconds_counter, attack_time;
+
+	struct GameObject* last_object;
 }GameObject;
 
 
@@ -143,15 +151,16 @@ struct SGameObjectList {
 typedef struct SGameObjectList GameObjectList;
 
 
-typedef enum LAYERS{
+typedef enum{ // upper means top in rendering
 
-	LAYERS_NONE,
-	LAYERS_GROUND,
+	LAYERS_NONE = 0, // not rendering this
 	LAYERS_PLAYER,
 	LAYERS_ENEMY,
-};
+	LAYERS_GROUND,
 
-#define LAYER_NONE 1 << LAYERS_NONE
+}LAYERS;
+
+//#define LAYER_NONE 1 << LAYERS_NONE /* not rendering */
 #define LAYER_GROUND 1 << LAYERS_GROUND
 #define LAYER_PLAYER 1 << LAYERS_PLAYER
 #define LAYER_ENEMY 1 << LAYERS_ENEMY

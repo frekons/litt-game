@@ -47,7 +47,8 @@ GameObjectList GetInteractsOfCollider(BoxCollider col1, Point position)
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* go = GameObjects.List[i];
-
+		if (go == NULL)
+			continue;
 		BoxCollider col2 = go->collider;
 		col2.offset.x += go->transform->position.x;
 		col2.offset.y += go->transform->position.y;
@@ -83,7 +84,8 @@ GameObjectList GetInteracts(GameObject* object)
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* go = GameObjects.List[i];
-
+		if (go == NULL)
+			continue;
 		if (go == object) continue;
 
 		BoxCollider col2 = go->collider;
@@ -149,6 +151,9 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* go = GameObjects.List[i];
+
+		if (go == NULL)
+			continue;
 
 		if (go == object) continue;
 
@@ -221,7 +226,8 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* go = GameObjects.List[i];
-
+		if (go == NULL)
+			continue;
 		if (go == object) continue;
 
 		//int objLayerMask = (1 << go->layer);
@@ -274,4 +280,82 @@ Vector2 collider_center(BoxCollider collider)
 	Vector2 center = { collider.size.x / 2 + collider.offset.x, collider.size.y / 2 + collider.offset.y };
 
 	return center;
+}
+
+
+
+GameObject* is_on_platform(GameObject* self, int platform_layermask, float tolerance)
+{
+
+	GameObjectList list = GetInteracts(self);
+
+	for (int i = 0; i < list.Count; i++)
+		if (list.List[i] != NULL && (platform_layermask & list.List[i]->layer))
+		{
+			float foot_y = self->transform->position.y + self->collider.offset.y + self->collider.size.y * self->transform->scale.y;
+
+			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
+
+			if (float_compare(foot_y, ground_y, tolerance)) // eðer ayaðýn platformun üstündeyse
+			{
+				self->transform->position.y = ground_y - (self->collider.offset.y + self->collider.size.y * self->transform->scale.y);
+
+				return list.List[i];
+			}
+
+		}
+
+
+
+
+	return NULL;
+}
+
+GameObject* is_on_something(GameObject* self, int layermask, float tolerance)
+{
+
+	GameObjectList list = GetInteractsOnlyLayer(self, layermask);
+
+	for (int i = 0; i < list.Count; i++)
+		if (list.List[i] != NULL)
+		{
+			float foot_y = self->transform->position.y + self->collider.offset.y + self->collider.size.y * self->transform->scale.y;
+
+			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
+
+			if (float_compare(foot_y, ground_y, tolerance)) // eðer ayaðýn platformun üstündeyse
+			{
+				return list.List[i];
+			}
+
+		}
+
+
+
+
+	return NULL;
+}
+
+
+
+bool is_collides_except(GameObject* self, GameObject* except)
+{
+	GameObjectList list = GetInteracts(self);
+
+	bool result = false;
+
+	for (int i = 0; i < list.Count; i++)
+	{
+		if (list.List[i] == NULL)
+			continue;
+
+		if (list.List[i] == except)
+			return false;
+
+		result = true;
+		break;
+	}
+
+
+	return result;
 }
