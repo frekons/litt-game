@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "Winmm.lib")
 
 
 #undef main
