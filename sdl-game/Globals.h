@@ -29,7 +29,7 @@ void set_up_things();
 
 double deltaTime;
 
-
+bool renderable_state;
 
 
 //#endif // !GLOBALS_H
