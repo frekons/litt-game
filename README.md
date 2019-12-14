@@ -4,4 +4,4 @@
 ###### Map Editor
 
 ### Bugs
-- When inside an enemy, you get stuck horizontally
+- Enemy not deleted when killed
