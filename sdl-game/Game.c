@@ -20,7 +20,6 @@ float gravity = 20.0f;
 
 float jump_force = 500.0f, player_speed = 5.0f, player_accel = 12.0f;
 
-Vector2 local_player_velocity = { 0,0 };
 
 int wait_time = 0;
 
@@ -31,17 +30,17 @@ bool compare_animator_state(GameObject* self, char* state) // time is in seconds
 	return strcmp(self->current_state, state) == 0;
 }
 
-void set_animator_state(GameObject* self, char* state, float time, bool ignore_move) // time is in seconds
+bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move) // time is in seconds
 {
 	if (compare_animator_state(self, state))
-		return;
+		return false;
 
 	if (ignore_move) // logical
 		ignore_movement = true;
 
 	Uint32 current_time = SDL_GetTicks();
 
-	if (wait_time > current_time) return;
+	if (wait_time > current_time) return false;
 
 	wait_time = current_time + time * 1000.0f;
 
@@ -51,6 +50,8 @@ void set_animator_state(GameObject* self, char* state, float time, bool ignore_m
 		animation->current_index = 0;
 
 	strcpy(self->current_state, state);
+
+	return true;
 }
 
 float clamp(float value, float min, float max)
@@ -126,6 +127,8 @@ void localplayer_start(GameObject* self)
 {
 	local_player = self;
 
+	self->velocity = (Vector2) { 0, 0 };
+
 	SDL_LogMessage(SDL_LOG_CATEGORY_TEST, SDL_LOG_PRIORITY_INFO, "Local Player has spawned!");
 
 	self->health = 100;
@@ -142,18 +145,23 @@ void attack(GameObject* self)
 	{
 		timer += deltaTime;
 
-		float forward = self->transform->left ? -16 / 68.0f : 1;
+		float x_size = (self->collider.size.x) * self->transform->scale.x;
+		float y_size = (self->collider.size.x) * self->transform->scale.y;
+
+		float forward = self->transform->left ? -16 / (x_size + 4) : 1;
 
 		BoxCollider boxcol;
-		boxcol.size = (Vector2) { 20, 20 };
-		boxcol.offset = (Vector2) { forward * 68, 32 };;
+		boxcol.size = (Vector2) { (x_size * 1.5f), y_size * 0.5f };
+		boxcol.offset = (Vector2) { forward * (x_size + 4), y_size * 0.5f };
 
 		bool to_break = false;
 
 		GameObjectList list = GetInteractsOfCollider(boxcol, self->transform->position);
 		for (int i = 0; i < list.Count; i++) {
+
 			if (list.List[i] == NULL)
 				continue;
+
 			GameObject* go = list.List[i];
 
 			if (go == self)
@@ -183,18 +191,20 @@ void localplayer_update(GameObject* self)
 
 	if (!on_ground)
 	{
-		if (local_player_velocity.y <= 15.0f)
-			local_player_velocity.y += deltaTime * gravity;
+		if (self->velocity.y <= 15.0f)
+			self->velocity.y += deltaTime * gravity;
 		
 			
 		if(keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
-			local_player_velocity.y += deltaTime * gravity;
+			self->velocity.y += deltaTime * gravity;
 	}
 	else
 	{
-		local_player_velocity.y = 0;
+		self->velocity.y = 0;
 	}
 		
+	if (self->health <= 0)
+		set_animator_state(self, "die", 10, true);
 
 	Uint32 current_time = SDL_GetTicks();
 
@@ -223,7 +233,7 @@ void localplayer_update(GameObject* self)
 	{
 		if (on_ground)
 		{
-			local_player_velocity.y = -jump_force * deltaTime;
+			self->velocity.y = -jump_force * deltaTime;
 
 			play_sound("resources/sounds/jump.wav");
 		}
@@ -234,8 +244,8 @@ void localplayer_update(GameObject* self)
 	{
 		self->transform->left = false;
 
-		local_player_velocity.x += deltaTime * player_accel;
-		local_player_velocity.x = clamp(local_player_velocity.x, -1, 1);
+		self->velocity.x += deltaTime * player_accel;
+		self->velocity.x = clamp(self->velocity.x, -1, 1);
 
 		set_animator_state(self, "run", 0, false);
 	}
@@ -243,27 +253,38 @@ void localplayer_update(GameObject* self)
 	{
 		self->transform->left = true;
 
-		local_player_velocity.x -= deltaTime * player_accel;
-		local_player_velocity.x = clamp(local_player_velocity.x, -1, 1);
+		self->velocity.x -= deltaTime * player_accel;
+		self->velocity.x = clamp(self->velocity.x, -1, 1);
 
 
 		set_animator_state(self, "run", 0, false);
 	}
 	else
 	{
-		local_player_velocity.x -= local_player_velocity.x * deltaTime * player_accel;
+		self->velocity.x -= self->velocity.x * deltaTime * player_accel;
 
 		set_animator_state(self, "idle", 0, false);
 	}
 
 	Point camera_pos;
-	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2 + local_player_velocity.x * 150.0f;
-	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2 + local_player_velocity.y - 75;
+	camera_pos.x = self->transform->position.x + self->image->clip_size.x * 2 + self->velocity.x * 150.0f;
+	camera_pos.y = self->transform->position.y - self->image->clip_size.y / 2 + self->velocity.y - 75;
 
-	camera->position = vec2_lerp(camera->position, camera_pos, 0.12f); // deltaTime should be used? (deltaTime causes screen shakes)
+	camera->position = point_lerp(camera->position, camera_pos, 0.12f); // deltaTime should be used? (deltaTime causes screen shakes)
 
-	self->transform->position.x += local_player_velocity.x * player_speed;
-	self->transform->position.y += local_player_velocity.y;
+	GameObjectList enemy_list;
+	if ((enemy_list = GetInteractsOnlyLayer(self, LAYER_ENEMY)).Count > 0)
+	{
+		float mine_x_center = self->transform->position.x + self->collider.size.x / 2 + self->collider.offset.x;
+		float enemy_x_center = enemy_list.List[0]->transform->position.x + enemy_list.List[0]->collider.size.x / 2 + enemy_list.List[0]->collider.offset.x;
+
+		//float speed = clamp( mine_x_center - enemy_x_center , -1, 1);
+		self->velocity.x += (enemy_list.List[0]->velocity.x) * deltaTime * 2.75f;
+		//self->velocity.y = speed * deltaTime * -10.0f;
+	}
+
+	self->transform->position.x += self->velocity.x * player_speed;
+	self->transform->position.y += self->velocity.y;
 
 	GameObjectList list = GetInteractsExceptLayer(self, LAYER_GROUND | LAYER_ENEMY);
 
@@ -271,7 +292,7 @@ void localplayer_update(GameObject* self)
 
 	if (list.Count > 0 || (!later_on_ground && GetInteracts(self).Count > 0))
 	{
-		self->transform->position.x -= local_player_velocity.x * player_speed;
+		self->transform->position.x -= self->velocity.x * player_speed;
 	}
 
 	if (!on_ground && later_on_ground)
@@ -285,7 +306,7 @@ void test_start(GameObject* self) {
 
 	self->health = 20;
 	
-
+	self->velocity = (Vector2) { 0, 0 };
 
 }
 
@@ -297,19 +318,55 @@ void destroy_after(GameObject* object)
 	
 }
 
+Uint32 test_enemy_attack_counter = 0;
+
 void test_update(GameObject * self) {
 	if (self->health > 0) {
-		float diff_x = local_player->transform->position.x - self->transform->position.x;
+		Vector2 mine_center = vec2_sum(self->transform->position, collider_center(self->collider));
+		Vector2 enemy_center = vec2_sum(local_player->transform->position, collider_center(local_player->collider));
+
+		Vector2 diff = vec2_minus(enemy_center, mine_center);
+
+		if (fabs(diff.x) > self->collider.size.x * 2 + 5) // 
+		{
+			float clampd = clamp(diff.x, -1, 1);
+
+			self->velocity.x = clampd * deltaTime * 100.0f;
 
 
-		self->transform->position.x += diff_x * deltaTime * 2;
-		set_animator_state(self, "run", 0, false);
-		if (diff_x < 0) {
-			self->transform->left = true;
+			set_animator_state(self, "run", 0, false);
 
+			if (diff.x < 0) {
+				self->transform->left = true;
+			}
+			else
+				self->transform->left = false;
 		}
 		else
-			self->transform->left = false;
+		{
+			self->velocity.x = 0;
+
+			if (fabs(diff.y) <= self->collider.size.y)
+			{
+				set_animator_state(self, "attack", 0, false);
+
+				Uint32 cur_time = SDL_GetTicks();
+
+				if (cur_time >= test_enemy_attack_counter)
+				{
+					create_thread(attack, self);
+					test_enemy_attack_counter = cur_time + 700;
+				}
+			}
+			else
+			{
+				set_animator_state(self, "idle", 0, false);
+			}
+
+		}
+
+		self->transform->position.x += self->velocity.x;
+		self->transform->position.y += self->velocity.y;
 	}
 
 
@@ -420,7 +477,7 @@ void Start()
 
 	image = LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 });
 	{
-		Point spawn_position = { 50,456 };
+		Point spawn_position = { 200,456 };
 		Vector2 spawn_scale = { 2.0f, 2.0f };
 
 		int animation_count = 4;

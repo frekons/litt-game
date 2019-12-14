@@ -127,6 +127,8 @@ typedef struct SGameObject {
 	int layer;
 	
 	int health;
+
+	Vector2 velocity;
 }GameObject;
 
 

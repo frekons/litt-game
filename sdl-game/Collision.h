@@ -19,5 +19,8 @@ GameObjectList GetInteracts(GameObject* object);
 
 GameObjectList GetInteractsExceptLayer(GameObject* object, int layer);
 
+GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask);
+
+Vector2 collider_center(BoxCollider col);
 
 //#endif

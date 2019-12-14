@@ -8,7 +8,7 @@ float magnitude(Point point)
 	return sqrtf(point.x * point.x + point.y * point.y);
 }
 
-Point vec2_lerp(Point point1, Point point2, float time) // time is between 0, 1
+Point point_lerp(Point point1, Point point2, float time) // time is between 0, 1
 {
 	Point diff = { point2.x - point1.x, point2.y - point1.y };
 
@@ -28,4 +28,14 @@ Point vec2_lerp(Point point1, Point point2, float time) // time is between 0, 1
 void* create_thread(void* func, void* parameter) {
 
 	return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)func, parameter, 0, 0);
+}
+
+Vector2 vec2_sum(Point vec1, Vector2 vec2)
+{
+	return (Vector2) { vec1.x + vec2.x, vec1.y + vec2.y };
+}
+
+Vector2 vec2_minus(Vector2 vec1, Vector2 vec2)
+{
+	return (Vector2) { vec1.x - vec2.x, vec1.y - vec2.y };
 }
