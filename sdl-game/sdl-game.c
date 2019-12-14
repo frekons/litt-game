@@ -61,9 +61,11 @@ int main(int argc, char* argv[])
 
 		__int64 nanoseconds = (time2 - time1);
 
-		deltaTime = nanoseconds / 10000000.0;
+		deltaTime = nanoseconds / 10000.0;
 
-		int sleep_time = (0.0162f - deltaTime) * 1000;
+		int sleep_time = (int)(16.0 - deltaTime);
+
+		printf("%lf - %lf = %lf, sleep_time: %d\n", 16.0, deltaTime, (16.0 - deltaTime), sleep_time);
 
 		if (sleep_time > 0)
 			Sleep(sleep_time);

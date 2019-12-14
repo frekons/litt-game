@@ -99,7 +99,7 @@ void camera_position(GameObject* object)
 
 void localplayer_update(GameObject* self)
 {
-	printf("%f\n", deltaTime);
+	printf("FPS: %f\n", 1.0f / deltaTime);
 
 	if (self->health > 0) // alive
 	{
