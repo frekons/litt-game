@@ -20,7 +20,7 @@ GameObject* local_player = NULL;
 
 float gravity = 20.0f;
 
-float jump_force = 650.0f, player_speed = 4.0f, player_accel = 12.0f;
+float jump_force = 1000.0f, player_speed = 4.0f, player_accel = 12.0f;
 
 
 void attack(GameObject* self)
