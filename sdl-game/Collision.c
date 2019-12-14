@@ -5,7 +5,9 @@
 
 #include "Globals.h"
 
-//#define DEBUG_COLLISION
+#include "Utils.h"
+
+#define DEBUG_COLLISION
 
 bool IsInteractingPoint(BoxCollider col, Point point) {
 	// offset is used as position
@@ -68,10 +70,14 @@ GameObjectList GetInteracts(GameObject* object)
 	initialize_game_object_list(&list);
 
 	BoxCollider col1 = object->collider;
-	col1.offset.x += object->transform->position.x;
-	col1.offset.y += object->transform->position.y;
 	col1.size.x *= object->transform->scale.x;
 	col1.size.y *= object->transform->scale.y;
+
+	col1.offset.x *= object->transform->scale.x;
+	col1.offset.y *= object->transform->scale.y;
+
+	col1.offset.x += object->transform->position.x;
+	col1.offset.y += object->transform->position.y;
 
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
@@ -89,10 +95,16 @@ GameObjectList GetInteracts(GameObject* object)
 		if (go == object) continue;
 
 		BoxCollider col2 = go->collider;
-		col2.offset.x += go->transform->position.x;
-		col2.offset.y += go->transform->position.y;
+
+		col2.offset.x *= go->transform->scale.x;
+		col2.offset.y *= go->transform->scale.y;
+
 		col2.size.x *= go->transform->scale.x;
 		col2.size.y *= go->transform->scale.y;
+
+		col2.offset.x += go->transform->position.x;
+		col2.offset.y += go->transform->position.y;
+
 
 
 
@@ -134,10 +146,14 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 	initialize_game_object_list(&list);
 
 	BoxCollider col1 = object->collider;
-	col1.offset.x += object->transform->position.x;
-	col1.offset.y += object->transform->position.y;
 	col1.size.x *= object->transform->scale.x;
 	col1.size.y *= object->transform->scale.y;
+
+	col1.offset.x *= object->transform->scale.x;
+	col1.offset.y *= object->transform->scale.y;
+
+	col1.offset.x += object->transform->position.x;
+	col1.offset.y += object->transform->position.y;
 
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
@@ -163,10 +179,14 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 
 
 		BoxCollider col2 = go->collider;
-		col2.offset.x += go->transform->position.x;
-		col2.offset.y += go->transform->position.y;
+		col2.offset.x *= go->transform->scale.x;
+		col2.offset.y *= go->transform->scale.y;
+
 		col2.size.x *= go->transform->scale.x;
 		col2.size.y *= go->transform->scale.y;
+
+		col2.offset.x += go->transform->position.x;
+		col2.offset.y += go->transform->position.y;
 
 
 
@@ -209,10 +229,15 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 	initialize_game_object_list(&list);
 
 	BoxCollider col1 = object->collider;
-	col1.offset.x += object->transform->position.x;
-	col1.offset.y += object->transform->position.y;
+
 	col1.size.x *= object->transform->scale.x;
 	col1.size.y *= object->transform->scale.y;
+
+	col1.offset.x *= object->transform->scale.x;
+	col1.offset.y *= object->transform->scale.y;
+
+	col1.offset.x += object->transform->position.x;
+	col1.offset.y += object->transform->position.y;
 
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
@@ -235,10 +260,14 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 		if (!(go->layer & layer_mask)) continue;
 
 		BoxCollider col2 = go->collider;
-		col2.offset.x += go->transform->position.x;
-		col2.offset.y += go->transform->position.y;
+		col2.offset.x *= go->transform->scale.x;
+		col2.offset.y *= go->transform->scale.y;
+
 		col2.size.x *= go->transform->scale.x;
 		col2.size.y *= go->transform->scale.y;
+
+		col2.offset.x += go->transform->position.x;
+		col2.offset.y += go->transform->position.y;
 
 
 
@@ -275,38 +304,68 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 }
 
 
-Vector2 collider_center(BoxCollider collider)
+Vector2 collider_center(GameObject* go)
 {
-	Vector2 center = { collider.size.x / 2 + collider.offset.x, collider.size.y / 2 + collider.offset.y };
+	Vector2 center = { (go->collider.size.x / 2 + go->collider.offset.x) * go->transform->scale.x, (go->collider.size.y / 2 + go->collider.offset.y) * go->transform->scale.y };
 
 	return center;
 }
 
+Vector2 collider_left_down(GameObject* go)
+{
+	Vector2 left_down = { go->collider.offset.x * go->transform->scale.x, (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
+
+	return left_down;
+}
+
+Vector2 collider_left_up(GameObject* go)
+{
+	Vector2 left_down = { go->collider.offset.x * go->transform->scale.x, (go->collider.offset.y) * go->transform->scale.y };
+
+	return left_down;
+}
+
+Vector2 collider_right_down(GameObject* go)
+{
+	Vector2 right_down = { (go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
+
+	return right_down;
+}
+
+Vector2 collider_right_up(GameObject* go)
+{
+	Vector2 right_up = { (go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, (go->collider.offset.y) * go->transform->scale.y };
+
+	return right_up;
+}
 
 
 GameObject* is_on_platform(GameObject* self, int platform_layermask, float tolerance)
 {
 
-	GameObjectList list = GetInteracts(self);
+	GameObjectList list = GetInteractsOnlyLayer(self, platform_layermask);
 
 	for (int i = 0; i < list.Count; i++)
-		if (list.List[i] != NULL && (platform_layermask & list.List[i]->layer))
+	{
+		GameObject* go = list.List[i];
+
+		if (go != NULL)
 		{
-			float foot_y = self->transform->position.y + self->collider.offset.y + self->collider.size.y * self->transform->scale.y;
+			Vector2 col_left_down = collider_left_down(self);
 
-			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
+			Vector2 player_left_down = vec2_sum(self->transform->position, col_left_down);
 
-			if (float_compare(foot_y, ground_y, tolerance)) // eðer ayaðýn platformun üstündeyse
+			Vector2 ground_left_up = vec2_sum(go->transform->position, collider_left_up(go));
+
+			if (float_compare(player_left_down.y, ground_left_up.y, tolerance)) // eðer ayaðýn platformun üstündeyse
 			{
-				self->transform->position.y = ground_y - (self->collider.offset.y + self->collider.size.y * self->transform->scale.y);
+				self->transform->position.y = ground_left_up.y - col_left_down.y;
 
-				return list.List[i];
+				return go;
 			}
 
 		}
-
-
-
+	}
 
 	return NULL;
 }
@@ -317,18 +376,25 @@ GameObject* is_on_something(GameObject* self, int layermask, float tolerance)
 	GameObjectList list = GetInteractsOnlyLayer(self, layermask);
 
 	for (int i = 0; i < list.Count; i++)
-		if (list.List[i] != NULL)
+	{
+		GameObject* go = list.List[i];
+
+		if (go != NULL)
 		{
-			float foot_y = self->transform->position.y + self->collider.offset.y + self->collider.size.y * self->transform->scale.y;
+			Vector2 col_left_down = collider_left_down(self);
 
-			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
+			Vector2 player_left_down = vec2_sum(self->transform->position, col_left_down);
 
-			if (float_compare(foot_y, ground_y, tolerance)) // eðer ayaðýn platformun üstündeyse
+			Vector2 ground_left_up = vec2_sum(go->transform->position, collider_left_up(go));
+
+			if (float_compare(player_left_down.y, ground_left_up.y, tolerance)) // eðer ayaðýn platformun üstündeyse
 			{
-				return list.List[i];
+				return go;
 			}
 
 		}
+	}
+
 
 
 

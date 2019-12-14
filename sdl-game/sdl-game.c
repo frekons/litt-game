@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 #undef main
 
 
@@ -37,9 +38,6 @@ int main(int argc, char* argv[])
 	SDL_Event event;
 	while (true)
 	{
-		//__int64 freq;
-		//QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
-		//double nanoseconds_per_count = 1.0e9 / *(double*)&freq;
 
 		__int64 time1, time2;
 		QueryPerformanceCounter((LARGE_INTEGER*)&time1);
@@ -71,6 +69,8 @@ int main(int argc, char* argv[])
 		__int64 nanoseconds = (time2 - time1);
 
 		deltaTime = nanoseconds / 10000000.0;
+
+		//SDL_Log("fps: %f\n", fps);
 	}
 
 	//SDL_FreeSurface(s);

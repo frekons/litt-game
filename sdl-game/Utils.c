@@ -27,9 +27,41 @@ Point point_lerp(Point point1, Point point2, float time) // time is between 0, 1
 	return to_return;
 }
 
+Vector2 vec2_lerp(Vector2 point1, Vector2 point2, float time) // time is between 0, 1
+{
+	Vector2 diff = { point2.x - point1.x, point2.y - point1.y };
+
+	float magn = magnitude((Point) { diff.x, diff.y });
+
+	if (magn <= 0.1f)
+		return point2;
+
+	Vector2 to_return;
+
+	to_return.x = point1.x * (1 - time) + point2.x * time;
+	to_return.y = point1.y * (1 - time) + point2.y * time;
+
+	return to_return;
+}
+
+float float_lerp(float value1, float value2, float time) // time is between 0, 1
+{
+	return value1 * (1 - time) + value2 * time;
+}
+
 void* create_thread(void* func, void* parameter) {
 
 	return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)func, parameter, 0, 0);
+}
+
+Point point_sum(Point vec1, Vector2 vec2)
+{
+	return (Point) { vec1.x + vec2.x, vec1.y + vec2.y };
+}
+
+Vector2 vec2_multiplier(Vector2 vec1, float multiplier)
+{
+	return (Vector2) { vec1.x * multiplier, vec1.y * multiplier };
 }
 
 Vector2 vec2_sum(Point vec1, Vector2 vec2)

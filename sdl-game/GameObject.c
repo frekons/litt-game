@@ -6,6 +6,8 @@
 
 #include "Time.h"
 
+#include "Globals.h"
+
 Camera* create_camera(int screen_width, int screen_height)
 {
 	Camera* cam = (Camera*)malloc(sizeof(Camera));
@@ -122,7 +124,9 @@ void GameObject_Draw(GameObject* self)
 
 		DrawClipImage(self->image, rect, create_rect(0,0, self->image->clip_size.x, self->image->clip_size.y), animation->sprites.List[animation->current_index], self->transform->left);
 
-		if (++animation->current_frame >= animation->wait_frame)
+		float fps = 1.0f / deltaTime;
+
+		if ( ++animation->current_frame >= animation->wait_frame * (fps / 60.0f) )
 		{
 			animation->current_frame = 0;
 			animation->current_index++;

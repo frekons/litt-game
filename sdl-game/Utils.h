@@ -7,6 +7,14 @@
 
 Point point_lerp(Point point1, Point point2, float time);
 
+Vector2 vec2_lerp(Vector2 point1, Vector2 point2, float time);
+
+float float_lerp(float value1, float value2, float time); // time is between 0, 1
+
+Point point_sum(Point vec1, Vector2 vec2);
+
+Vector2 vec2_multiplier(Vector2 vec1, float multiplier);
+
 Vector2 vec2_sum(Point vec1, Vector2 vec2);
 
 Vector2 vec2_minus(Vector2 vec1, Vector2 vec2);

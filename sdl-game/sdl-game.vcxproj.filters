@@ -48,6 +48,9 @@
     <ClInclude Include="Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Editor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdl-game.c">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
