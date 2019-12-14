@@ -65,6 +65,17 @@ float clamp(float value, float min, float max)
 	return value;
 }
 
+float sign(float value)
+{
+	if (value > 0)
+		return 1;
+
+	if (value < 0)
+		return -1;
+
+	return value;
+}
+
 bool float_compare(float one, float two, float tolerance)
 {
 	if (one > two - tolerance && one < two + tolerance)
@@ -275,11 +286,11 @@ void localplayer_update(GameObject* self)
 	GameObjectList enemy_list;
 	if ((enemy_list = GetInteractsOnlyLayer(self, LAYER_ENEMY)).Count > 0)
 	{
-		float mine_x_center = self->transform->position.x + self->collider.size.x / 2 + self->collider.offset.x;
-		float enemy_x_center = enemy_list.List[0]->transform->position.x + enemy_list.List[0]->collider.size.x / 2 + enemy_list.List[0]->collider.offset.x;
+		Vector2 mine_center = vec2_sum(self->transform->position, collider_center(self->collider));
+		Vector2 enemy_center = vec2_sum(enemy_list.List[0]->transform->position, collider_center(enemy_list.List[0]->collider));
 
-		//float speed = clamp( mine_x_center - enemy_x_center , -1, 1);
-		self->velocity.x += (enemy_list.List[0]->velocity.x) * deltaTime * 2.75f;
+		float speed = sign( mine_center.x - enemy_center.x );
+		self->velocity.x += speed * (fabs(enemy_list.List[0]->velocity.x) > 1.0f ? fabs(enemy_list.List[0]->velocity.x) : 1.0f) * deltaTime * 2.75f;
 		//self->velocity.y = speed * deltaTime * -10.0f;
 	}
 
