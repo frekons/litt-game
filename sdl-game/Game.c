@@ -4,7 +4,7 @@
 #include "Draws.h"
 #include "GameObject.h"
 #include "Image.h"
-
+#include "Editor.h"
 #include "Utils.h"
 
 #include "Collision.h"
@@ -370,7 +370,7 @@ void Start()
 
 	Image* image = LoadTexture("resources/players/mario.png", true, create_vec2(16, 16)); // local_player creation
 	{
-		Point spawn_position = { 50,400 };
+		//Point spawn_position = { 50,400 };
 		Vector2 spawn_scale = { 2.0f, 2.0f };
 
 		int animation_count = 5;
@@ -451,7 +451,7 @@ void Start()
 			animations[4].wait_frame = 6;
 		}
 
-		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider) { 0, 0, image->clip_size.x, image->clip_size.y }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+		GameObject* gameObject = CreateObject(spawn_scale, (BoxCollider) { 0, 0, image->clip_size.x, image->clip_size.y }, LAYER_PLAYER, image, animations, animation_count, & localplayer_start, & localplayer_update); // spawning local player
 	}
 
 	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
