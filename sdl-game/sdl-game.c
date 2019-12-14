@@ -39,8 +39,10 @@ int main(int argc, char* argv[])
 	while (true)
 	{
 
-		__int64 time1, time2;
-		QueryPerformanceCounter((LARGE_INTEGER*)&time1);
+		//__int64 time1, time2;
+		//QueryPerformanceCounter((LARGE_INTEGER*)&time1);
+
+		DWORD start_time = timeGetTime();
 	
 		if (SDL_PollEvent(&event))
 		{
@@ -61,26 +63,31 @@ int main(int argc, char* argv[])
 		set_render_color(background_color);
 		SDL_RenderPresent(renderer);
 
-		QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+		//QueryPerformanceCounter((LARGE_INTEGER*)&time2);
 
-		__int64 nanoseconds = (time2 - time1);
+		//__int64 nanoseconds = (time2 - time1);
 
-		deltaTime = nanoseconds / 10000000.0;
+		//deltaTime = nanoseconds / 10000000.0;
 
-		int sleep_time = (int)((0.016 - deltaTime) * 1000);
+		DWORD end_time = timeGetTime();
 
-		printf("sleep_time: %d\n", sleep_time);
+		DWORD diff = end_time - start_time;
 
-		if (sleep_time > 0)
+		Uint32 sleep_time = 16 - diff;
+
+		if (sleep_time > 0 && sleep_time < 1000)
 		{
-			printf("sleep!\n");
-			SDL_Delay((Uint32)sleep_time);
+			SDL_Delay(sleep_time);
 
-			QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+			end_time = timeGetTime();
 
-			nanoseconds = (time2 - time1);
+			deltaTime = (end_time - start_time) / 1000.0f;
 
-			deltaTime = nanoseconds / 10000000.0;
+			//QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+
+			//nanoseconds = (time2 - time1);
+
+			//deltaTime = nanoseconds / 10000000.0;
 		}
 			
 

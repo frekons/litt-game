@@ -27,7 +27,7 @@ void set_render_color(Color color);
 void set_up_things();
 
 
-double deltaTime;
+float deltaTime;
 
 bool renderable_state;
 
