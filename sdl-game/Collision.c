@@ -34,7 +34,12 @@ GameObjectList GetInteractsOfCollider(BoxCollider col1, Point position)
 	col1.offset.x += position.x;
 	col1.offset.y += position.y;
 
-
+#ifdef DEBUG_COLLISION
+	DrawRectangle((Rect) {
+		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
+			col1.size.x, col1.size.y
+	}, (Color) { 255, 0, 0, 255 });
+#endif
 
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
