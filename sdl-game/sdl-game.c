@@ -63,6 +63,17 @@ int main(int argc, char* argv[])
 
 		deltaTime = nanoseconds / 10000000.0;
 
+		int sleep_time = (0.0162f - deltaTime) * 1000;
+
+		if (sleep_time > 0)
+			Sleep(sleep_time);
+
+		QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+
+		nanoseconds = (time2 - time1);
+
+		deltaTime = nanoseconds / 10000000.0;
+
 		//SDL_Log("fps: %f\n", fps);
 	}
 

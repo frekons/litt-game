@@ -99,6 +99,8 @@ void camera_position(GameObject* object)
 
 void localplayer_update(GameObject* self)
 {
+	printf("%f\n", deltaTime);
+
 	if (self->health > 0) // alive
 	{
 		const Uint8* keystate = SDL_GetKeyboardState(NULL);
