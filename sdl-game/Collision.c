@@ -3,6 +3,8 @@
 
 #include "Draws.h"
 
+#include "Globals.h"
+
 #define DEBUG_COLLISION
 
 bool IsInteractingPoint(BoxCollider col, Point point) {
@@ -35,7 +37,8 @@ GameObjectList GetInteractsOfCollider(BoxCollider col1, Point position)
 	col1.offset.y += position.y;
 
 #ifdef DEBUG_COLLISION
-	DrawRectangle((Rect) {
+	if (renderable_state)
+		DrawRectangle((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -70,7 +73,8 @@ GameObjectList GetInteracts(GameObject* object)
 	col1.size.y *= object->transform->scale.y;
 
 #ifdef DEBUG_COLLISION
-	DrawRectangle((Rect) {
+	if (renderable_state)
+		DrawRectangle((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -96,7 +100,8 @@ GameObjectList GetInteracts(GameObject* object)
 			add_game_object_to_list(&list, go);
 
 #ifdef DEBUG_COLLISION
-			DrawRectangle((Rect) {
+			if (renderable_state)
+				DrawRectangle((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 255, 0, 0, 255 });
@@ -105,7 +110,9 @@ GameObjectList GetInteracts(GameObject* object)
 		else
 		{
 #ifdef DEBUG_COLLISION
-			DrawRectangle((Rect) {
+			if (renderable_state)
+
+				DrawRectangle((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 0, 255, 0, 255 });
@@ -119,7 +126,7 @@ GameObjectList GetInteracts(GameObject* object)
 }
 
 
-GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
+GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 {
 	GameObjectList list;
 	initialize_game_object_list(&list);
@@ -131,7 +138,9 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
 	col1.size.y *= object->transform->scale.y;
 
 #ifdef DEBUG_COLLISION
-	DrawRectangle((Rect) {
+	if (renderable_state)
+
+		DrawRectangle((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -143,7 +152,7 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
 
 		if (go == object) continue;
 
-		if (go->layer == layer) continue;
+		if (go->layer & layer_mask) continue;
 
 		BoxCollider col2 = go->collider;
 		col2.offset.x += go->transform->position.x;
@@ -159,6 +168,8 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
 			add_game_object_to_list(&list, go);
 
 #ifdef DEBUG_COLLISION
+			if (renderable_state)
+
 			DrawRectangle((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
@@ -168,6 +179,8 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer)
 		else
 		{
 #ifdef DEBUG_COLLISION
+			if (renderable_state)
+
 			DrawRectangle((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y

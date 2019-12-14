@@ -51,9 +51,11 @@ int main(int argc, char* argv[])
 		SDL_RenderClear(renderer);
 		
 		// draw processes
+		renderable_state = true;
 
 		Render();
 
+		renderable_state = false;
 		// show
 		set_render_color(background_color);
 		SDL_RenderPresent(renderer);

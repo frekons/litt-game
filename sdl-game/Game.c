@@ -11,12 +11,14 @@
 
 #include "Audio.h"
 
+#include <Windows.h> // for threads
+
 
 GameObject* local_player = NULL;
 
 float gravity = 20.0f;
 
-float jump_force = 800.0f, player_speed = 5.0f, player_accel = 12.0f;
+float jump_force = 500.0f, player_speed = 5.0f, player_accel = 12.0f;
 
 Vector2 local_player_velocity = { 0,0 };
 
@@ -82,7 +84,7 @@ GameObject* is_on_platform(GameObject* self)
 
 			float ground_y = list.List[i]->transform->position.y + list.List[i]->collider.offset.y;
 
-			if (float_compare(foot_y, ground_y, 10)) // eðer ayaðýn platformun üstündeyse
+			if (float_compare(foot_y, ground_y, 16)) // eðer ayaðýn platformun üstündeyse
 			{
 				self->transform->position.y = ground_y - self->image->clip_size.y * self->transform->scale.y;
 
@@ -129,12 +131,60 @@ void localplayer_start(GameObject* self)
 Uint32 attack_cooldown = 700, attack_timer = 0;
 
 
+void attack(GameObject* self)
+{
+	float timer = 0;
+
+	while (timer <= 0.4f)
+	{
+		timer += deltaTime;
+
+		float forward = self->transform->left ? -16 / 68.0f : 1;
+
+		BoxCollider boxcol;
+		boxcol.size = (Vector2) { 20, 20 };
+		boxcol.offset = (Vector2) { forward * 68, 32 };;
+
+		bool to_break = false;
+
+		GameObjectList list = GetInteractsOfCollider(boxcol, self->transform->position);
+		for (int i = 0; i < list.Count; i++) {
+			GameObject* go = list.List[i];
+
+			if (go == self)
+				continue;
+
+			if (go->health > 0)
+				go->health -= 5;
+
+			to_break = true;
+
+			printf("dmg to %X, left health: %d\n", go, go->health);
+		}
+
+		if (to_break)
+			break;
+
+		Sleep((int)(deltaTime * 1000));
+	}
+}
+
+
 void localplayer_update(GameObject* self)
 {
+	const Uint8* keystate = SDL_GetKeyboardState(NULL);
+
 	GameObject* on_ground = is_on_platform(self);
 
 	if (!on_ground)
-		local_player_velocity.y += deltaTime * gravity;
+	{
+		if (local_player_velocity.y <= 15.0f)
+			local_player_velocity.y += deltaTime * gravity;
+		
+			
+		if(keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
+			local_player_velocity.y += deltaTime * gravity;
+	}
 	else
 	{
 		local_player_velocity.y = 0;
@@ -146,8 +196,6 @@ void localplayer_update(GameObject* self)
 	if (ignore_movement && wait_time > current_time) return;
 
 	ignore_movement = false;
-
-	const Uint8* keystate = SDL_GetKeyboardState(NULL);
 	
 	//if (keystate[SDL_SCANCODE_G])
 	//{
@@ -161,25 +209,8 @@ void localplayer_update(GameObject* self)
 		play_sound("resources/sounds/attack.wav");
 
 		attack_timer = current_time + attack_cooldown;
-		float forward = self->transform->left ? -12/68.0f : 1;
 
-		BoxCollider boxcol;
-		boxcol.size =(Vector2){ 20,20 };
-		boxcol.offset =(Vector2){ forward * 68,32 };
-
-
-
-		GameObjectList LIST = GetInteractsOfCollider(boxcol, self->transform->position);
-		for (int i = 0; i < LIST.Count; i++) {
-			GameObject* go = LIST.List[i];
-			if (go == self)
-				continue;
-
-			if (go->health > 0)
-				go->health -=5;
-			printf("dmg to %X\n", go);
-		}
-
+		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)attack, self, 0, 0);
 		// TO DO, look for enemy and damage it
 	}
 
@@ -229,7 +260,7 @@ void localplayer_update(GameObject* self)
 	self->transform->position.x += local_player_velocity.x * player_speed;
 	self->transform->position.y += local_player_velocity.y;
 
-	GameObjectList list = GetInteractsExceptLayer(self, LAYER_GROUND);
+	GameObjectList list = GetInteractsExceptLayer(self, LAYER_GROUND | LAYER_ENEMY);
 
 	GameObject* later_on_ground = is_on_platform(self);
 

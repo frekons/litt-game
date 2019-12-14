@@ -125,6 +125,7 @@ typedef struct SGameObject {
 	void* update;
 
 	int layer;
+	
 	int health;
 }GameObject;
 
