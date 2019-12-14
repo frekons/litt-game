@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Sound">
+      <UniqueIdentifier>{af18801d-6c7f-46b5-805b-60439e6247a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Sprites">
+      <UniqueIdentifier>{bda77e7a-8fcc-4d76-8e5c-53f0141ebd09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Environment">
+      <UniqueIdentifier>{256c15d9-bc88-4470-8501-2d0d6af2f805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Enemies">
+      <UniqueIdentifier>{fff0e481-9431-4446-b9b4-6ab5adaa8158}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h">
@@ -46,6 +58,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,5 +98,45 @@
     <ClCompile Include="Time.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Editor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\sounds\attack.wav">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+    <Media Include="resources\sounds\coin.wav">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+    <Media Include="resources\sounds\jump.wav">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+    <Media Include="resources\sounds\kill.wav">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+    <Media Include="resources\sounds\unk.wav">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\players\mario.png">
+      <Filter>Resource Files\Sprites</Filter>
+    </Image>
+    <Image Include="resources\players\player-spritesheet.png">
+      <Filter>Resource Files\Sprites</Filter>
+    </Image>
+    <Image Include="resources\players\spritePlayer.png">
+      <Filter>Resource Files\Sprites</Filter>
+    </Image>
+    <Image Include="resources\environment\ground.png">
+      <Filter>Resource Files\Environment</Filter>
+    </Image>
+    <Image Include="resources\environment\test.png">
+      <Filter>Resource Files\Environment</Filter>
+    </Image>
+    <Image Include="resources\enemies\enemy3.png">
+      <Filter>Resource Files\Enemies</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -9,10 +9,11 @@ void process_pixel_data(SDL_Surface* surface)
 
     for (int y = 0; y < surface->h; y++) {
         for (int x = 0; x < surface->w; x++) {
-            //SDL_GetRGBA(get_pixel_data(surface,x,y), &surface->format, &red, &green, &blue, &alpha);
+            SDL_GetRGBA(get_pixel_data(surface,x,y), surface->format, &red, &green, &blue, &alpha);
 
-            if (red == 0 && green == 38 && blue == 255)
+            if (red == 0 && green == 38 && blue == 255) {
                 printf("player");
+            }
         }
     }
 }
