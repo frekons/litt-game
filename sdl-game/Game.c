@@ -78,7 +78,7 @@ GameObject* is_on_platform(GameObject* self)
 	GameObjectList list = GetInteracts(self);
 
 	for (int i = 0; i < list.Count; i++)
-		if (LAYER_GROUND == list.List[i]->layer)
+		if (list.List[i] != NULL && LAYER_GROUND == list.List[i]->layer)
 		{
 			float foot_y = self->transform->position.y + self->image->clip_size.y * self->transform->scale.y;
 
@@ -108,6 +108,9 @@ bool is_collides_except(GameObject* self, GameObject* except)
 
 	for (int i = 0; i < list.Count; i++)
 	{
+		if (list.List[i] == NULL)
+			continue;
+
 		if (list.List[i] == except)
 			return false;
 
@@ -149,6 +152,8 @@ void attack(GameObject* self)
 
 		GameObjectList list = GetInteractsOfCollider(boxcol, self->transform->position);
 		for (int i = 0; i < list.Count; i++) {
+			if (list.List[i] == NULL)
+				continue;
 			GameObject* go = list.List[i];
 
 			if (go == self)
@@ -286,11 +291,10 @@ void test_start(GameObject* self) {
 
 void destroy_after(GameObject* object)
 {
-	Sleep(5 * 1000);
+	Sleep(3 * 1000);
 
 	delete_game_object_from_list(&GameObjects, object);
 	
-	//free(object);
 }
 
 void test_update(GameObject * self) {

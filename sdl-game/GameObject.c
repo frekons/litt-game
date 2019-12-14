@@ -169,6 +169,8 @@ void delete_game_object_at(GameObjectList * list, int index)
 {
 	if (index < 0 || index >= list->Count) return;
 
+	free(list->List[index]);
+
 	for (int i = index; i < list->Count - 1; i++)
 		list->List[i] = list->List[i + 1];
 
