@@ -1,5 +1,7 @@
 #include "Structs.h"
 
+#include <Windows.h>
+
 
 float magnitude(Point point)
 {
@@ -21,4 +23,9 @@ Point vec2_lerp(Point point1, Point point2, float time) // time is between 0, 1
 	to_return.y = point1.y * (1 - time) + point2.y * time;;
 
 	return to_return;
+}
+
+void* create_thread(void* func, void* parameter) {
+
+	return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)func, parameter, 0, 0);
 }

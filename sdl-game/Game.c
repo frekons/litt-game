@@ -210,7 +210,7 @@ void localplayer_update(GameObject* self)
 
 		attack_timer = current_time + attack_cooldown;
 
-		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)attack, self, 0, 0);
+		create_thread(attack, self);
 		// TO DO, look for enemy and damage it
 	}
 
@@ -284,6 +284,15 @@ void test_start(GameObject* self) {
 
 }
 
+void destroy_after(GameObject* object)
+{
+	Sleep(5 * 1000);
+
+	delete_game_object_from_list(&GameObjects, object);
+	
+	//free(object);
+}
+
 void test_update(GameObject * self) {
 	if (self->health > 0) {
 		float diff_x = local_player->transform->position.x - self->transform->position.x;
@@ -300,8 +309,11 @@ void test_update(GameObject * self) {
 	}
 
 
-	if (self->health <= 0)
+	if (self->health <= 0 && !compare_animator_state(self, "die"))
+	{
+		create_thread(destroy_after, self);
 		set_animator_state(self, "die", 0, false);
+	}
 
 }
 
