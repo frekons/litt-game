@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		deltaTime = nanoseconds / 10000000.0;
 	}
 
-	SDL_FreeSurface(s);
+	//SDL_FreeSurface(s);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game_window);
