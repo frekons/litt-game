@@ -144,7 +144,8 @@ typedef enum {
 
 	LAYER_NONE,
 	LAYER_GROUND,
-	LAYER_PLAYER
+	LAYER_PLAYER,
+	LAYER_ENEMY,
 
 };
 

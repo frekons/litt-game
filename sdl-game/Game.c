@@ -16,7 +16,7 @@ GameObject* local_player = NULL;
 
 float gravity = 20.0f;
 
-float jump_force = 350.0f, player_speed = 5.0f, player_accel = 12.0f;
+float jump_force = 800.0f, player_speed = 5.0f, player_accel = 12.0f;
 
 Vector2 local_player_velocity = { 0,0 };
 
@@ -156,13 +156,30 @@ void localplayer_update(GameObject* self)
 
 	if ( keystate[SDL_SCANCODE_F] && attack_timer <= current_time )
 	{
-		set_animator_state(self, "attack", 0.525f, true);
+		set_animator_state(self, "attack", 0.525f, false);
 
 		play_sound("resources/sounds/attack.wav");
 
 		attack_timer = current_time + attack_cooldown;
+		float forward = self->transform->left ? -12/68.0f : 1;
 
-		// GetInteractsOfCollider(box_col)
+		BoxCollider boxcol;
+		boxcol.size =(Vector2){ 20,20 };
+		boxcol.offset =(Vector2){ forward * 68,32 };
+
+
+
+		GameObjectList LIST = GetInteractsOfCollider(boxcol, self->transform->position);
+		for (int i = 0; i < LIST.Count; i++) {
+			GameObject* go = LIST.List[i];
+			if (go == self)
+				continue;
+
+			if (go->health > 0)
+				go->health -=5;
+			printf("dmg to %X\n", go);
+		}
+
 		// TO DO, look for enemy and damage it
 	}
 
@@ -228,12 +245,40 @@ void localplayer_update(GameObject* self)
 
 }
 
+void test_start(GameObject* self) {
+
+	self->health = 20;
+	
+
+
+}
+
+void test_update(GameObject * self) {
+	if (self->health > 0) {
+		float diff_x = local_player->transform->position.x - self->transform->position.x;
+
+
+		self->transform->position.x += diff_x * deltaTime * 2;
+		set_animator_state(self, "run", 0, false);
+		if (diff_x < 0) {
+			self->transform->left = true;
+
+		}
+		else
+			self->transform->left = false;
+	}
+
+
+	if (self->health <= 0)
+		set_animator_state(self, "die", 0, false);
+
+}
 
 void Start()
 {
 	initialize_game_object_list(&GameObjects);
 	//
-	
+
 	Image* image = LoadTexture("resources/players/spritePlayer.png", true, create_vec2(32, 32)); // local_player creation
 	{
 		Point spawn_position = { 50,400 };
@@ -318,13 +363,109 @@ void Start()
 			animations[3].wait_frame = 6;
 		}
 
-		
-		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider){0,0, image->clip_size.x, image->clip_size.y}, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
-	} 
+
+		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider) { image->clip_size.x / 2, 0, image->clip_size.x/2, image->clip_size.y }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+	}
 
 	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
 
 	GameObject_New(create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 20, image->rect.w, image->rect.h - 20 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
+
+	image = LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 });
+	{
+		Point spawn_position = { 50,456 };
+		Vector2 spawn_scale = { 2.0f, 2.0f };
+
+		int animation_count = 4;
+
+		Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+		strcpy(animations[0].state_name, "idle");
+		{
+			initialize_int_list(&animations[0].sprites);
+
+			add_int_to_list(&animations[0].sprites, 0);
+			add_int_to_list(&animations[0].sprites, 1);
+			add_int_to_list(&animations[0].sprites, 2);
+			add_int_to_list(&animations[0].sprites, 3);
+			add_int_to_list(&animations[0].sprites, 4);
+			add_int_to_list(&animations[0].sprites, 5);
+			add_int_to_list(&animations[0].sprites, 6);
+			add_int_to_list(&animations[0].sprites, 7);
+			add_int_to_list(&animations[0].sprites, 8);
+			add_int_to_list(&animations[0].sprites, 9);
+			add_int_to_list(&animations[0].sprites, 10);
+			add_int_to_list(&animations[0].sprites, 11);
+			add_int_to_list(&animations[0].sprites, 12);
+			animations[0].loop = true;
+
+			animations[0].current_index = 0;
+			animations[0].current_frame = 0;
+			animations[0].wait_frame = 6;
+		}
+
+		strcpy(animations[1].state_name, "run");
+		{
+			initialize_int_list(&animations[1].sprites);
+
+			add_int_to_list(&animations[1].sprites, 13);
+			add_int_to_list(&animations[1].sprites, 14);
+			add_int_to_list(&animations[1].sprites, 15);
+			add_int_to_list(&animations[1].sprites, 16);
+			add_int_to_list(&animations[1].sprites, 17);
+			add_int_to_list(&animations[1].sprites, 18);
+			add_int_to_list(&animations[1].sprites, 19);
+			add_int_to_list(&animations[1].sprites, 20);
+
+			animations[1].loop = true;
+
+			animations[1].current_index = 0;
+			animations[1].current_frame = 0;
+			animations[1].wait_frame = 6;
+		}
+
+		strcpy(animations[2].state_name, "attack");
+		{
+			initialize_int_list(&animations[2].sprites);
+
+			add_int_to_list(&animations[2].sprites, 39);
+			add_int_to_list(&animations[2].sprites, 40);
+			add_int_to_list(&animations[2].sprites, 41);
+			add_int_to_list(&animations[2].sprites, 42);	
+			add_int_to_list(&animations[2].sprites, 43);
+			add_int_to_list(&animations[2].sprites, 44);
+			add_int_to_list(&animations[2].sprites, 45);
+
+			animations[2].loop = true;
+
+			animations[2].current_index = 0;
+			animations[2].current_frame = 0;
+			animations[2].wait_frame = 6;
+		}
+
+		strcpy(animations[3].state_name, "die");
+		{
+			initialize_int_list(&animations[3].sprites);
+
+			add_int_to_list(&animations[3].sprites, 91);
+			add_int_to_list(&animations[3].sprites, 92);
+			add_int_to_list(&animations[3].sprites, 93);
+			add_int_to_list(&animations[3].sprites, 94);
+			add_int_to_list(&animations[3].sprites, 95);
+			add_int_to_list(&animations[3].sprites, 96);
+			add_int_to_list(&animations[3].sprites, 97);
+
+			animations[3].loop = false;
+
+			animations[3].current_index = 0;
+			animations[3].current_frame = 0;
+			animations[3].wait_frame = 6;
+		}
+
+
+		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider) {14,17,15,22}, LAYER_ENEMY, image, animations, animation_count, &test_start, &test_update); // spawning local player
+	}
+
 
 }
 
