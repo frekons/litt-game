@@ -370,7 +370,7 @@ void Start()
 
 	Image* image = LoadTexture("resources/players/mario.png", true, create_vec2(16, 16)); // local_player creation
 	{
-		Point spawn_position = { 50,400 };
+		//Point spawn_position = { 50,400 };
 		Vector2 spawn_scale = { 2.0f, 2.0f };
 
 		int animation_count = 5;
