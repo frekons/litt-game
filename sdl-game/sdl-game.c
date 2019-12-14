@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#pragma comment(lib, "ws2_32.lib")
+
 
 #undef main
 
@@ -30,6 +32,8 @@ int main(int argc, char* argv[])
 	Start(); // don't use Game::GameObjects before this!
 
 	MusicInitialize();
+
+	deltaTime = 0.016;
 
 	SDL_Event event;
 	while (true)
@@ -61,20 +65,24 @@ int main(int argc, char* argv[])
 
 		__int64 nanoseconds = (time2 - time1);
 
-		deltaTime = nanoseconds / 10000.0;
+		deltaTime = nanoseconds / 10000000.0;
 
-		int sleep_time = (int)(16.0 - deltaTime);
+		int sleep_time = (int)((0.016 - deltaTime) * 1000);
 
-		printf("%lf - %lf = %lf, sleep_time: %d\n", 16.0, deltaTime, (16.0 - deltaTime), sleep_time);
+		printf("sleep_time: %d\n", sleep_time);
 
 		if (sleep_time > 0)
-			Sleep(sleep_time);
+		{
+			printf("sleep!\n");
+			SDL_Delay((Uint32)sleep_time);
 
-		QueryPerformanceCounter((LARGE_INTEGER*)&time2);
+			QueryPerformanceCounter((LARGE_INTEGER*)&time2);
 
-		nanoseconds = (time2 - time1);
+			nanoseconds = (time2 - time1);
 
-		deltaTime = nanoseconds / 10000000.0;
+			deltaTime = nanoseconds / 10000000.0;
+		}
+			
 
 		//SDL_Log("fps: %f\n", fps);
 	}

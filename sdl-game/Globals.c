@@ -58,7 +58,7 @@ void set_up_things()
 
 	game_window = SDL_CreateWindow("SDL-Game", window_rect.x, window_rect.y, window_rect.w, window_rect.h, SDL_WINDOW_OPENGL);
 
-	renderer = SDL_CreateRenderer(game_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(game_window, -1, SDL_RENDERER_ACCELERATED);
 
 	camera = create_camera(screen_width, screen_height);
 }
