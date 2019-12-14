@@ -7,8 +7,6 @@
 
 #include "Audio.h"
 
-#include "Editor.h"
-
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
@@ -32,7 +30,6 @@ int main(int argc, char* argv[])
 
 	MusicInitialize();
 
-	SDL_Surface* s = load_image("resources/environment/test.png");
 	SDL_Event event;
 	while (true)
 	{
@@ -55,8 +52,6 @@ int main(int argc, char* argv[])
 		// draw processes
 		renderable_state = true;
 
-		
-
 		Render();
 
 		renderable_state = false;
@@ -70,8 +65,6 @@ int main(int argc, char* argv[])
 
 		deltaTime = nanoseconds / 10000000.0;
 	}
-
-	//SDL_FreeSurface(s);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(game_window);

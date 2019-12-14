@@ -1,21 +1,36 @@
 #include "Editor.h"
-#include <SDL2/SDL_image.h>
 
-void process_pixel_data(SDL_Surface* surface)
+#include <SDL2/SDL_image.h>
+#include <string.h>
+
+SDL_Surface* load_image(const char* file)
 {
+    SDL_Surface *surf = IMG_Load(file);
+
+    return surf;
+}
+
+Point process_pixel_data(SDL_Surface* surface, char* object) {
     Uint8 red, green, blue, alpha;
 
     int bpp = surface->format->BytesPerPixel;
 
     for (int y = 0; y < surface->h; y++) {
         for (int x = 0; x < surface->w; x++) {
-            SDL_GetRGBA(get_pixel_data(surface,x,y), surface->format, &red, &green, &blue, &alpha);
+            SDL_GetRGBA(get_pixel_data(surface, x, y), surface->format, &red, &green, &blue, &alpha);
 
-            if (red == 0 && green == 38 && blue == 255) {
-                printf("player");
+            if (red == 0 && green == 38 && blue == 255 && !memcmp(object,"player",6)) {
+                return (Point){ x*10, y*10};
             }
         }
     }
+}
+
+GameObject* CreateObject(Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update)
+{
+    SDL_Surface* surface = load_image("resources/environment/test.png");
+
+    return GameObject_New(process_pixel_data(surface,"player"), scale, collider, layer, image, animations, animations_size, start, update); 
 }
 
 Uint32 get_pixel_data(SDL_Surface* surface, int x, int y)
@@ -83,9 +98,4 @@ void put_pixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
     }
 }
 
-SDL_Surface* load_image(const char* file)
-{
-    SDL_Surface *surf = IMG_Load(file);
 
-    return surf;
-}
