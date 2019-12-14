@@ -143,14 +143,18 @@ struct SGameObjectList {
 typedef struct SGameObjectList GameObjectList;
 
 
-typedef enum {
+typedef enum LAYERS{
 
-	LAYER_NONE,
-	LAYER_GROUND,
-	LAYER_PLAYER,
-	LAYER_ENEMY,
-
+	LAYERS_NONE,
+	LAYERS_GROUND,
+	LAYERS_PLAYER,
+	LAYERS_ENEMY,
 };
+
+#define LAYER_NONE 1 << LAYERS_NONE
+#define LAYER_GROUND 1 << LAYERS_GROUND
+#define LAYER_PLAYER 1 << LAYERS_PLAYER
+#define LAYER_ENEMY 1 << LAYERS_ENEMY
 
 
 //#endif

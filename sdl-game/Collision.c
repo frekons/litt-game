@@ -152,7 +152,10 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 
 		if (go == object) continue;
 
-		if (go->layer & layer_mask) continue;
+		//int objLayerMask = (1 << go->layer);
+
+		if ((go->layer & layer_mask)) continue;
+
 
 		BoxCollider col2 = go->collider;
 		col2.offset.x += go->transform->position.x;
@@ -221,7 +224,9 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 
 		if (go == object) continue;
 
-		if (!(go->layer == layer_mask)) continue;
+		//int objLayerMask = (1 << go->layer);
+
+		if (!(go->layer & layer_mask)) continue;
 
 		BoxCollider col2 = go->collider;
 		col2.offset.x += go->transform->position.x;
