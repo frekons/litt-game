@@ -22,11 +22,11 @@ Camera* create_camera(int screen_width, int screen_height)
 }
 
 
-GameObject* GameObject_New(Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation *animations, int animations_size, void* start, void* update)
+GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation *animations, int animations_size, void* start, void* update)
 {
 	GameObject* self = (GameObject*)malloc(sizeof(GameObject));
 
-	self->id = GameObjects.Count;
+	self->id = id;
 
 	Transform *transform = (Transform*)malloc(sizeof(Transform));
 	//transform->gameObject = self;

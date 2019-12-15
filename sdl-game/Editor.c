@@ -3,6 +3,8 @@
 #include <SDL2/SDL_image.h>
 #include <string.h>
 
+#include "Game.h"
+
 SDL_Surface* load_image(const char* file)
 {
 	SDL_Surface *surf = IMG_Load(file);
@@ -30,7 +32,7 @@ GameObject* CreateObject(Vector2 scale, BoxCollider collider, int layer, Image* 
 {
 	SDL_Surface* surface = load_image("resources/environment/test.png");
 
-	return GameObject_New(process_pixel_data(surface, "player"), scale, collider, layer, image, animations, animations_size, start, update);
+	return GameObject_New(GameObjects.Count, process_pixel_data(surface, "player"), scale, collider, layer, image, animations, animations_size, start, update);
 }
 
 Uint32 get_pixel_data(SDL_Surface* surface, int x, int y)

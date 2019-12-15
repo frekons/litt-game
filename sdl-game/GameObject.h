@@ -31,7 +31,7 @@ bool set_animator_state(GameObject* self, char* state, float time, bool ignore_m
 
 
 
-GameObject* GameObject_New(Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update);
+GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update);
 
 void GameObject_Start(GameObject* self);
 
