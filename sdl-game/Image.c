@@ -11,22 +11,23 @@ Image* LoadTexture(const char* path, bool sprite_sheet, Vector2 clip_size)
 	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
 	Rect rect;
 
-	if (texture != NULL)
+	if (texture == NULL)
 	{
-		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-
-		Image* image = (Image*)malloc(sizeof(Image));
-		image->rect = rect;
-		image->texture = texture;
-
-		image->sprite_sheet = sprite_sheet;
-		image->clip_size = clip_size;
-
-		return image;
+		SDL_Log("Error when loading texture: '%s', error: %s\n", path, SDL_GetError());
+		return NULL;
 	}
-	
 
-	return NULL;
+	SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+
+	Image* image = (Image*)malloc(sizeof(Image));
+	image->rect = rect;
+	image->texture = texture;
+
+	image->sprite_sheet = sprite_sheet;
+	image->clip_size = clip_size;
+
+	return image;
+
 }
 
 
