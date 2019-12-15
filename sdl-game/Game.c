@@ -24,9 +24,41 @@ float jump_force = 6.0f, player_speed = 200.0f, player_accel = 0.15f;
 
 float on_ground_tolerance = 0.1f;
 
+void create_particle(GameObject* self){
+	Image* image = LoadTexture("resources/effects/particle.png", true, (Vector2) { 12, 12 });
+	int animation_count = 1;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	strcpy(animations[0].state_name, "idle");
+	{
+		initialize_int_list(&animations[0].sprites);
+
+		add_int_to_list(&animations[0].sprites, 0);
+		add_int_to_list(&animations[0].sprites, 1);
+		add_int_to_list(&animations[0].sprites, 2);
+		add_int_to_list(&animations[0].sprites, 3);
+
+
+		animations[0].loop = false;
+
+		animations[0].current_index = 0;
+		animations[0].current_frame = 0;
+		animations[0].wait_frame = 6;
+	}
+	Point ammopos;
+	ammopos.x = self->transform->position.x+(self->velocity.x*deltaTime);
+	ammopos.y = self->transform->position.y;
+
+	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 0 , 0}, LAYER_EFFECTS, image, animations, animation_count, 0, 0);
+	destroy_after(ammo, 0.5f);
+
+}
 
 void ammo_start(GameObject* self) {
 
+	destroy_after(self, 10);
+	
 }
 
 void ammo_update(GameObject* self) {
@@ -44,6 +76,8 @@ void ammo_update(GameObject* self) {
 		
 		if (go->health > 0)
 			go->health -= self->attack_force;
+
+		create_particle(self);
 
 		destroy_after(self, 0);
 
@@ -77,14 +111,10 @@ void create_ammo(GameObject * self) {
 	ammopos.x = self->transform->position.x + (self->transform->left ? -5 : 89);
 	ammopos.y = self->transform->position.y + 30;
 	
-	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 1, 1 }, (BoxCollider) { 0, 0, 12, 12 }, LAYERS_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
+	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 1, 1 }, (BoxCollider) { 0, 0, 12, 12 }, LAYER_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
 	ammo->owner = self;
 	ammo->velocity.x = 200 * (self->transform->left ? -1 : 1);
 	ammo->attack_force = self->attack_force;
-
-	
-
-
 
 } 
 
@@ -261,7 +291,7 @@ void localplayer_update(GameObject* self)
 
 			if (keystate[SDL_SCANCODE_Z] && self->dash_in_seconds_counter <= cur_time) // dash
 			{
-				//set_animator_state(self, "dash", 0.35f, true);
+				set_animator_state(self, "dash", 0.35f, true);
 
 				self->extra_velocity.x = ( self->transform->left ? -1.0f : 1.0f ) * self->dash_force;
 
@@ -279,7 +309,7 @@ void localplayer_update(GameObject* self)
 		self->transform->position = point_sum(self->transform->position, vec2_multiplier(vec2_sum((Point) { self->velocity.x, self->velocity.y }, self->extra_velocity), deltaTime * player_speed));
 
 		//
-		GameObjectList interact_list = GetInteracts(self);
+		GameObjectList interact_list = GetInteractsExceptLayer(self,LAYER_ENEMY);
 
 		GameObject* later_on_ground = is_on_platform(self, LAYER_GROUND|LAYER_EFFECTS, on_ground_tolerance);
 
@@ -319,9 +349,9 @@ void localplayer_update(GameObject* self)
 
 }
 
-void test_start(GameObject* self) {
+void enemy_start(GameObject* self) {
 
-	self->health = 20;
+	self->health = 50;
 
 	self->velocity = (Vector2) { 0, 0 };
 
@@ -335,11 +365,66 @@ void test_start(GameObject* self) {
 	self->ignore_movement = false;
 }
 
+void create_enemy(void);
 
-void test_update(GameObject * self) {
 
+void enemy_update(GameObject * self) {
+	
+	static float angle = 0;
+	float value = cosf((angle += deltaTime * 10) * 3.14159265359 / 180) * 200;
+	self->transform->position.x = 200+sinf((angle += deltaTime * 10) * 3.14159265359 / 180) * 200;
+	if (value < 0)
+		self->transform->left = true;
+	else
+		self->transform->left = false;
+
+	if (angle >= 360)
+		angle = 0;
+
+
+	if (self->health <= 0) {
+		angle = 0;
+		create_enemy();
+		destroy_object(self);
+		
+	}
+	printf("a\n");
+}
+
+
+void create_enemy(void){
+	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 64 , 64 });
+	int animation_count = 1;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	strcpy(animations[0].state_name, "idle");
+	{
+		initialize_int_list(&animations[0].sprites);
+
+		add_int_to_list(&animations[0].sprites, 8);
+		add_int_to_list(&animations[0].sprites, 9);
+		add_int_to_list(&animations[0].sprites, 10);
+		add_int_to_list(&animations[0].sprites, 11);
+
+
+		animations[0].loop = true;
+
+		animations[0].current_index = 0;
+		animations[0].current_frame = 0;
+		animations[0].wait_frame = 6;
+	}
+	Point enemypos;
+	enemypos.x = rand() % 100;
+	enemypos.y = 440;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 36, 64 }, LAYER_ENEMY, image, animations, animation_count,&enemy_start,&enemy_update);
+	
+	
+	
 
 }
+
 
 void Start()
 {
@@ -351,7 +436,7 @@ void Start()
 		Point spawn_position = { 50,400 };
 		Vector2 spawn_scale = { 2.0f, 2.0f };
 
-		int animation_count = 6;
+		int animation_count = 7;
 
 		Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
 
@@ -463,6 +548,20 @@ void Start()
 			animations[5].current_frame = 0;
 			animations[5].wait_frame = 6;
 		}
+		strcpy(animations[6].state_name, "dash");
+		{
+			initialize_int_list(&animations[6].sprites);
+
+			add_int_to_list(&animations[6].sprites, 34);
+
+
+
+			animations[6].loop = false;
+
+			animations[6].current_index = 0;
+			animations[6].current_frame = 0;
+			animations[6].wait_frame = 6;
+		}
 
 		
 
@@ -471,9 +570,9 @@ void Start()
 
 	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
 
-	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 20, image->rect.w, image->rect.h - 20 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
+	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-
+	create_enemy();
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
@@ -498,7 +597,8 @@ void Render()
 
 
 	////////////
-	for (int i = (int)pow(2, sizeof(LAYERS) - 1); i != 1; i /= 2)
+	
+	for (int i = (int)pow(2, 4); i != 1; i /= 2)
 	{
 		GameObjectList list = GetObjectsOfLayer(i);
 
