@@ -28,9 +28,9 @@ Point process_pixel_data(SDL_Surface* surface, char* object) {
 	}
 }
 
-GameObject* CreateObject(Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update)
+GameObject* CreateObject(char* file, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update)
 {
-	SDL_Surface* surface = load_image("resources/environment/test.png");
+	SDL_Surface* surface = load_image(file);
 
 	return GameObject_New(GameObjects.Count, process_pixel_data(surface, "player"), scale, collider, layer, image, animations, animations_size, start, update);
 }
