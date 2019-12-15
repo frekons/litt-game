@@ -128,13 +128,15 @@ typedef struct SGameObject {
 	
 	int health;
 
-	Vector2 velocity;
+	Vector2 velocity, extra_velocity;
 
 	bool ignore_movement;
 	float ignore_movement_time;
 
 	int attack_force;
-	float attack_in_seconds, attack_in_seconds_counter, attack_time;
+	float attack_in_seconds, attack_in_seconds_counter, attack_time; 
+
+	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
 	struct GameObject* last_object;
 }GameObject;

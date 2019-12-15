@@ -5,7 +5,12 @@
 #include <Windows.h>
 
 
-float magnitude(Point point)
+float point_magnitude(Point point)
+{
+	return sqrtf(point.x * point.x + point.y * point.y);
+}
+
+float vec2_magnitude(Vector2 point)
 {
 	return sqrtf(point.x * point.x + point.y * point.y);
 }
@@ -14,7 +19,7 @@ Point point_lerp(Point point1, Point point2, float time) // time is between 0, 1
 {
 	Point diff = { point2.x - point1.x, point2.y - point1.y };
 
-	float magn = magnitude(diff);
+	float magn = point_magnitude(diff);
 
 	if (magn <= 0.1f)
 		return point2;
@@ -31,7 +36,7 @@ Vector2 vec2_lerp(Vector2 point1, Vector2 point2, float time) // time is between
 {
 	Vector2 diff = { point2.x - point1.x, point2.y - point1.y };
 
-	float magn = magnitude((Point) { diff.x, diff.y });
+	float magn = point_magnitude((Point) { diff.x, diff.y });
 
 	if (magn <= 0.1f)
 		return point2;
@@ -43,6 +48,25 @@ Vector2 vec2_lerp(Vector2 point1, Vector2 point2, float time) // time is between
 
 	return to_return;
 }
+
+
+Vector2 vec2_movetowards(Vector2 point1, Vector2 point2, float speed)
+{
+	Vector2 a = vec2_minus(point2, point1);
+	float magn = vec2_magnitude(a);
+
+	if (magn <= speed || magn == 0.0f)
+	{
+		return point2;
+	}
+
+	Vector2 result;
+	result.x = point1.x + a.x / magn * speed;
+	result.y = point1.y + a.y / magn * speed;
+
+	return result;
+}
+
 
 float float_lerp(float value1, float value2, float time) // time is between 0, 1
 {

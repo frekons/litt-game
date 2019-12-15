@@ -7,7 +7,7 @@
 
 #include "Utils.h"
 
-#define DEBUG_COLLISION
+//#define DEBUG_COLLISION
 
 bool IsInteractingPoint(BoxCollider col, Point point) {
 	// offset is used as position

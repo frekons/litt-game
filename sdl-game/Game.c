@@ -18,9 +18,9 @@
 
 GameObject* local_player = NULL;
 
-float gravity = 0.2f;
+float gravity = 0.15f;
 
-float jump_force = 3.5f, player_speed = 180.0f, player_accel = 0.25f;
+float jump_force = 3.0f, player_speed = 190.0f, player_accel = 0.15f;
 
 
 void attack(GameObject* self)
@@ -75,15 +75,20 @@ void localplayer_start(GameObject* self)
 	local_player = self;
 
 	self->velocity = (Vector2) { 0, 0 };
+	self->extra_velocity = (Vector2) { 0, 0 };
 
 	self->health = 100;
 
 	self->attack_force = 10;
-	self->attack_in_seconds = 0.7f;
+	self->attack_in_seconds = 0.6f;
 	self->attack_time = 0.4f;
+
+	self->dash_in_seconds = 1.0f;
+	self->dash_force = 3.0f;
 
 
 	self->attack_in_seconds_counter = 0;
+	self->dash_in_seconds_counter = 0;
 	self->ignore_movement_time = 0;
 	self->ignore_movement = false;
 }
@@ -97,9 +102,22 @@ void camera_position(GameObject* object)
 	camera->position = position;
 }
 
+//void dash(GameObject* self)
+//{
+//	float start_time = get_time();
+//	float cur_time = start_time;
+//
+//	while (start_time + self->dash_time >= cur_time)
+//	{
+//		self->
+//
+//		Sleep(deltaTime);
+//	}
+//}
+
 void localplayer_update(GameObject* self)
 {
-	printf("FPS: %f\n", 1.0f / deltaTime);
+	float cur_time = get_time();
 
 	if (self->health > 0) // alive
 	{
@@ -113,7 +131,7 @@ void localplayer_update(GameObject* self)
 		{
 			self->velocity.y = 0;
 
-			if (keystate[SDL_SCANCODE_SPACE])
+			if (keystate[SDL_SCANCODE_UP])
 				self->velocity.y = -jump_force;
 
 		}
@@ -122,22 +140,47 @@ void localplayer_update(GameObject* self)
 			self->velocity.y += gravity;
 		}
 
-
-		if (keystate[SDL_SCANCODE_RIGHT])
+		if (!(self->ignore_movement && self->ignore_movement_time > cur_time))
 		{
-			self->transform->left = false;
+			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
+			{
+				set_animator_state(self, "shoot", 0.35f, true);
 
-			self->velocity.x = clamp(self->velocity.x + player_accel, -1.0f, 1.0f);
+				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
+			}
 
-			set_animator_state(self, "run", 0, 0);
-		}
-		else if (keystate[SDL_SCANCODE_LEFT])
-		{
-			self->transform->left = true;
+			if (keystate[SDL_SCANCODE_RIGHT])
+			{
+				self->transform->left = false;
 
-			self->velocity.x = clamp(self->velocity.x - player_accel, -1.0f, 1.0f);
+				self->velocity.x = clamp(self->velocity.x + player_accel, -1.0f, 1.0f);
 
-			set_animator_state(self, "run", 0, 0);
+				set_animator_state(self, "run", 0, 0);
+			}
+			else if (keystate[SDL_SCANCODE_LEFT])
+			{
+				self->transform->left = true;
+
+				self->velocity.x = clamp(self->velocity.x - player_accel, -1.0f, 1.0f);
+
+				set_animator_state(self, "run", 0, 0);
+			}
+			else // no input
+			{
+				self->velocity.x = float_lerp(self->velocity.x, 0, player_accel);
+
+				set_animator_state(self, "idle", 0, 0);
+			}
+
+
+			if (keystate[SDL_SCANCODE_Z] && self->dash_in_seconds_counter <= cur_time) // dash
+			{
+				//set_animator_state(self, "dash", 0.35f, true);
+
+				self->extra_velocity.x = ( self->transform->left ? -1.0f : 1.0f ) * self->dash_force;
+
+				self->dash_in_seconds_counter = cur_time + self->dash_in_seconds;
+			}
 		}
 		else // no input
 		{
@@ -147,7 +190,9 @@ void localplayer_update(GameObject* self)
 		}
 
 		Point old_position = self->transform->position;
-		self->transform->position = point_sum(self->transform->position, vec2_multiplier(self->velocity, deltaTime * player_speed));
+		self->transform->position = point_sum(self->transform->position, vec2_multiplier(vec2_sum((Point) { self->velocity.x, self->velocity.y }, self->extra_velocity), deltaTime * player_speed));
+
+		self->extra_velocity = vec2_movetowards(self->extra_velocity, (Vector2) { 0, 0 }, deltaTime * 5.0f);
 
 		//
 		GameObjectList interact_list = GetInteracts(self);
@@ -169,7 +214,7 @@ void localplayer_update(GameObject* self)
 	}
 	else // dead
 	{
-
+		set_animator_state(self, "die", 0, false);
 	}
 
 }
@@ -258,7 +303,7 @@ void Start()
 			add_int_to_list(&animations[2].sprites, 19);
 			add_int_to_list(&animations[2].sprites, 20);
 
-			animations[2].loop = true;
+			animations[2].loop = false;
 
 			animations[2].current_index = 0;
 			animations[2].current_frame = 0;
@@ -286,7 +331,7 @@ void Start()
 			animations[3].wait_frame = 6;
 		}
 
-		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 36 }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+		GameObject* gameObject = GameObject_New(spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 35 }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
 	}
 
 	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });

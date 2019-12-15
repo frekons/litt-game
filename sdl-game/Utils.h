@@ -5,9 +5,13 @@
 
 #include "Structs.h"
 
+float vec2_magnitude(Vector2 point);
+
 Point point_lerp(Point point1, Point point2, float time);
 
 Vector2 vec2_lerp(Vector2 point1, Vector2 point2, float time);
+
+Vector2 vec2_movetowards(Vector2 point1, Vector2 point2, float speed);
 
 float float_lerp(float value1, float value2, float time); // time is between 0, 1
 
