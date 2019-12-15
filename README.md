@@ -3,4 +3,4 @@
 ###### Map Editor
 
 ### Bugs
-- player can't jump on bullets
+- no known bug at the moment.
