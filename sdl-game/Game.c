@@ -608,8 +608,7 @@ void Render()
 
 			if (gameObject != NULL)
 			{
-				GameObject_Update(gameObject);
-
+				gameObject = GameObject_Update(gameObject);
 
 				GameObject_Draw(gameObject);
 			}
