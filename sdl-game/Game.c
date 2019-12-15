@@ -18,11 +18,75 @@
 
 GameObject* local_player = NULL;
 
-float gravity = 0.15f, max_y_speed = 4.0f;
+float gravity = 0.2f, max_y_speed = 4.0f;
 
-float jump_force = 3.0f, player_speed = 200.0f, player_accel = 0.15f;
+float jump_force = 6.0f, player_speed = 200.0f, player_accel = 0.15f;
 
 float on_ground_tolerance = 0.1f;
+
+
+void ammo_start(GameObject* self) {
+
+}
+
+void ammo_update(GameObject* self) {
+	
+	self->transform->position.x += self->velocity.x*deltaTime;
+	
+	GameObjectList list = GetInteracts(self);
+	
+	for (int i = 0; i < list.Count; i++) {
+	
+		GameObject* go = list.List[i];
+		
+		if (go == NULL || go == self->owner)
+			continue;
+		
+		if (go->health > 0)
+			go->health -= self->attack_force;
+
+		destroy_after(self, 0);
+
+		break;
+	}
+
+}
+
+
+void create_ammo(GameObject * self) {
+	Image* image = LoadTexture("resources/effects/bullet.png", true, (Vector2) {12,12});
+	int animation_count = 1;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	strcpy(animations[0].state_name, "idle");
+	{
+		initialize_int_list(&animations[0].sprites);
+
+		add_int_to_list(&animations[0].sprites, 0);
+		add_int_to_list(&animations[0].sprites, 1);
+		
+
+		animations[0].loop = true;
+
+		animations[0].current_index = 0;
+		animations[0].current_frame = 0;
+		animations[0].wait_frame = 6;
+	}
+	Point ammopos;
+	ammopos.x = self->transform->position.x + (self->transform->left ? -5 : 89);
+	ammopos.y = self->transform->position.y + 30;
+	
+	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 1, 1 }, (BoxCollider) { 0, 0, 12, 12 }, LAYERS_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
+	ammo->owner = self;
+	ammo->velocity.x = 200 * (self->transform->left ? -1 : 1);
+	ammo->attack_force = self->attack_force;
+
+	
+
+
+
+} 
 
 
 void attack(GameObject* self)
@@ -129,15 +193,16 @@ void localplayer_update(GameObject* self)
 
 		camera_position(self);
 
-		GameObject* on_ground = is_on_platform(self, LAYER_GROUND, on_ground_tolerance);
+		GameObject* on_ground = is_on_platform(self, LAYER_GROUND|LAYER_EFFECTS, on_ground_tolerance);
 
 		if (on_ground)
 		{
 			self->velocity.y = float_lerp(self->velocity.y, 0, deltaTime * 5.0f);
 
-			if (keystate[SDL_SCANCODE_UP])
+			if (keystate[SDL_SCANCODE_UP]) {
 				self->velocity.y = -jump_force;
-
+				set_animator_state(self, "jump", 0, 0);
+			}
 		}
 		else // on air
 		{
@@ -155,9 +220,16 @@ void localplayer_update(GameObject* self)
 		{
 			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
 			{
-				set_animator_state(self, "shoot", 0.45f, true);
+				if (on_ground)
+					set_animator_state(self, "shoot", 0.45f, true);
+				else
+					set_animator_state(self, "shootonair", 0.45f, true);
+
+
+				create_ammo(self);
 
 				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
+
 			}
 
 			if (keystate[SDL_SCANCODE_RIGHT])
@@ -179,10 +251,13 @@ void localplayer_update(GameObject* self)
 			else // no input
 			{
 				self->velocity.x = float_lerp(self->velocity.x, 0, player_accel);
-
-				set_animator_state(self, "idle", 0, 0);
+				if (on_ground)
+					set_animator_state(self, "idle", 0, 0);
+				
 			}
-
+			if (!on_ground) {
+				set_animator_state(self, "jump", 0, 0);
+			}
 
 			if (keystate[SDL_SCANCODE_Z] && self->dash_in_seconds_counter <= cur_time) // dash
 			{
@@ -196,8 +271,7 @@ void localplayer_update(GameObject* self)
 		else // no input
 		{
 			self->velocity.x = float_lerp(self->velocity.x, 0, player_accel);
-
-			set_animator_state(self, "idle", 0, 0);
+			
 		}
 
 
@@ -207,7 +281,7 @@ void localplayer_update(GameObject* self)
 		//
 		GameObjectList interact_list = GetInteracts(self);
 
-		GameObject* later_on_ground = is_on_platform(self, LAYER_GROUND, on_ground_tolerance);
+		GameObject* later_on_ground = is_on_platform(self, LAYER_GROUND|LAYER_EFFECTS, on_ground_tolerance);
 
 		for (int i = 0; i < interact_list.Count; i++)
 		{
@@ -277,7 +351,7 @@ void Start()
 		Point spawn_position = { 50,400 };
 		Vector2 spawn_scale = { 2.0f, 2.0f };
 
-		int animation_count = 4;
+		int animation_count = 6;
 
 		Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
 
@@ -356,6 +430,41 @@ void Start()
 			animations[3].current_frame = 0;
 			animations[3].wait_frame = 6;
 		}
+		
+		
+		strcpy(animations[4].state_name, "jump");
+		{
+			initialize_int_list(&animations[4].sprites);
+
+			add_int_to_list(&animations[4].sprites, 33);
+			
+
+
+			animations[4].loop = true;
+
+			animations[4].current_index = 0;
+			animations[4].current_frame = 0;
+			animations[4].wait_frame = 6;
+		}
+
+		strcpy(animations[5].state_name, "shootonair");
+		{
+			initialize_int_list(&animations[5].sprites);
+
+			add_int_to_list(&animations[5].sprites, 40);
+			add_int_to_list(&animations[5].sprites, 41);
+			add_int_to_list(&animations[5].sprites, 42);
+			add_int_to_list(&animations[5].sprites, 43);
+			add_int_to_list(&animations[5].sprites, 44);
+
+			animations[5].loop = false;
+
+			animations[5].current_index = 0;
+			animations[5].current_frame = 0;
+			animations[5].wait_frame = 6;
+		}
+
+		
 
 		GameObject* gameObject = GameObject_New(GameObjects.Count, spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 35 }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
 	}

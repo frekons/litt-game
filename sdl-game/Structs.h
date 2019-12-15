@@ -138,7 +138,7 @@ typedef struct SGameObject {
 
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
-	struct GameObject* last_object;
+	struct GameObject* last_object,*owner;
 }GameObject;
 
 
@@ -159,6 +159,7 @@ typedef enum{ // upper means top in rendering
 	LAYERS_PLAYER,
 	LAYERS_ENEMY,
 	LAYERS_GROUND,
+	LAYERS_EFFECTS,
 
 }LAYERS;
 
@@ -166,6 +167,7 @@ typedef enum{ // upper means top in rendering
 #define LAYER_GROUND 1 << LAYERS_GROUND
 #define LAYER_PLAYER 1 << LAYERS_PLAYER
 #define LAYER_ENEMY 1 << LAYERS_ENEMY
+#define LAYER_EFFECTS 1 << LAYERS_EFFECTS
 
 
 struct SPointerList {
