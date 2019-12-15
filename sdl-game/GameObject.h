@@ -35,7 +35,7 @@ GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider co
 
 void GameObject_Start(GameObject* self);
 
-void GameObject_Update(GameObject* self);
+GameObject* GameObject_Update(GameObject* self);
 
 void GameObject_Draw(GameObject* self);
 

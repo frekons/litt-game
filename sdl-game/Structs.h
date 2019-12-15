@@ -138,7 +138,7 @@ typedef struct SGameObject {
 
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
-	struct GameObject* last_object,*owner;
+	struct GameObject* last_object, *owner;
 }GameObject;
 
 

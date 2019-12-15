@@ -75,15 +75,17 @@ void GameObject_Start(GameObject* self)
 }
 
 
-void GameObject_Update(GameObject* self)
+GameObject* GameObject_Update(GameObject* self)
 {
 	if (self->update != NULL)
 	{
-		typedef void func(GameObject*);
+		typedef GameObject* func(GameObject*);
 		func* f = (func*)self->update;
 
-		f(self);
+		return f(self);
 	}
+
+	return self;
 }
 
 
