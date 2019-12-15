@@ -34,6 +34,7 @@ bool float_compare(float one, float two, float tolerance);
 
 void destroy_after(GameObject* object, float after_time);
 
+void destroy_object(GameObject* object);
 
 
 

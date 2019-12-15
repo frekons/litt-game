@@ -155,3 +155,10 @@ void destroy_after(GameObject* object, float after_time)
 
 	create_thread(destroy_after_background, info); // destroy after 3 seconds
 }
+
+
+void destroy_object(GameObject* object)
+{
+	delete_game_object_from_list(&GameObjects, object);
+}
+
