@@ -61,7 +61,7 @@ void ammo_start(GameObject* self) {
 	
 }
 
-void ammo_update(GameObject* self) {
+GameObject* ammo_update(GameObject* self) {
 	
 	self->transform->position.x += self->velocity.x*deltaTime;
 	
@@ -83,7 +83,7 @@ void ammo_update(GameObject* self) {
 
 		break;
 	}
-
+	return self;
 }
 
 
@@ -211,7 +211,7 @@ void camera_position(GameObject* object)
 //	}
 //}
 
-void localplayer_update(GameObject* self)
+GameObject* localplayer_update(GameObject* self)
 {
 	DrawTextInGame("test", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
@@ -346,7 +346,7 @@ void localplayer_update(GameObject* self)
 	{
 		set_animator_state(self, "die", 0, false);
 	}
-
+	return self;
 }
 
 void enemy_start(GameObject* self) {
@@ -367,12 +367,13 @@ void enemy_start(GameObject* self) {
 
 void create_enemy(void);
 
+float angle = 0;
 
-void enemy_update(GameObject * self) {
+GameObject* enemy_update(GameObject * self) {
 	
-	static float angle = 0;
-	float value = cosf((angle += deltaTime * 10) * 3.14159265359 / 180) * 200;
-	self->transform->position.x = 200+sinf((angle += deltaTime * 10) * 3.14159265359 / 180) * 200;
+	
+	float value = cosf((angle += deltaTime * 10) * 3.14159f / 180.0f) * 200;
+	self->transform->position.x = 200+sinf((angle += deltaTime * 10) * 3.14159f / 180.0f) * 200;
 	if (value < 0)
 		self->transform->left = true;
 	else
@@ -386,9 +387,9 @@ void enemy_update(GameObject * self) {
 		angle = 0;
 		create_enemy();
 		destroy_object(self);
-		
+		return NULL;
 	}
-	printf("a\n");
+	return self;
 }
 
 
