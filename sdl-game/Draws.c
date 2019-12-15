@@ -104,8 +104,6 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 
 	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
-	add_member_to_list(&texture_list_to_be_destroyed, Message);
-
 	Rect rect;
 
 	rect.x = position.x;
