@@ -20,6 +20,7 @@
 #include <time.h>
 
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "SDL2_ttf.lib")
 
 
 #undef main
@@ -33,7 +34,8 @@ int main(int argc, char* argv[])
 
 	Start(); // don't use Game::GameObjects before this!
 
-	MusicInitialize();
+	InitializeSounds();
+	InitializeDraws();
 
 	deltaTime = 0.016;
 
@@ -64,6 +66,14 @@ int main(int argc, char* argv[])
 		// show
 		set_render_color(background_color);
 		SDL_RenderPresent(renderer);
+
+		int count = texture_list_to_be_destroyed.Count;
+
+		for (int i = 0; i < count; i++)
+		{
+			SDL_DestroyTexture(texture_list_to_be_destroyed.List[0]);
+			delete_member_at(&texture_list_to_be_destroyed, 0);
+		}
 
 		//QueryPerformanceCounter((LARGE_INTEGER*)&time2);
 

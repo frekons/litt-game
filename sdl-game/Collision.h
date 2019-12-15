@@ -31,6 +31,8 @@ Vector2 collider_right_up(GameObject* go);
 
 Vector2 collider_left_up(GameObject* go);
 
+Vector2 collider_size(GameObject* go);
+
 GameObject* is_on_platform(GameObject* self, int platform_layermask, float tolerance);
 
 GameObject* is_on_something(GameObject* self, int platform_layermask, float tolerance);

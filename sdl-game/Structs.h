@@ -168,4 +168,25 @@ typedef enum{ // upper means top in rendering
 #define LAYER_ENEMY 1 << LAYERS_ENEMY
 
 
+struct SPointerList {
+
+	int Count;
+	void** List;
+
+};
+
+
+typedef struct SPointerList PointerList;
+
+
+
+void initialize_list(PointerList * list);
+
+void add_member_to_list(PointerList * list, void* texture);
+
+void delete_member_at(PointerList * list, int index);
+
+void delete_member_from_list(PointerList * list, void* member);
+
+
 //#endif

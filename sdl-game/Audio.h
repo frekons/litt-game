@@ -6,7 +6,7 @@
 #include <SDL2/SDL_mixer.h>
 
 
-void MusicInitialize();
+void InitializeSounds();
 
 //The music that will be played
 Mix_Music* main_music;	// tek bir tane ana tema muzigi oldugunu varsayarak buraya koydum. ana tema muzigi ile fonksiyonlar bunu baz alıyor sadece

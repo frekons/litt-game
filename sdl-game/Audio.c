@@ -46,7 +46,7 @@ Music* find_in_list(MusicList * list, char* name)
 MusicList music_list;
 
 
-void MusicInitialize()
+void InitializeSounds()
 {
 	initialize_music_list(&music_list);
 

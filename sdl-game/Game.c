@@ -18,9 +18,11 @@
 
 GameObject* local_player = NULL;
 
-float gravity = 0.15f;
+float gravity = 0.15f, max_y_speed = 4.0f;
 
-float jump_force = 3.0f, player_speed = 190.0f, player_accel = 0.15f;
+float jump_force = 3.0f, player_speed = 200.0f, player_accel = 0.15f;
+
+float on_ground_tolerance = 0.1f;
 
 
 void attack(GameObject* self)
@@ -117,6 +119,8 @@ void camera_position(GameObject* object)
 
 void localplayer_update(GameObject* self)
 {
+	DrawTextInGame("test", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+
 	float cur_time = get_time();
 
 	if (self->health > 0) // alive
@@ -125,11 +129,11 @@ void localplayer_update(GameObject* self)
 
 		camera_position(self);
 
-		GameObject* on_ground = is_on_platform(self, LAYER_GROUND, 25.0f);
+		GameObject* on_ground = is_on_platform(self, LAYER_GROUND, on_ground_tolerance);
 
 		if (on_ground)
 		{
-			self->velocity.y = 0;
+			self->velocity.y = float_lerp(self->velocity.y, 0, deltaTime * 5.0f);
 
 			if (keystate[SDL_SCANCODE_UP])
 				self->velocity.y = -jump_force;
@@ -137,14 +141,21 @@ void localplayer_update(GameObject* self)
 		}
 		else // on air
 		{
-			self->velocity.y += gravity;
+			if (self->velocity.y <= max_y_speed)
+			{
+				self->velocity.y += gravity;
+
+				if(keystate[SDL_SCANCODE_DOWN])
+					self->velocity.y += gravity;
+			}
+				
 		}
 
 		if (!(self->ignore_movement && self->ignore_movement_time > cur_time))
 		{
 			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
 			{
-				set_animator_state(self, "shoot", 0.35f, true);
+				set_animator_state(self, "shoot", 0.45f, true);
 
 				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
 			}
@@ -189,15 +200,14 @@ void localplayer_update(GameObject* self)
 			set_animator_state(self, "idle", 0, 0);
 		}
 
+
 		Point old_position = self->transform->position;
 		self->transform->position = point_sum(self->transform->position, vec2_multiplier(vec2_sum((Point) { self->velocity.x, self->velocity.y }, self->extra_velocity), deltaTime * player_speed));
-
-		self->extra_velocity = vec2_movetowards(self->extra_velocity, (Vector2) { 0, 0 }, deltaTime * 5.0f);
 
 		//
 		GameObjectList interact_list = GetInteracts(self);
 
-		GameObject* later_on_ground = is_on_platform(self, LAYER_GROUND, 25.0f);
+		GameObject* later_on_ground = is_on_platform(self, LAYER_GROUND, on_ground_tolerance);
 
 		for (int i = 0; i < interact_list.Count; i++)
 		{
@@ -205,11 +215,27 @@ void localplayer_update(GameObject* self)
 
 			if (interacted_object == NULL || interacted_object == later_on_ground) continue;
 
+			Point new_position = self->transform->position;
 			self->transform->position = old_position;
+
+			Point diff = { new_position.x - old_position.x, new_position.y - old_position.y };
+			
+			if (collider_left_down(self).y <= collider_left_up(interacted_object).y)
+			{
+				self->transform->position = new_position;
+				self->transform->position.y = collider_left_up(interacted_object).y - collider_size(self).y;
+			}
+			else
+			{
+				self->transform->position.y = new_position.y;
+			}
+
 
 			break;
 		}
 		//
+
+		self->extra_velocity = vec2_movetowards(self->extra_velocity, (Vector2) { 0, 0 }, deltaTime * 5.0f);
 
 	}
 	else // dead

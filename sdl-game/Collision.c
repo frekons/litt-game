@@ -12,7 +12,10 @@
 bool IsInteractingPoint(BoxCollider col, Point point) {
 	// offset is used as position
 
-	return point.x < col.offset.x + col.size.x && point.x > col.offset.x && point.y < col.offset.y + col.size.y && point.y > col.offset.y;
+	return point.x <= col.offset.x + col.size.x &&
+		point.x >= col.offset.x &&
+		point.y <= col.offset.y + col.size.y &&
+		point.y >= col.offset.y;
 
 }
 
@@ -40,7 +43,7 @@ GameObjectList GetInteractsOfCollider(BoxCollider col1, Point position)
 
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
-		DrawRectangle((Rect) {
+		DrawRectangleOnScreen((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -81,7 +84,7 @@ GameObjectList GetInteracts(GameObject* object)
 
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
-		DrawRectangle((Rect) {
+		DrawRectangleOnScreen((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -115,7 +118,7 @@ GameObjectList GetInteracts(GameObject* object)
 
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
-				DrawRectangle((Rect) {
+				DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 255, 0, 0, 255 });
@@ -126,7 +129,7 @@ GameObjectList GetInteracts(GameObject* object)
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
 
-				DrawRectangle((Rect) {
+				DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 0, 255, 0, 255 });
@@ -158,7 +161,7 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
 
-		DrawRectangle((Rect) {
+		DrawRectangleOnScreen((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -198,7 +201,7 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
 
-			DrawRectangle((Rect) {
+			DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 255, 0, 0, 255 });
@@ -209,7 +212,7 @@ GameObjectList GetInteractsExceptLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
 
-			DrawRectangle((Rect) {
+			DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 0, 255, 0, 255 });
@@ -242,7 +245,7 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 	if (renderable_state)
 
-		DrawRectangle((Rect) {
+		DrawRectangleOnScreen((Rect) {
 		col1.offset.x - (camera->position.x - camera->width / 2), col1.offset.y - (camera->position.y - camera->height / 2),
 			col1.size.x, col1.size.y
 	}, (Color) { 255, 0, 0, 255 });
@@ -279,7 +282,7 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
 
-				DrawRectangle((Rect) {
+				DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 255, 0, 0, 255 });
@@ -290,7 +293,7 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 #ifdef DEBUG_COLLISION
 			if (renderable_state)
 
-				DrawRectangle((Rect) {
+				DrawRectangleOnScreen((Rect) {
 				col2.offset.x - (camera->position.x - camera->width / 2), col2.offset.y - (camera->position.y - camera->height / 2),
 					col2.size.x, col2.size.y
 			}, (Color) { 0, 255, 0, 255 });
@@ -306,37 +309,47 @@ GameObjectList GetInteractsOnlyLayer(GameObject* object, int layer_mask)
 
 Vector2 collider_center(GameObject* go)
 {
-	Vector2 center = { (go->collider.size.x / 2 + go->collider.offset.x) * go->transform->scale.x, (go->collider.size.y / 2 + go->collider.offset.y) * go->transform->scale.y };
+	Vector2 center = { go->transform->position.x + (go->collider.size.x / 2 + go->collider.offset.x) * go->transform->scale.x,go->transform->position.y + (go->collider.size.y / 2 + go->collider.offset.y) * go->transform->scale.y };
 
 	return center;
 }
 
 Vector2 collider_left_down(GameObject* go)
 {
-	Vector2 left_down = { go->collider.offset.x * go->transform->scale.x, (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
+	Vector2 left_down = { go->transform->position.x + go->collider.offset.x * go->transform->scale.x, go->transform->position.y + (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
 
 	return left_down;
 }
 
 Vector2 collider_left_up(GameObject* go)
 {
-	Vector2 left_down = { go->collider.offset.x * go->transform->scale.x, (go->collider.offset.y) * go->transform->scale.y };
+	Vector2 left_up = { go->transform->position.x + go->collider.offset.x * go->transform->scale.x, go->transform->position.y + (go->collider.offset.y) * go->transform->scale.y };
 
-	return left_down;
+	return left_up;
 }
 
 Vector2 collider_right_down(GameObject* go)
 {
-	Vector2 right_down = { (go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
+	Vector2 right_down = { go->transform->position.x+(go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, go->transform->position.y+(go->collider.size.y + go->collider.offset.y) * go->transform->scale.y };
 
 	return right_down;
 }
 
 Vector2 collider_right_up(GameObject* go)
 {
-	Vector2 right_up = { (go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, (go->collider.offset.y) * go->transform->scale.y };
+	Vector2 right_up = { go->transform->position.x+(go->collider.offset.x + go->collider.size.x) * go->transform->scale.x, go->transform->position.y + (go->collider.offset.y) * go->transform->scale.y };
 
 	return right_up;
+}
+
+Vector2 collider_size(GameObject* go)
+{
+	Vector2 size;
+
+	size.x = (go->collider.size.x + go->collider.offset.x) * go->transform->scale.x;
+	size.y = (go->collider.size.y + go->collider.offset.y) * go->transform->scale.y;
+
+	return size;
 }
 
 
@@ -353,13 +366,13 @@ GameObject* is_on_platform(GameObject* self, int platform_layermask, float toler
 		{
 			Vector2 col_left_down = collider_left_down(self);
 
-			Vector2 player_left_down = vec2_sum(self->transform->position, col_left_down);
+			Vector2 player_left_down = col_left_down;
 
-			Vector2 ground_left_up = vec2_sum(go->transform->position, collider_left_up(go));
+			Vector2 ground_left_up = collider_left_up(go);
 
 			if (float_compare(player_left_down.y, ground_left_up.y, tolerance)) // eðer ayaðýn platformun üstündeyse
 			{
-				self->transform->position.y = ground_left_up.y - col_left_down.y;
+				self->transform->position.y = ground_left_up.y - collider_size(self).y;
 
 				return go;
 			}
@@ -383,9 +396,9 @@ GameObject* is_on_something(GameObject* self, int layermask, float tolerance)
 		{
 			Vector2 col_left_down = collider_left_down(self);
 
-			Vector2 player_left_down = vec2_sum(self->transform->position, col_left_down);
+			Vector2 player_left_down = col_left_down;
 
-			Vector2 ground_left_up = vec2_sum(go->transform->position, collider_left_up(go));
+			Vector2 ground_left_up = collider_left_up(go);
 
 			if (float_compare(player_left_down.y, ground_left_up.y, tolerance)) // eðer ayaðýn platformun üstündeyse
 			{
