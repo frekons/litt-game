@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 
 		DWORD diff = end_time - start_time;
 
-		Uint32 sleep_time = 16 - diff;
+		Uint32 sleep_time = 16 - diff; // 16ms = 1000 / 16 = 62,5 fps
 
 		if (sleep_time > 0 && sleep_time < 1000)
 		{
