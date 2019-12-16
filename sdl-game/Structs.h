@@ -81,7 +81,7 @@ struct STransform {
 typedef struct STransform Transform;
 
 typedef struct Animation {
-	char state_name[32];
+	char state_name[24];
 	IntList sprites;
 
 	bool loop;
@@ -139,6 +139,8 @@ typedef struct SGameObject {
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
 	struct GameObject* last_object, *owner;
+
+	void* destroy_thread_handle;
 }GameObject;
 
 

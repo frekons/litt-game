@@ -42,6 +42,7 @@ void GameObject_Draw(GameObject* self);
 
 
 
+bool wait_to_make_process_on_gameobject_list;
 
 void initialize_game_object_list(GameObjectList * list);
 
@@ -49,7 +50,7 @@ void add_game_object_to_list(GameObjectList * list, GameObject* game_object);
 
 void delete_game_object_at(GameObjectList * list, int index);
 
-void delete_game_object_from_list(GameObjectList * list, GameObject* game_object);
+int delete_game_object_from_list(GameObjectList * list, GameObject* game_object);
 
 
 ///

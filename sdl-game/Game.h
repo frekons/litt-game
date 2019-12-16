@@ -5,7 +5,9 @@
 
 #include "GameObject.h"
 
-GameObjectList GameObjects;
+GameObjectList GameObjects, ToBeDestroyed;
+
+bool wait_to_process_on_to_be_destroyed;
 
 void Start();
 

@@ -24,7 +24,7 @@ float jump_force = 6.0f, player_speed = 200.0f, player_accel = 0.15f;
 
 float on_ground_tolerance = 0.1f;
 
-void create_particle(GameObject* self){
+void create_particle(GameObject* self) {
 	Image* image = LoadTexture("resources/effects/particle.png", true, (Vector2) { 12, 12 });
 	int animation_count = 1;
 
@@ -47,12 +47,11 @@ void create_particle(GameObject* self){
 		animations[0].wait_frame = 6;
 	}
 	Point ammopos;
-	ammopos.x = self->transform->position.x+(self->velocity.x*deltaTime);
+	ammopos.x = self->transform->position.x + (self->velocity.x*deltaTime);
 	ammopos.y = self->transform->position.y;
 
-	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 0 , 0}, LAYER_EFFECTS, image, animations, animation_count, 0, 0);
-	destroy_after(ammo, 0.5f);
-
+	GameObject* ammo_particle = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 0, 0 }, LAYER_EFFECTS, image, animations, animation_count, 0, 0);
+	destroy_after(ammo_particle, 0.5f);
 }
 
 void ammo_start(GameObject* self) {
@@ -63,7 +62,10 @@ void ammo_start(GameObject* self) {
 
 GameObject* ammo_update(GameObject* self) {
 	
-	self->transform->position.x += self->velocity.x*deltaTime;
+	if (self == NULL)
+		return self;
+
+	self->transform->position.x += self->velocity.x * deltaTime;
 	
 	GameObjectList list = GetInteracts(self);
 	
@@ -79,7 +81,8 @@ GameObject* ammo_update(GameObject* self) {
 
 		create_particle(self);
 
-		destroy_after(self, 0);
+		
+		return NULL; // means destroy self
 
 		break;
 	}
@@ -109,11 +112,11 @@ void create_ammo(GameObject * self) {
 	}
 	Point ammopos;
 	ammopos.x = self->transform->position.x + (self->transform->left ? -5 : 89);
-	ammopos.y = self->transform->position.y + 30;
+	ammopos.y = self->transform->position.y + 35;
 	
 	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 1, 1 }, (BoxCollider) { 0, 0, 12, 12 }, LAYER_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
 	ammo->owner = self;
-	ammo->velocity.x = 200 * (self->transform->left ? -1 : 1);
+	ammo->velocity.x = player_speed * (self->transform->left ? -1 : 1);
 	ammo->attack_force = self->attack_force;
 
 } 
@@ -170,23 +173,14 @@ void localplayer_start(GameObject* self)
 
 	local_player = self;
 
-	self->velocity = (Vector2) { 0, 0 };
-	self->extra_velocity = (Vector2) { 0, 0 };
-
 	self->health = 100;
 
 	self->attack_force = 10;
-	self->attack_in_seconds = 0.6f;
-	self->attack_time = 0.4f;
+	self->attack_in_seconds = 0.5f;
+	self->attack_time = 0.45f;
 
 	self->dash_in_seconds = 1.0f;
 	self->dash_force = 3.0f;
-
-
-	self->attack_in_seconds_counter = 0;
-	self->dash_in_seconds_counter = 0;
-	self->ignore_movement_time = 0;
-	self->ignore_movement = false;
 }
 
 void camera_position(GameObject* object)
@@ -198,22 +192,14 @@ void camera_position(GameObject* object)
 	camera->position = position;
 }
 
-//void dash(GameObject* self)
-//{
-//	float start_time = get_time();
-//	float cur_time = start_time;
-//
-//	while (start_time + self->dash_time >= cur_time)
-//	{
-//		self->
-//
-//		Sleep(deltaTime);
-//	}
-//}
 
 GameObject* localplayer_update(GameObject* self)
 {
-	DrawTextInGame("test", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+	char fps_str[16];
+	snprintf(fps_str, sizeof(fps_str), "%d fps", (int)(1.0f / deltaTime));
+
+	DrawTextOnScreen(fps_str, (Vector2) { 5, 5 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+	DrawTextInGame("litt-game", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 	float cur_time = get_time();
 
@@ -248,19 +234,6 @@ GameObject* localplayer_update(GameObject* self)
 
 		if (!(self->ignore_movement && self->ignore_movement_time > cur_time))
 		{
-			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
-			{
-				if (on_ground)
-					set_animator_state(self, "shoot", 0.45f, true);
-				else
-					set_animator_state(self, "shootonair", 0.45f, true);
-
-
-				create_ammo(self);
-
-				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
-
-			}
 
 			if (keystate[SDL_SCANCODE_RIGHT])
 			{
@@ -289,6 +262,20 @@ GameObject* localplayer_update(GameObject* self)
 				set_animator_state(self, "jump", 0, 0);
 			}
 
+			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
+			{
+				if (on_ground)
+					set_animator_state(self, "shoot", self->attack_time, true);
+				else
+					set_animator_state(self, "shootonair", self->attack_time, true);
+
+
+				create_ammo(self);
+
+				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
+
+			}
+
 			if (keystate[SDL_SCANCODE_Z] && self->dash_in_seconds_counter <= cur_time) // dash
 			{
 				set_animator_state(self, "dash", 0.35f, true);
@@ -304,6 +291,7 @@ GameObject* localplayer_update(GameObject* self)
 			
 		}
 
+		self->animations.List[1]->wait_frame = 5 / fabs(self->velocity.x); // run animation speed
 
 		Point old_position = self->transform->position;
 		self->transform->position = point_sum(self->transform->position, vec2_multiplier(vec2_sum((Point) { self->velocity.x, self->velocity.y }, self->extra_velocity), deltaTime * player_speed));
@@ -369,26 +357,50 @@ void create_enemy(void);
 
 float angle = 0;
 
+float lineer_sin(float val, int* slope)
+{
+	if (val <= 2)
+	{
+		if (slope)
+			*slope = 1;
+
+		return val - 1;
+	}
+	else if (val <= 4)
+	{
+		if (slope)
+			*slope = -1;
+
+		return -val + 3;
+	}
+
+	return 0;
+}
+
 GameObject* enemy_update(GameObject * self) {
 	
 	
-	float value = cosf((angle += deltaTime * 10) * 3.14159f / 180.0f) * 200;
-	self->transform->position.x = 200+sinf((angle += deltaTime * 10) * 3.14159f / 180.0f) * 200;
-	if (value < 0)
+	int slope;
+	self->transform->position.x = 200 + lineer_sin(angle, &slope) * 200;
+
+	if (slope < 0)
 		self->transform->left = true;
 	else
 		self->transform->left = false;
 
-	if (angle >= 360)
+	angle += deltaTime * 0.75f;
+
+	if (angle > 4)
 		angle = 0;
 
 
 	if (self->health <= 0) {
 		angle = 0;
 		create_enemy();
-		destroy_object(self);
-		return NULL;
+		
+		return NULL; // means destroy self
 	}
+
 	return self;
 }
 
@@ -429,9 +441,11 @@ void create_enemy(void){
 
 void Start()
 {
+	
 	initialize_game_object_list(&GameObjects);
+	initialize_game_object_list(&ToBeDestroyed);
 	//
-
+	
 	Image* image = LoadTexture("resources/players/player.png", true, create_vec2(48, 48)); // local_player creation
 	{
 		Point spawn_position = { 50,400 };
@@ -592,12 +606,37 @@ GameObjectList GetObjectsOfLayer(int layer)
 	return list;
 }
 
+bool wait_to_process_on_to_be_destroyed = false;
+
 void Render()
 {
 	// UI things
 
 
 	////////////
+
+	int count = ToBeDestroyed.Count;
+	wait_to_process_on_to_be_destroyed = true;
+	for (int i = 0; i < count; i++)
+	{
+		GameObject* to_destroy = ToBeDestroyed.List[i];
+
+		if (to_destroy == NULL) continue;
+
+		if (destroy_object(to_destroy, true))
+			delete_game_object_at(&ToBeDestroyed, 0);
+		
+
+		//int index = delete_game_object_from_list(&GameObjects, to_destroy);
+
+		//if (index >= 0)
+		//{
+		//	delete_game_object_at(&ToBeDestroyed, 0);
+
+		//	free(to_destroy);
+		//}
+	}
+	wait_to_process_on_to_be_destroyed = false;
 	
 	for (int i = (int)pow(2, 4); i != 1; i /= 2)
 	{
@@ -605,11 +644,17 @@ void Render()
 
 		for (int j = 0; j < list.Count; j++)
 		{
-			GameObject* gameObject = list.List[j];
+			GameObject* gameObject = list.List[j], *temp = gameObject;
 
 			if (gameObject != NULL)
 			{
 				gameObject = GameObject_Update(gameObject);
+
+				if (gameObject == NULL)
+				{
+					destroy_object(temp, true);
+					continue;
+				}
 
 				GameObject_Draw(gameObject);
 			}

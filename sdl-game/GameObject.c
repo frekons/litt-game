@@ -8,6 +8,8 @@
 
 #include "Globals.h"
 
+#include <Windows.h>
+
 Camera* create_camera(int screen_width, int screen_height)
 {
 	Camera* cam = (Camera*)malloc(sizeof(Camera));
@@ -51,12 +53,21 @@ GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider co
 	for (int i = 0; i < animations_size; i++)
 		add_animation_to_list(&self->animations, &animations[i]);
 
-	
-
 	self->start = start;
 	self->update = update;
 
+
+	self->velocity = (Vector2) { 0, 0 };
+	self->extra_velocity = (Vector2) { 0, 0 };
+	self->attack_in_seconds_counter = 0;
+	self->dash_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+	self->destroy_thread_handle = 0;
+
+
 	add_game_object_to_list(&GameObjects, self);
+
 
 	GameObject_Start(self);
 
@@ -157,6 +168,7 @@ Animation * get_animation_sprites(GameObject* self, char* state)
 
 ////////////////// LIST
 
+bool wait_to_make_process_on_gameobject_list = false;
 
 void initialize_game_object_list(GameObjectList * list)
 {
@@ -175,9 +187,14 @@ void add_game_object_to_list(GameObjectList * list, GameObject* game_object)
 
 void delete_game_object_at(GameObjectList * list, int index)
 {
-	if (index < 0 || index >= list->Count) return;
+	wait_to_make_process_on_gameobject_list = true;
 
-	GameObject* addr = list->List[index];
+	if (index < 0 || index >= list->Count) {
+		wait_to_make_process_on_gameobject_list = false;
+		return;
+	}
+
+	//GameObject* addr = list->List[index];
 
 	for (int i = index; i < list->Count - 1; i++)
 		list->List[i] = list->List[i + 1];
@@ -186,11 +203,17 @@ void delete_game_object_at(GameObjectList * list, int index)
 
 	list->List = (GameObject**)realloc(list->List, list->Count * sizeof(GameObject*));
 
-	free(addr);
+	//free(addr);
+
+	wait_to_make_process_on_gameobject_list = false;
 }
 
-void delete_game_object_from_list(GameObjectList * list, GameObject* game_object)
+int delete_game_object_from_list(GameObjectList * list, GameObject* game_object)
 {
+	while (wait_to_make_process_on_gameobject_list) Sleep(1);
+
+	wait_to_make_process_on_gameobject_list = true;
+
 	int index = -1;
 	for (int i = 0; i < list->Count; i++)
 		if (list->List[i] == game_object)
@@ -199,7 +222,18 @@ void delete_game_object_from_list(GameObjectList * list, GameObject* game_object
 			break;
 		}
 
+	//printf("index: %d\n", index);
+
+	if (index < 0) {
+
+		wait_to_make_process_on_gameobject_list = false;
+
+		return index;
+	}
+
 	delete_game_object_at(list, index);
+
+	return index;
 }
 
 //

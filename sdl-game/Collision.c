@@ -12,6 +12,9 @@
 bool IsInteractingPoint(BoxCollider col, Point point) {
 	// offset is used as position
 
+	if ((col.size.x == 0 && col.size.y == 0))
+		return false;
+
 	return point.x <= col.offset.x + col.size.x &&
 		point.x >= col.offset.x &&
 		point.y <= col.offset.y + col.size.y &&
@@ -23,6 +26,8 @@ bool IsInteractingPoint(BoxCollider col, Point point) {
 bool IsInteracting(BoxCollider col1, BoxCollider col2) {
 	// offset is used as position
 
+	if ((col1.size.x == 0 && col1.size.y == 0) || (col2.size.x == 0 && col2.size.y == 0))
+		return false;
 
 	return col1.offset.x <= col2.offset.x + col2.size.x &&
 		col1.offset.x + col1.size.x >= col2.offset.x &&
