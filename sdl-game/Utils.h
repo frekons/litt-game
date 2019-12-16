@@ -38,5 +38,7 @@ bool destroy_object(GameObject* object, bool terminate_thread);
 
 bool IsBadPtr(void* p);
 
+Vector2Int mouse_position;
+int mouse_button_mask;
 
 //#endif

@@ -35,7 +35,11 @@ GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider co
 
 void GameObject_Start(GameObject* self);
 
+PointerList GameObject_BeforePhysics(GameObject* self);
+
 GameObject* GameObject_Update(GameObject* self);
+
+void GameObject_Physics(GameObject* self, PointerList before_interacts);
 
 void GameObject_Draw(GameObject* self);
 

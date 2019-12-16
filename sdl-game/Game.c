@@ -81,7 +81,6 @@ GameObject* ammo_update(GameObject* self) {
 
 		create_particle(self);
 
-		
 		return NULL; // means destroy self
 
 		break;
@@ -167,11 +166,26 @@ void attack(GameObject* self)
 	}
 }
 
+void on_collision_enter(GameObject* self, GameObject* other)
+{
+	printf("COLLISION ENTER!\n");
+
+}
+
+void on_collision_exit(GameObject* self, GameObject* other)
+{
+	printf("COLLISION EXIT!\n");
+
+}
+
 void localplayer_start(GameObject* self)
 {
 	SDL_LogMessage(SDL_LOG_CATEGORY_TEST, SDL_LOG_PRIORITY_INFO, "Local Player has spawned!");
 
 	local_player = self;
+
+	add_member_to_list(&self->collider.onEnter, &on_collision_enter);
+	add_member_to_list(&self->collider.onExit, &on_collision_exit);
 
 	self->health = 100;
 
@@ -192,14 +206,15 @@ void camera_position(GameObject* object)
 	camera->position = position;
 }
 
+void onClick(void)
+{
+	local_player->velocity.y = -jump_force;
+}
 
 GameObject* localplayer_update(GameObject* self)
 {
-	char fps_str[16];
-	snprintf(fps_str, sizeof(fps_str), "%d fps", (int)(1.0f / deltaTime));
+	DrawButtonInGame("button", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 
-	DrawTextOnScreen(fps_str, (Vector2) { 5, 5 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
-	DrawTextInGame("litt-game", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 	float cur_time = get_time();
 
@@ -581,6 +596,7 @@ void Start()
 		
 
 		GameObject* gameObject = GameObject_New(GameObjects.Count, spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 35 }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
+
 	}
 
 	image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
@@ -608,10 +624,15 @@ GameObjectList GetObjectsOfLayer(int layer)
 
 bool wait_to_process_on_to_be_destroyed = false;
 
+
 void Render()
 {
 	// UI things
+	char fps_str[16];
+	snprintf(fps_str, sizeof(fps_str), "%d fps", (int)(1.0f / deltaTime));
 
+	DrawTextOnScreen(fps_str, (Vector2) { 50, 20 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+	DrawTextInGame("litt-game", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 	////////////
 
@@ -625,16 +646,7 @@ void Render()
 
 		if (destroy_object(to_destroy, true))
 			delete_game_object_at(&ToBeDestroyed, 0);
-		
-
-		//int index = delete_game_object_from_list(&GameObjects, to_destroy);
-
-		//if (index >= 0)
-		//{
-		//	delete_game_object_at(&ToBeDestroyed, 0);
-
-		//	free(to_destroy);
-		//}
+	
 	}
 	wait_to_process_on_to_be_destroyed = false;
 	
@@ -648,6 +660,8 @@ void Render()
 
 			if (gameObject != NULL)
 			{
+				PointerList interact_list = GameObject_BeforePhysics(gameObject);
+
 				gameObject = GameObject_Update(gameObject);
 
 				if (gameObject == NULL)
@@ -655,6 +669,8 @@ void Render()
 					destroy_object(temp, true);
 					continue;
 				}
+
+				GameObject_Physics(gameObject, interact_list);
 
 				GameObject_Draw(gameObject);
 			}

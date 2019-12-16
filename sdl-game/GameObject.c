@@ -8,6 +8,8 @@
 
 #include "Globals.h"
 
+#include "Collision.h"
+
 #include <Windows.h>
 
 Camera* create_camera(int screen_width, int screen_height)
@@ -65,6 +67,8 @@ GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider co
 	self->ignore_movement = false;
 	self->destroy_thread_handle = 0;
 
+	initialize_list(&self->collider.onEnter);
+	initialize_list(&self->collider.onExit);
 
 	add_game_object_to_list(&GameObjects, self);
 
@@ -86,6 +90,17 @@ void GameObject_Start(GameObject* self)
 }
 
 
+PointerList GameObject_BeforePhysics(GameObject* self)
+{
+	//if (self->collider.onEnter.Count == 0 && self->collider.onExit.Count == 0)
+	//	return (PointerList) { 0, 0 };
+
+	GameObjectList objects = GetInteracts(self);
+
+	return *(PointerList*)&objects;
+}
+
+
 GameObject* GameObject_Update(GameObject* self)
 {
 	if (self->update != NULL)
@@ -99,6 +114,63 @@ GameObject* GameObject_Update(GameObject* self)
 	return self;
 }
 
+void GameObject_Physics(GameObject* self, PointerList before_interacts)
+{
+	//if (self->collider.onEnter.Count == 0 && self->collider.onExit.Count == 0)
+	//	return;
+
+	GameObjectList objects = GetInteracts(self);
+
+	PointerList interacts = *(PointerList*)&objects;
+
+	PointerList differents = find_differences_in_lists(&before_interacts, &interacts);
+
+	for (int j = 0; j < differents.Count; j++) // onEnter event
+	{
+		GameObject* obj = (GameObject*)differents.List[j];
+
+		for (int i = 0; i < self->collider.onEnter.Count; i++)
+		{
+			typedef void func(GameObject*, GameObject*);
+			func* f = (func*)self->collider.onEnter.List[i];
+
+			f(self, obj);
+		}
+
+		for (int i = 0; i < obj->collider.onEnter.Count; i++)
+		{
+			typedef void func(GameObject*, GameObject*);
+			func* f = (func*)obj->collider.onEnter.List[i];
+
+			f(obj, self);
+		}
+	}
+
+
+	differents = find_differences_in_lists(&interacts, &before_interacts);
+
+	for (int j = 0; j < differents.Count; j++) // onEnter event
+	{
+
+		GameObject* obj = (GameObject*)differents.List[j];
+
+		for (int i = 0; i < self->collider.onExit.Count; i++)
+		{
+			typedef void func(GameObject*, GameObject*);
+			func* f = (func*)self->collider.onExit.List[i];
+
+			f(self, obj);
+		}
+
+		for (int i = 0; i < obj->collider.onExit.Count; i++)
+		{
+			typedef void func(GameObject*, GameObject*);
+			func* f = (func*)obj->collider.onExit.List[i];
+
+			f(obj, self);
+		}
+	}
+}
 
 void GameObject_Draw(GameObject* self)
 {
