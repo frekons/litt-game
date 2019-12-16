@@ -368,7 +368,7 @@ void enemy_start(GameObject* self) {
 	self->ignore_movement = false;
 }
 
-void create_enemy(void);
+void create_enemy_one(void);
 
 float angle = 0;
 
@@ -411,7 +411,7 @@ GameObject* enemy_update(GameObject * self) {
 
 	if (self->health <= 0) {
 		angle = 0;
-		create_enemy();
+		create_enemy_one((Vector2) { 200, 440 });
 		
 		return NULL; // means destroy self
 	}
@@ -420,7 +420,7 @@ GameObject* enemy_update(GameObject * self) {
 }
 
 
-void create_enemy(void){
+void create_enemy_one(Vector2 position){
 	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 64 , 64 });
 	int animation_count = 1;
 
@@ -443,8 +443,8 @@ void create_enemy(void){
 		animations[0].wait_frame = 6;
 	}
 	Point enemypos;
-	enemypos.x = rand() % 100;
-	enemypos.y = 440;
+	enemypos.x = position.x;
+	enemypos.y = position.y;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 36, 64 }, LAYER_ENEMY, image, animations, animation_count,&enemy_start,&enemy_update);
 	
@@ -603,7 +603,7 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	create_enemy();
+	create_enemy_one((Vector2) { 200, 440 });
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
@@ -676,6 +676,20 @@ void Render()
 			}
 		}
 
+
+	}
+
+}
+
+
+
+void create_enemy(int index, Vector2 position)
+{
+	switch (index)
+	{
+	case 0:
+		create_enemy_one(position);
+		break;
 
 	}
 

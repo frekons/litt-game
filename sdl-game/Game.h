@@ -13,5 +13,6 @@ void Start();
 
 void Render();
 
+void create_enemy(int index, Vector2 position);
 
 //#endif // !GAME_H
