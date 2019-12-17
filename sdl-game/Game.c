@@ -346,7 +346,7 @@ GameObject* localplayer_update(GameObject* self)
 		{
 			GameObject* interacted_object = interact_list.List[i];
 
-			if (interacted_object == NULL || interacted_object == later_on_ground) continue;
+			if (interacted_object == NULL || interacted_object == later_on_ground || interacted_object->collider.is_trigger) continue;
 
 			Point new_position = self->transform->position;
 			self->transform->position = old_position;
