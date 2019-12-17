@@ -1,6 +1,7 @@
 # a little game with c sdl
 ### TODO
-###### Map Editor
+###### map editor
+###### some enemy types
 
 ### Bugs
 - no known bug at the moment.
