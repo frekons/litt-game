@@ -102,44 +102,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Media Include="resources\sounds\attack.wav">
-      <Filter>Resource Files\Sound</Filter>
-    </Media>
-    <Media Include="resources\sounds\coin.wav">
-      <Filter>Resource Files\Sound</Filter>
-    </Media>
-    <Media Include="resources\sounds\jump.wav">
-      <Filter>Resource Files\Sound</Filter>
-    </Media>
-    <Media Include="resources\sounds\kill.wav">
-      <Filter>Resource Files\Sound</Filter>
-    </Media>
-    <Media Include="resources\sounds\unk.wav">
-      <Filter>Resource Files\Sound</Filter>
-    </Media>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\enemies\enemy3.png">
-      <Filter>Resource Files\Enemies</Filter>
-    </Image>
-    <Image Include="resources\players\mario.png">
-      <Filter>Resource Files\Sprites</Filter>
-    </Image>
-    <Image Include="resources\players\player-spritesheet.png">
-      <Filter>Resource Files\Sprites</Filter>
-    </Image>
-    <Image Include="resources\players\spritePlayer.png">
-      <Filter>Resource Files\Sprites</Filter>
-    </Image>
-    <Image Include="resources\environment\ground.png">
-      <Filter>Resource Files\Environment</Filter>
-    </Image>
-    <Image Include="resources\environment\test.png">
-      <Filter>Resource Files\Environment</Filter>
-    </Image>
-    <Image Include="resources\players\player.png">
-      <Filter>Resource Files\Sprites</Filter>
-    </Image>
-  </ItemGroup>
 </Project>

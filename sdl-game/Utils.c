@@ -83,7 +83,7 @@ Point point_sum(Point vec1, Vector2 vec2)
 	return (Point) { vec1.x + vec2.x, vec1.y + vec2.y };
 }
 
-Vector2 vec2_multiplier(Vector2 vec1, float multiplier)
+Vector2 vec2_multiply(Vector2 vec1, float multiplier)
 {
 	return (Vector2) { vec1.x * multiplier, vec1.y * multiplier };
 }
@@ -131,84 +131,93 @@ bool float_compare(float one, float two, float tolerance)
 
 #include "Game.h"
 
-typedef struct sdestroy_info
-{
-	GameObject* object;
-	float after_time;
-}destroy_info;
 
-void destroy_after_backside(destroy_info* info)
-{
-	Sleep(info->after_time * 1000);
 
-	while (wait_to_process_on_to_be_destroyed) Sleep(1);
-
-	add_game_object_to_list(&ToBeDestroyed, info->object);
-
-	free(info);
-}
+//void destroy_after_backside(destroy_info* info)
+//{
+//	Sleep(info->after_time * 1000);
+//
+//	while (wait_to_process_on_to_be_destroyed) Sleep(0);
+//
+//	add_game_object_to_list(&ToBeDestroyed, info->object);
+//
+//	free(info);
+//}
 
 
 void destroy_after(GameObject* object, float after_time)
 {
-	destroy_info* info = (destroy_info*)malloc(sizeof(destroy_info));
+	DestroyInfo* info = (DestroyInfo*)malloc(sizeof(DestroyInfo));
 	info->object = object;
-	info->after_time = after_time;
+	info->time = after_time;
+	info->destroyed = false;
 
-	object->destroy_thread_handle = create_thread(destroy_after_backside, info); // destroy after 3 seconds
+	//while (wait_to_process_on_to_be_destroyed);
+
+	add_member_to_list(&ToBeDestroyed, info);
+
+	//object->destroy_thread_handle = create_thread(destroy_after_backside, info); // destroy after 3 seconds
 }
 
+DestroyInfo* find_in_destroy_info(GameObject* object)
+{
+	for (int i = 0; i < ToBeDestroyed.Count; i++)
+	{
+		DestroyInfo** list = ToBeDestroyed.List;
 
-bool destroy_object(GameObject* object, bool terminate_thread)
+		if (list[i]->object == object)
+			return list[i];
+	}
+
+	return NULL;
+}
+
+bool destroy_object(GameObject* object, bool delete_from_destroy_list)
 {
 	int index = delete_game_object_from_list(&GameObjects, object);
 
 	if (index >= 0)
 	{
-		SDL_DestroyTexture(object->image->texture);
+		if (delete_from_destroy_list)
+		{
+			DestroyInfo* destroy_info = find_in_destroy_info(object);
+			if (destroy_info != NULL)
+			{
+				delete_member_from_list(&ToBeDestroyed, destroy_info);
 
-		free(object->image);
+				free(destroy_info);
+			}
+		}
+			
+
+		UnloadTexture(object->image);
+		//SDL_DestroyTexture(object->image->texture);
+
+		//free(object->image);
 
 		free(object->transform);
 
 		for (int i = 0; i < object->animations.Count; i++)
 		{
-			free(object->animations.List[i]->sprites.List);
-			//free(object->animations.List[i]->state_name);
+			if (object->animations.List[i]->sprites.List != NULL)
+				free(object->animations.List[i]->sprites.List);
 
 			free(object->animations.List[i]);
 		}
-		
-		//free(object->current_state);
 
 		free(object->animations.List);
 
-		if (terminate_thread && object->destroy_thread_handle)
-		{
-			TerminateThread(object->destroy_thread_handle, 0);
-		}
+		//if (delete_from_destroy_list && object->destroy_thread_handle)
+		//{
+		//	TerminateThread(object->destroy_thread_handle, 0);
+		//}
 
 		free(object);
-	
+
+
 		return true;
 	}
 		
 	return false;
-}
-
-
-bool IsBadPtr(void* p)
-{
-	MEMORY_BASIC_INFORMATION mbi = { 0 };
-	if (VirtualQuery(p, &mbi, sizeof(mbi)))
-	{
-		DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
-		bool b = !(mbi.Protect & mask);
-		// check the page is not a guard page
-		if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) b = true;
-
-		return b;
-	}
-	return true;
 }
 

@@ -6,6 +6,10 @@
 
 #include "Utils.h"
 
+#include "Collision.h"
+
+#include "Image.h"
+
 void InitializeDraws()
 {
 	TTF_Init();
@@ -173,11 +177,33 @@ SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* 
 	return Message;
 }
 
-#include "Collision.h"
 
 void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick)
 {
 	DrawFilledRectangleOnScreen(rect, color);
+
+	DrawTextOnScreen(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+
+	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
+	{
+		if (onClick)
+		{
+			typedef void func(void);
+			func* f = (func*)onClick;
+			f();
+
+			mouse_button_mask = 0;
+		}
+	}
+}
+
+void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick)
+{
+	//DrawFilledRectangleOnScreen(rect, color);
+	Image* image = LoadTexture(img_directory, false, (Vector2) { 0, 0 });
+	DrawImage(image, rect, false);
+
+	UnloadTexture(image);
 
 	DrawTextOnScreen(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
 
