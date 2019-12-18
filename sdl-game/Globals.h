@@ -32,4 +32,7 @@ float deltaTime;
 bool renderable_state;
 
 
+bool game_state;
+
+
 //#endif // !GLOBALS_H

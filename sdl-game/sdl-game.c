@@ -59,7 +59,9 @@ int main(int argc, char* argv[])
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT)
-				break;
+			{
+				game_state = false;
+			}
 
 			if (event.type == SDL_MOUSEMOTION)
 			{
@@ -75,6 +77,9 @@ int main(int argc, char* argv[])
 			}
 
 		}
+
+		if (!game_state)
+			break;
 
 		// clear screen
 		SDL_RenderClear(renderer);
