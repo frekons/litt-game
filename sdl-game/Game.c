@@ -194,8 +194,16 @@ void localplayer_start(GameObject* self)
 	self->health = 100;
 
 	self->attack_force = 10;
+
+	self->attack_in_seconds = 0.2f;
+	self->attack_time = 0.4f;
+
+	self->attack_in_seconds = 0.5f;
+	self->attack_time = 0.45f;
+
 	self->attack_in_seconds = 0.35f;
 	self->attack_time = 0.2f;
+
 
 	self->dash_in_seconds = 1.0f;
 	self->dash_force = 3.0f;
