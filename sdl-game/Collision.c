@@ -9,8 +9,23 @@
 
 //#define DEBUG_COLLISION
 
-bool IsInteractingPoint(BoxCollider col, Point point) {
+bool IsInteractingRect(Rect col, Vector2Int point) 
+{
 	// offset is used as position
+
+	return point.x <= col.x + col.w &&
+		point.x >= col.x &&
+		point.y <= col.y + col.h &&
+		point.y >= col.y;
+
+}
+
+bool IsInteractingPoint(BoxCollider col, Point point) 
+{
+	// offset is used as position
+
+	if ((col.size.x == 0 && col.size.y == 0))
+		return false;
 
 	return point.x <= col.offset.x + col.size.x &&
 		point.x >= col.offset.x &&
@@ -23,6 +38,8 @@ bool IsInteractingPoint(BoxCollider col, Point point) {
 bool IsInteracting(BoxCollider col1, BoxCollider col2) {
 	// offset is used as position
 
+	if ((col1.size.x == 0 && col1.size.y == 0) || (col2.size.x == 0 && col2.size.y == 0))
+		return false;
 
 	return col1.offset.x <= col2.offset.x + col2.size.x &&
 		col1.offset.x + col1.size.x >= col2.offset.x &&
@@ -428,7 +445,7 @@ bool is_collides_except(GameObject* self, GameObject* except)
 		if (list.List[i] == NULL)
 			continue;
 
-		if (list.List[i] == except)
+		if (list.List[i] == except || list.List[i]->collider.is_trigger)
 			return false;
 
 		result = true;

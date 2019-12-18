@@ -92,3 +92,34 @@ void delete_member_from_list(PointerList * list, void* member)
 
 	delete_member_at(list, index);
 }
+
+int find_member_in_list(PointerList* list, void* member)
+{
+	for (int i = 0; i < list->Count; i++)
+	{
+		if (list->List[i] == member)
+			return i;
+	}
+
+	return -1;
+}
+
+PointerList find_differences_in_lists(PointerList * list1, PointerList * list2)
+{
+	PointerList differenties;
+	initialize_list(&differenties);
+
+	//for (int i = 0; i < list1->Count; i++)
+	//{
+	//	if (find_member_in_list(list2, list1->List[i]) == -1)
+	//		add_member_to_list(&differenties, list1->List[i]);
+	//}
+
+	for (int i = 0; i < list2->Count; i++)
+	{
+		if (find_member_in_list(list1, list2->List[i]) == -1)
+			add_member_to_list(&differenties, list2->List[i]);
+	}
+
+	return differenties;
+}

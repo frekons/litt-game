@@ -7,6 +7,8 @@
 
 #include "Audio.h"
 
+#include "Utils.h"
+
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
@@ -48,10 +50,24 @@ int main(int argc, char* argv[])
 
 		DWORD start_time = timeGetTime();
 	
-		if (SDL_PollEvent(&event))
+		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT)
 				break;
+
+			if (event.type == SDL_MOUSEMOTION)
+			{
+				Uint32 val = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+
+			}
+
+			if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+			{
+				Uint32 val = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+
+				mouse_button_mask = SDL_BUTTON(val);
+			}
+
 		}
 
 		// clear screen
@@ -85,7 +101,7 @@ int main(int argc, char* argv[])
 
 		DWORD diff = end_time - start_time;
 
-		Uint32 sleep_time = 16 - diff; // 16ms = 1000 / 16 = 62,5 fps
+		Uint32 sleep_time = 15 - diff; // 15ms = 1000 / 15 = 66,6 fps
 
 		if (sleep_time > 0 && sleep_time < 1000)
 		{

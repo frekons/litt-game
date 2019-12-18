@@ -7,6 +7,16 @@
 #include <stdbool.h>
 
 
+struct SPointerList {
+
+	int Count;
+	void** List;
+
+};
+
+
+typedef struct SPointerList PointerList;
+
 struct SIntList {
 
 	int Count;
@@ -24,6 +34,10 @@ void add_int_to_list(IntList * list, int member);
 typedef struct SVector2 {
 	float x, y;
 }Vector2;
+
+typedef struct SVector2Int {
+	int x, y;
+}Vector2Int;
 
 Vector2 create_vec2(float x, float y);
 
@@ -66,6 +80,11 @@ typedef struct SImage {
 struct SBoxCollider
 {
 	Vector2 offset, size;
+	bool is_trigger;
+
+	//events
+	PointerList onEnter; //
+	PointerList onExit; //
 };
 
 typedef struct SBoxCollider BoxCollider;
@@ -81,7 +100,7 @@ struct STransform {
 typedef struct STransform Transform;
 
 typedef struct Animation {
-	char state_name[32];
+	char state_name[24];
 	IntList sprites;
 
 	bool loop;
@@ -139,6 +158,8 @@ typedef struct SGameObject {
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
 	struct GameObject* last_object, *owner;
+
+	void* destroy_thread_handle;
 }GameObject;
 
 
@@ -170,25 +191,20 @@ typedef enum{ // upper means top in rendering
 #define LAYER_EFFECTS 1 << LAYERS_EFFECTS
 
 
-struct SPointerList {
-
-	int Count;
-	void** List;
-
-};
-
-
-typedef struct SPointerList PointerList;
 
 
 
 void initialize_list(PointerList * list);
 
-void add_member_to_list(PointerList * list, void* texture);
+void add_member_to_list(PointerList * list, void* member);
 
 void delete_member_at(PointerList * list, int index);
 
 void delete_member_from_list(PointerList * list, void* member);
+
+int find_member_in_list(PointerList* list, void* member);
+
+PointerList find_differences_in_lists(PointerList * list1, PointerList * list2);
 
 
 //#endif

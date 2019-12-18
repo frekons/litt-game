@@ -8,6 +8,7 @@
 #include "Structs.h"
 
 
+bool IsInteractingRect(Rect col, Vector2Int point);
 
 bool IsInteractingPoint(BoxCollider col, Point point);
 

@@ -34,8 +34,11 @@ bool float_compare(float one, float two, float tolerance);
 
 void destroy_after(GameObject* object, float after_time);
 
-void destroy_object(GameObject* object);
+bool destroy_object(GameObject* object, bool terminate_thread);
 
+bool IsBadPtr(void* p);
 
+Vector2Int mouse_position;
+int mouse_button_mask;
 
 //#endif

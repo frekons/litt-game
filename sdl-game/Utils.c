@@ -137,11 +137,13 @@ typedef struct sdestroy_info
 	float after_time;
 }destroy_info;
 
-void destroy_after_background(destroy_info* info)
+void destroy_after_backside(destroy_info* info)
 {
 	Sleep(info->after_time * 1000);
 
-	delete_game_object_from_list(&GameObjects, info->object);
+	while (wait_to_process_on_to_be_destroyed) Sleep(1);
+
+	add_game_object_to_list(&ToBeDestroyed, info->object);
 
 	free(info);
 }
@@ -153,12 +155,60 @@ void destroy_after(GameObject* object, float after_time)
 	info->object = object;
 	info->after_time = after_time;
 
-	create_thread(destroy_after_background, info); // destroy after 3 seconds
+	object->destroy_thread_handle = create_thread(destroy_after_backside, info); // destroy after 3 seconds
 }
 
 
-void destroy_object(GameObject* object)
+bool destroy_object(GameObject* object, bool terminate_thread)
 {
-	delete_game_object_from_list(&GameObjects, object);
+	int index = delete_game_object_from_list(&GameObjects, object);
+
+	if (index >= 0)
+	{
+		SDL_DestroyTexture(object->image->texture);
+
+		free(object->image);
+
+		free(object->transform);
+
+		for (int i = 0; i < object->animations.Count; i++)
+		{
+			free(object->animations.List[i]->sprites.List);
+			//free(object->animations.List[i]->state_name);
+
+			free(object->animations.List[i]);
+		}
+		
+		//free(object->current_state);
+
+		free(object->animations.List);
+
+		if (terminate_thread && object->destroy_thread_handle)
+		{
+			TerminateThread(object->destroy_thread_handle, 0);
+		}
+
+		free(object);
+	
+		return true;
+	}
+		
+	return false;
+}
+
+
+bool IsBadPtr(void* p)
+{
+	MEMORY_BASIC_INFORMATION mbi = { 0 };
+	if (VirtualQuery(p, &mbi, sizeof(mbi)))
+	{
+		DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+		bool b = !(mbi.Protect & mask);
+		// check the page is not a guard page
+		if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) b = true;
+
+		return b;
+	}
+	return true;
 }
 

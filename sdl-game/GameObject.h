@@ -35,13 +35,18 @@ GameObject* GameObject_New(int id, Point position, Vector2 scale, BoxCollider co
 
 void GameObject_Start(GameObject* self);
 
+PointerList GameObject_BeforePhysics(GameObject* self);
+
 GameObject* GameObject_Update(GameObject* self);
+
+void GameObject_Physics(GameObject* self, PointerList before_interacts);
 
 void GameObject_Draw(GameObject* self);
 
 
 
 
+bool wait_to_make_process_on_gameobject_list;
 
 void initialize_game_object_list(GameObjectList * list);
 
@@ -49,7 +54,7 @@ void add_game_object_to_list(GameObjectList * list, GameObject* game_object);
 
 void delete_game_object_at(GameObjectList * list, int index);
 
-void delete_game_object_from_list(GameObjectList * list, GameObject* game_object);
+int delete_game_object_from_list(GameObjectList * list, GameObject* game_object);
 
 
 ///
