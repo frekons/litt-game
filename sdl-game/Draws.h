@@ -22,6 +22,7 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* font);
 
 void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
+void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
 
 void DrawButtonInGame(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
 

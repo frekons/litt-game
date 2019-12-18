@@ -21,7 +21,12 @@
 
 #include <time.h>
 
+// Winmm.lib;SDL2.lib;legacy_stdio_definitions.lib;SDL2_image.lib;SDL2_mixer.lib
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "SDL2.lib")
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+#pragma comment(lib, "SDL2_image.lib")
+#pragma comment(lib, "SDL2_mixer.lib")
 #pragma comment(lib, "SDL2_ttf.lib")
 
 
@@ -38,6 +43,7 @@ int main(int argc, char* argv[])
 
 	InitializeSounds();
 	InitializeDraws();
+	InitializeImage();
 
 	deltaTime = 0.016;
 

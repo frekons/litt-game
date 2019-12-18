@@ -163,6 +163,12 @@ typedef struct SGameObject {
 }GameObject;
 
 
+typedef struct {
+	GameObject* object;
+	float time;
+	bool destroyed;
+}DestroyInfo;
+
 struct SGameObjectList {
 
 	int Count;
@@ -200,7 +206,7 @@ void add_member_to_list(PointerList * list, void* member);
 
 void delete_member_at(PointerList * list, int index);
 
-void delete_member_from_list(PointerList * list, void* member);
+int delete_member_from_list(PointerList * list, void* member);
 
 int find_member_in_list(PointerList* list, void* member);
 

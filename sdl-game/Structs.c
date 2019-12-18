@@ -80,7 +80,7 @@ void delete_member_at(PointerList * list, int index)
 	//free(addr);
 }
 
-void delete_member_from_list(PointerList * list, void* member)
+int delete_member_from_list(PointerList * list, void* member)
 {
 	int index = -1;
 	for (int i = 0; i < list->Count; i++)
@@ -91,6 +91,8 @@ void delete_member_from_list(PointerList * list, void* member)
 		}
 
 	delete_member_at(list, index);
+
+	return index;
 }
 
 int find_member_in_list(PointerList* list, void* member)

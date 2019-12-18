@@ -381,6 +381,8 @@ GameObject* is_on_platform(GameObject* self, int platform_layermask, float toler
 
 		if (go != NULL)
 		{
+			if (go->collider.is_trigger) continue;
+
 			Vector2 col_left_down = collider_left_down(self);
 
 			Vector2 player_left_down = col_left_down;
@@ -411,6 +413,8 @@ GameObject* is_on_something(GameObject* self, int layermask, float tolerance)
 
 		if (go != NULL)
 		{
+			if (go->collider.is_trigger) continue;
+
 			Vector2 col_left_down = collider_left_down(self);
 
 			Vector2 player_left_down = col_left_down;

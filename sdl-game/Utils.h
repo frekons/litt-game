@@ -17,7 +17,7 @@ float float_lerp(float value1, float value2, float time); // time is between 0, 
 
 Point point_sum(Point vec1, Vector2 vec2);
 
-Vector2 vec2_multiplier(Vector2 vec1, float multiplier);
+Vector2 vec2_multiply(Vector2 vec1, float multiplier);
 
 Vector2 vec2_sum(Point vec1, Vector2 vec2);
 
@@ -35,8 +35,6 @@ bool float_compare(float one, float two, float tolerance);
 void destroy_after(GameObject* object, float after_time);
 
 bool destroy_object(GameObject* object, bool terminate_thread);
-
-bool IsBadPtr(void* p);
 
 Vector2Int mouse_position;
 int mouse_button_mask;

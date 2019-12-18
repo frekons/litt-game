@@ -4,10 +4,55 @@
 
 #include <SDL2/SDL_image.h>
 
+#include "Structs.h"
 
+PointerList image_list;
+
+void InitializeImage()
+{
+	initialize_list(&image_list);
+}
+
+typedef struct {
+	SDL_Texture* texture;
+	char path[128];
+	Rect rect;
+}texture_cache;
+
+texture_cache* find_image(char* path)
+{
+
+	for (int i = 0; i < image_list.Count; i++)
+	{
+		texture_cache* image = image_list.List[i];
+
+		if (image == NULL)
+			continue;
+
+		if (strcmp(image->path, path) == 0)
+			return image;
+	}
+
+	return NULL;
+}
 
 Image* LoadTexture(const char* path, bool sprite_sheet, Vector2 clip_size)
 {
+	texture_cache* cache_image = find_image(path);
+
+	if (cache_image != NULL)
+	{
+		Image* image = (Image*)malloc(sizeof(Image));
+
+		image->rect = cache_image->rect;
+		image->texture = cache_image->texture;
+
+		image->sprite_sheet = sprite_sheet;
+		image->clip_size = clip_size;
+
+		return image;
+	}
+
 	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
 	Rect rect;
 
@@ -26,8 +71,32 @@ Image* LoadTexture(const char* path, bool sprite_sheet, Vector2 clip_size)
 	image->sprite_sheet = sprite_sheet;
 	image->clip_size = clip_size;
 
-	return image;
+	cache_image = (texture_cache*)malloc(sizeof(texture_cache));
 
+	cache_image->texture = texture;
+	strcpy(cache_image->path, path, sizeof(cache_image->path));
+	cache_image->rect = rect;
+
+	add_member_to_list(&image_list, cache_image);
+
+	return image;
+}
+
+#include "Utils.h"
+
+bool UnloadTexture(Image* img)
+{
+	//SDL_DestroyTexture(img->texture);
+
+	free(img);
+
+	//int index = delete_member_from_list(&image_list, img);
+
+	//printf("index: %d\n", index);
+
+	//return index >= 0;
+
+	return true;
 }
 
 
