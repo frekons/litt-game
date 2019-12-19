@@ -197,13 +197,13 @@ bool destroy_object(GameObject* object, bool delete_from_destroy_list)
 
 		free(object->transform);
 
-		for (int i = 0; i < object->animations.Count; i++)
-		{
-			if (object->animations.List[i]->sprites.List != NULL)
-				free(object->animations.List[i]->sprites.List);
+		//for (int i = 0; i < object->animations.Count; i++)
+		//{
+		//	if (object->animations.List[i]->sprites.List != NULL)
+		//		free(object->animations.List[i]->sprites.List);
 
-			free(object->animations.List[i]);
-		}
+		//	free(object->animations.List[i]);
+		//}
 
 		free(object->animations.List);
 

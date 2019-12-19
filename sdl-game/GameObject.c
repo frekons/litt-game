@@ -22,6 +22,9 @@ Camera* create_camera(int screen_width, int screen_height)
 	cam->width = screen_width;
 	cam->height = screen_height;
 
+	cam->shake_force = 0;
+	cam->shake_time = 0;
+
 	return cam;
 }
 
@@ -172,6 +175,13 @@ void GameObject_Physics(GameObject* self, PointerList before_interacts)
 	}
 }
 
+void shake_camera(float force, float time)
+{
+	camera->shake_force = force;
+	camera->shake_time = time;
+}
+
+
 void GameObject_Draw(GameObject* self)
 {
 	if (self == NULL || self->image == NULL) return;
@@ -179,6 +189,18 @@ void GameObject_Draw(GameObject* self)
 	Rect rect;
 	rect.x = self->transform->position.x - (camera->position.x - camera->width / 2);
 	rect.y = self->transform->position.y - (camera->position.y - camera->height / 2);
+	
+	if (camera->shake_time > 0 && camera->shake_force != 0)
+	{
+		float x = (float)rand() / (float)(RAND_MAX / (camera->shake_force * 2.0f)) - camera->shake_force;
+		float y = (float)rand() / (float)(RAND_MAX / (camera->shake_force * 2.0f)) - camera->shake_force;
+
+		rect.x -= x;
+		rect.y -= y;
+
+		camera->shake_time -= deltaTime;
+	}
+
 
 	if (!self->image->sprite_sheet)
 	{
@@ -332,17 +354,22 @@ bool compare_animator_state(GameObject* self, char* state) // time is in seconds
 }
 
 
-bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move) // time is in seconds
+bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move, bool dont_check) // time is in seconds
 {
-	if (compare_animator_state(self, state))
-		return false;
+	if (!dont_check)
+	{
+		if (compare_animator_state(self, state))
+			return false;
+	}
+
 
 	if (ignore_move) // logical
 		self->ignore_movement = true;
 
 	float current_time = get_time();
 
-	if (self->ignore_movement_time > current_time) return false;
+	if (!dont_check)
+		if (self->ignore_movement_time > current_time) return false;
 
 	self->ignore_movement_time = current_time + time;
 

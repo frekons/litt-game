@@ -75,7 +75,10 @@ GameObject* ammo_update(GameObject* self) {
 		
 		if (go == NULL || go == self->owner)
 			continue;
-		
+
+		if (go->layer == LAYER_ENEMY && go->health <= 0)
+			continue;
+
 		if (go->health > 0)
 			go->health -= self->attack_force;
 
@@ -125,50 +128,7 @@ void create_ammo(GameObject * self) {
 } 
 
 
-void attack(GameObject* self)
-{
-	float timer = 0;
 
-	while (timer <= self->attack_time)
-	{
-		timer += deltaTime;
-
-		float x_size = (self->collider.size.x) * self->transform->scale.x;
-		float y_size = (self->collider.size.x) * self->transform->scale.y;
-
-		float forward = self->transform->left ? -16 / (x_size + 4) : 1;
-
-		BoxCollider boxcol;
-		boxcol.size = (Vector2) { (x_size * 1.5f), y_size * 0.5f };
-		boxcol.offset = (Vector2) { forward * (x_size + 4), y_size * 0.5f };
-
-		bool to_break = false;
-
-		GameObjectList list = GetInteractsOfCollider(boxcol, self->transform->position);
-		for (int i = 0; i < list.Count; i++) {
-
-			if (list.List[i] == NULL)
-				continue;
-
-			GameObject* go = list.List[i];
-
-			if (go == self)
-				continue;
-
-			if (go->health > 0)
-				go->health -= self->attack_force;
-
-			to_break = true;
-
-			printf("dmg to %X, left health: %d\n", go, go->health);
-		}
-
-		if (to_break)
-			break;
-
-		Sleep((int)(deltaTime * 1000));
-	}
-}
 
 void on_collision_enter(GameObject* self, GameObject* other)
 {
@@ -194,12 +154,6 @@ void localplayer_start(GameObject* self)
 	self->health = 100;
 
 	self->attack_force = 10;
-
-	self->attack_in_seconds = 0.2f;
-	self->attack_time = 0.4f;
-
-	self->attack_in_seconds = 0.5f;
-	self->attack_time = 0.45f;
 
 	self->attack_in_seconds = 0.35f;
 	self->attack_time = 0.2f;
@@ -229,13 +183,14 @@ GameObject* localplayer_update(GameObject* self)
 	//DrawButtonInGame("button", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 	//DrawButtonWithImageOnScreen("button", "resources/enemies/enemy.png", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 
-	char buffer[12];
-	Vector2 healtbar = collider_center(self);
-	healtbar.y -= self->collider.size.y*1.5;
-	
+	Vector2 healtbar_position = collider_center(self);
+	healtbar_position.y -= self->collider.size.y*1.5;
 
+	char buffer[12];
 	snprintf(buffer, sizeof(buffer), "%d", self->health);
-	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+
+	DrawTextInGame(buffer, healtbar_position, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+
 	
 	float cur_time = get_time();
 
@@ -269,7 +224,7 @@ GameObject* localplayer_update(GameObject* self)
 
 			self->velocity.y = -jump_force;
 
-			set_animator_state(self, "jump", 0, 0);
+			set_animator_state(self, "jump", 0, 0, 0);
 			play_sound("resources/sounds/jump.wav");
 
 			Vector2 center = collider_center(self);
@@ -287,31 +242,31 @@ GameObject* localplayer_update(GameObject* self)
 		if (!(self->ignore_movement && self->ignore_movement_time > cur_time))
 		{
 
-			if (keystate[SDL_SCANCODE_RIGHT])
+			if (keystate[SDL_SCANCODE_RIGHT] && last_input == SDL_SCANCODE_RIGHT)
 			{
 				self->transform->left = false;
 
 				self->velocity.x = clamp(self->velocity.x + player_accel, -1.0f, 1.0f);
 
-				set_animator_state(self, "run", 0, 0);
+				set_animator_state(self, "run", 0, 0, 0);
 			}
-			else if (keystate[SDL_SCANCODE_LEFT])
+			else if (keystate[SDL_SCANCODE_LEFT] && last_input == SDL_SCANCODE_LEFT)
 			{
 				self->transform->left = true;
 
 				self->velocity.x = clamp(self->velocity.x - player_accel, -1.0f, 1.0f);
 
-				set_animator_state(self, "run", 0, 0);
+				set_animator_state(self, "run", 0, 0, 0);
 			}
 			else // no input
 			{
 				self->velocity.x = float_lerp(self->velocity.x, 0, player_accel);
 				if (on_ground)
-					set_animator_state(self, "idle", 0, 0);
+					set_animator_state(self, "idle", 0, 0, 0);
 				
 			}
 			if (!on_ground) {
-				set_animator_state(self, "jump", 0, 0);
+				set_animator_state(self, "jump", 0, 0, 0);
 			}
 
 			if (keystate[SDL_SCANCODE_X] && self->attack_in_seconds_counter <= cur_time) // fire
@@ -319,9 +274,9 @@ GameObject* localplayer_update(GameObject* self)
 				play_sound("resources/sounds/shoot.wav");
 
 				if (on_ground)
-					set_animator_state(self, "shoot", self->attack_time, true);
+					set_animator_state(self, "shoot", self->attack_time, true, 0);
 				else
-					set_animator_state(self, "shootonair", self->attack_time, true);
+					set_animator_state(self, "shootonair", self->attack_time, true, 0);
 
 
 				create_ammo(self);
@@ -332,7 +287,7 @@ GameObject* localplayer_update(GameObject* self)
 
 			if (keystate[SDL_SCANCODE_Z] && self->dash_in_seconds_counter <= cur_time) // dash
 			{
-				set_animator_state(self, "dash", 0.35f, true);
+				set_animator_state(self, "dash", 0.35f, true, 0);
 
 				play_sound("resources/sounds/dash.wav");
 
@@ -388,30 +343,10 @@ GameObject* localplayer_update(GameObject* self)
 	}
 	else // dead
 	{
-		set_animator_state(self, "die", 0, false);
+		set_animator_state(self, "die", 0, false, 0);
 	}
 	return self;
 }
-
-void enemy_start(GameObject* self) {
-
-	self->health = 50;
-
-	self->velocity = (Vector2) { 0, 0 };
-
-	self->attack_force = 20;
-	self->attack_in_seconds = 0.7f;
-	self->attack_time = 0.4f;
-
-
-	self->attack_in_seconds_counter = 0;
-	self->ignore_movement_time = 0;
-	self->ignore_movement = false;
-}
-
-void create_enemy_one(void);
-
-float angle = 0;
 
 float lineer_sin(float val, int* slope)
 {
@@ -433,92 +368,218 @@ float lineer_sin(float val, int* slope)
 	return 0;
 }
 
-GameObject* enemy_update(GameObject * self) {
+void attack_enemy_one(GameObject* self)
+{
+	Sleep((int)(self->attack_preparation_time * 1000));
+
+	if (self->health <= 0)
+		return;
+
+	play_sound("resources/sounds/enemy1_hit.wav");
+
+	float timer = 0;
+
+	while (timer <= self->attack_time)
+	{
+		if (self->health <= 0)
+			break;
+
+		timer += deltaTime;
+
+		float x_size = (self->collider.size.x) * self->transform->scale.x;
+		float y_size = (self->collider.size.x) * self->transform->scale.y;
+
+		float forward = self->transform->left ? -1 : 1;
+
+		BoxCollider boxcol;
+		boxcol.size = (Vector2) { (x_size * 1.5f), y_size * 0.5f };
+		boxcol.offset = (Vector2) { forward * (x_size + 4), y_size * 0.5f };
+
+		bool to_break = false;
+
+		Vector2 center = collider_center(self);
+		Point point = { center.x, center.y };
+
+		GameObjectList list = GetInteractsOfCollider(boxcol, point);
+		for (int i = 0; i < list.Count; i++) {
+
+			if (list.List[i] == NULL)
+				continue;
+
+			GameObject* go = list.List[i];
+
+			if (go == self)
+				continue;
+
+			if (go->health > 0)
+			{
+				go->health -= self->attack_force;
+
+				if (go->layer == LAYER_PLAYER)
+					shake_camera(2.0f, 0.5f);
+			}
+
+
+			to_break = true;
+		}
+
+		if (to_break)
+			break;
+
+		Sleep((int)(deltaTime * 1000));
+	}
+}
+
+void create_enemy_one(Vector2);
+
+void enemy_one_start(GameObject* self) {
+
+	self->health = 50;
+
+	self->velocity = (Vector2) { 0, 0 };
+
+	self->attack_force = 20;
+	self->attack_range = 45;
+	self->attack_in_seconds = 2.0f;
+	self->attack_time = 0.2f;
+	self->attack_preparation_time = 0.6f;
+
+
+	self->attack_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+}
+
+GameObject* enemy_one_update(GameObject * self) {
+	
+	if (self->health == INT_MIN)
+		return self;
 	
 	char buffer[12];
 	Vector2 healtbar = collider_center(self);
 	healtbar.y -= self->collider.size.y * 1.5;
 
-
 	snprintf(buffer, sizeof(buffer), "%d", self->health);
 	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
 	
+	if (self->health <= 0) {
+	
+		set_animator_state(self, "die", 999, 1, 1);
+		self->health = INT_MIN;
+		destroy_after(self, 3.0f);
+
+		create_enemy(0, (Vector2) { 100 + rand() % 401, 464 });
+
+		return self;
+	}
+
+	if (self->ignore_movement && self->ignore_movement_time >= get_time())
+		return self;
+
+	self->ignore_movement = false;
+
 	float dist = fabs(collider_center(local_player).x- collider_center(self).x);
 
 	float velx = sign(local_player->transform->position.x - self->transform->position.x);
-	if (dist < 60) {
-		if (self->attack_in_seconds_counter <= get_time()) {
+	if (dist < self->attack_range) {
 
-			float timex = get_time();
+		if (local_player->health > 0 && self->attack_in_seconds_counter <= get_time()) {
 
-			GameObjectList list = GetInteractsOfCollider((BoxCollider) { velx * 60, 0, 30, 30 }, (Point) { collider_center(self).x, collider_center(self).y });
-			printf("%d\n", list.Count);
+			set_animator_state(self, "attack", self->attack_in_seconds, 1, 1);
 
-			for (int i = 0; i < list.Count; i++) {
-				if (list.List[i] == self) {
-					continue;
-				}
-				list.List[i]->health -= 5;
-				self->attack_in_seconds_counter = timex + 6;
-
-			}
-
+			create_thread(&attack_enemy_one, self);
 		}
+
 	}
 	else
 	{
-		
-		self->transform->position.x += velx*deltaTime*50;
+		set_animator_state(self, "run", 0, 0, 0);
+
+		self->transform->position.x += velx * deltaTime * 50;
 		
 		self->transform->left = velx < 0;
-		
 	}
 
 	
 
-	if (self->health <= 0) {
-		angle = 0;
-		create_enemy_one((Vector2) { 200, 440 });
-	
-
-		return NULL; // means destroy self
-	}
 
 	return self;
 }
 
 
 void create_enemy_one(Vector2 position){
-	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 40 , 39 });
-	int animation_count = 1;
+	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 43 , 39 });
+	int animation_count = 4;
 
 	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
 
-	strcpy(animations[0].state_name, "idle");
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
 	{
-		initialize_int_list(&animations[0].sprites);
+		initialize_int_list(&animations[cur_anim].sprites);
 
-		add_int_to_list(&animations[0].sprites, 8);
-		add_int_to_list(&animations[0].sprites, 9);
-		add_int_to_list(&animations[0].sprites, 10);
-		add_int_to_list(&animations[0].sprites, 11);
+		for (int i = 32; i <= 42; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
 
+		animations[cur_anim].loop = true;
 
-		animations[0].loop = true;
-
-		animations[0].current_index = 0;
-		animations[0].current_frame = 0;
-		animations[0].wait_frame = 6;
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
 	}
-	Point enemypos;
-	enemypos.x = position.x;
-	enemypos.y = position.y;
 
-	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 36, 64 }, LAYER_ENEMY, image, animations, animation_count,&enemy_start,&enemy_update);
-	
-	
-	
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "run");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
 
+		for (int i = 44; i <= 56; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "attack");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 17; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "die");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 18; i <= 32; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 27, 39 }, LAYER_ENEMY, image, animations, animation_count, &enemy_one_start, &enemy_one_update);
 }
 
 
@@ -671,7 +732,7 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	create_enemy_one((Vector2) { 200, 440 });
+	create_enemy_one((Vector2) { 200, 464 });
 }
 
 GameObjectList GetObjectsOfLayer(int layer)

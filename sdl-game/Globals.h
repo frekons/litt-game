@@ -31,8 +31,20 @@ float deltaTime;
 
 bool renderable_state;
 
+int last_input;
 
-bool game_state;
+
+typedef enum {
+
+	MENU = 0,
+	INGAME,
+	PAUSE,
+	QUIT
+
+}GAME_STATES;
+
+
+GAME_STATES game_state;
 
 
 //#endif // !GLOBALS_H

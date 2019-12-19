@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 		{
 			if (event.type == SDL_QUIT)
 			{
-				game_state = false;
+				game_state = QUIT;
 			}
 
 			if (event.type == SDL_MOUSEMOTION)
@@ -76,9 +76,47 @@ int main(int argc, char* argv[])
 				mouse_button_mask = SDL_BUTTON(val);
 			}
 
+			if (event.type == SDL_KEYDOWN)
+			{
+				switch (event.key.keysym.scancode)
+				{
+				case SDL_SCANCODE_LEFT:
+					last_input = SDL_SCANCODE_LEFT;
+
+					break;
+
+				case SDL_SCANCODE_RIGHT:
+					last_input = SDL_SCANCODE_RIGHT;
+
+					break;
+
+					default:
+						break;
+				}
+			}
+
+			if (event.type == SDL_KEYUP)
+			{
+				switch (event.key.keysym.scancode)
+				{
+				case SDL_SCANCODE_LEFT:
+					last_input = SDL_SCANCODE_RIGHT;
+
+					break;
+
+				case SDL_SCANCODE_RIGHT:
+					last_input = SDL_SCANCODE_LEFT;
+
+					break;
+
+				default:
+					break;
+				}
+			}
+
 		}
 
-		if (!game_state)
+		if (game_state == QUIT)
 			break;
 
 		// clear screen
@@ -87,7 +125,19 @@ int main(int argc, char* argv[])
 		// draw processes
 		renderable_state = true;
 
-		Render();
+		if (game_state == MENU)
+		{
+
+		}
+		else if(game_state == INGAME)
+		{
+			Render();
+
+		}
+		else if (game_state == PAUSE)
+		{
+
+		}
 
 		renderable_state = false;
 		// show

@@ -122,6 +122,7 @@ typedef struct SCamera {
 
 	Point position;
 	int width, height;
+	float shake_time, shake_force;
 
 }Camera;
 
@@ -153,7 +154,8 @@ typedef struct SGameObject {
 	float ignore_movement_time;
 
 	int attack_force;
-	float attack_in_seconds, attack_in_seconds_counter, attack_time; 
+	float attack_range;
+	float attack_in_seconds, attack_in_seconds_counter, attack_time, attack_preparation_time; 
 
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 

@@ -18,7 +18,7 @@ Camera* camera;
 
 Camera* create_camera(int screen_width, int screen_height);
 
-
+void shake_camera(float force, float time);
 
 
 
@@ -27,7 +27,7 @@ Animation * get_animation_sprites(GameObject* self, char* state);
 
 bool compare_animator_state(GameObject* self, char* state); // time is in seconds
 
-bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move); // time is in seconds
+bool set_animator_state(GameObject* self, char* state, float time, bool ignore_move, bool dont_check); // time is in seconds
 
 
 

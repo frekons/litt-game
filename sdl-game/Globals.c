@@ -1,7 +1,7 @@
 #include "Common.h"
 
 
-bool game_state = true;
+GAME_STATES game_state = INGAME;
 
 
 void GetDesktopResolution(int* horizontal, int* vertical) // https://stackoverflow.com/questions/8690619/how-to-get-screen-resolution-in-c
