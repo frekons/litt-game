@@ -231,7 +231,7 @@ GameObject* localplayer_update(GameObject* self)
 
 	char buffer[12];
 	Vector2 healtbar = collider_center(self);
-	healtbar.y -= self->collider.size.y*2;
+	healtbar.y -= self->collider.size.y*1.5;
 	
 
 	snprintf(buffer, sizeof(buffer), "%d", self->health);
@@ -435,27 +435,36 @@ float lineer_sin(float val, int* slope)
 
 GameObject* enemy_update(GameObject * self) {
 	
-	
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y * 1.5;
+
+
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
 	
 	float dist = fabs(collider_center(local_player).x- collider_center(self).x);
 
 	float velx = sign(local_player->transform->position.x - self->transform->position.x);
-	if (dist < 60 && self->attack_in_seconds_counter<=get_time()) {
-		
-		float timex = get_time();
-		
-		GameObjectList list=GetInteractsOfCollider((BoxCollider) { velx * 60, 0, 30, 30 }, (Point) { collider_center(self).x, collider_center(self).y });
-		for (int i = 0; i < list.Count; i++) {
-			if (list.List[i] == self) {
-				continue;
-		   }
-			list.List[i]->health -= 5;
-			//self->attack_in_seconds_counter = timex + 6;
+	if (dist < 60) {
+		if (self->attack_in_seconds_counter <= get_time()) {
+
+			float timex = get_time();
+
+			GameObjectList list = GetInteractsOfCollider((BoxCollider) { velx * 60, 0, 30, 30 }, (Point) { collider_center(self).x, collider_center(self).y });
+			printf("%d\n", list.Count);
+
+			for (int i = 0; i < list.Count; i++) {
+				if (list.List[i] == self) {
+					continue;
+				}
+				list.List[i]->health -= 5;
+				self->attack_in_seconds_counter = timex + 6;
+
+			}
 
 		}
-		
 	}
-
 	else
 	{
 		
@@ -598,7 +607,7 @@ void Start()
 			add_int_to_list(&animations[3].sprites, 31);
 
 
-			animations[3].loop = true;
+			animations[3].loop = false;
 
 			animations[3].current_index = 0;
 			animations[3].current_frame = 0;
