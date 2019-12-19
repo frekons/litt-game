@@ -455,7 +455,7 @@ GameObject* enemy_update(GameObject * self) {
 
 
 void create_enemy_one(Vector2 position){
-	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 64 , 64 });
+	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 40 , 39 });
 	int animation_count = 1;
 
 	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
