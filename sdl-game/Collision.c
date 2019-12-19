@@ -7,7 +7,7 @@
 
 #include "Utils.h"
 
-//#define DEBUG_COLLISION
+#define DEBUG_COLLISION
 
 bool IsInteractingRect(Rect col, Vector2Int point) 
 {
