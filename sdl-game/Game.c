@@ -229,7 +229,14 @@ GameObject* localplayer_update(GameObject* self)
 	//DrawButtonInGame("button", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 	//DrawButtonWithImageOnScreen("button", "resources/enemies/enemy.png", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y*1.5;
+	
 
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+	
 	float cur_time = get_time();
 
 	if (self->health > 0) // alive
@@ -428,25 +435,52 @@ float lineer_sin(float val, int* slope)
 
 GameObject* enemy_update(GameObject * self) {
 	
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y * 1.5;
+
+
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
 	
-	int slope;
-	self->transform->position.x = 200 + lineer_sin(angle, &slope) * 200;
+	float dist = fabs(collider_center(local_player).x- collider_center(self).x);
 
-	if (slope < 0)
-		self->transform->left = true;
+	float velx = sign(local_player->transform->position.x - self->transform->position.x);
+	if (dist < 60) {
+		if (self->attack_in_seconds_counter <= get_time()) {
+
+			float timex = get_time();
+
+			GameObjectList list = GetInteractsOfCollider((BoxCollider) { velx * 60, 0, 30, 30 }, (Point) { collider_center(self).x, collider_center(self).y });
+			printf("%d\n", list.Count);
+
+			for (int i = 0; i < list.Count; i++) {
+				if (list.List[i] == self) {
+					continue;
+				}
+				list.List[i]->health -= 5;
+				self->attack_in_seconds_counter = timex + 6;
+
+			}
+
+		}
+	}
 	else
-		self->transform->left = false;
+	{
+		
+		self->transform->position.x += velx*deltaTime*50;
+		
+		self->transform->left = velx < 0;
+		
+	}
 
-	angle += deltaTime * 0.75f;
-
-	if (angle > 4)
-		angle = 0;
-
+	
 
 	if (self->health <= 0) {
 		angle = 0;
 		create_enemy_one((Vector2) { 200, 440 });
-		
+	
+
 		return NULL; // means destroy self
 	}
 
@@ -573,7 +607,7 @@ void Start()
 			add_int_to_list(&animations[3].sprites, 31);
 
 
-			animations[3].loop = true;
+			animations[3].loop = false;
 
 			animations[3].current_index = 0;
 			animations[3].current_frame = 0;
