@@ -67,7 +67,7 @@ GameObject* ammo_update(GameObject* self) {
 
 	self->transform->position.x += self->velocity.x * deltaTime;
 	
-	GameObjectList list = GetInteracts(self);
+	GameObjectList list = GetInteractsExceptLayer(self, LAYER_EFFECTS);
 	
 	for (int i = 0; i < list.Count; i++) {
 	
