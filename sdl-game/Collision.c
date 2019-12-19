@@ -69,9 +69,18 @@ GameObjectList GetInteractsOfCollider(BoxCollider col1, Point position)
 	for (int i = 0; i < GameObjects.Count; i++)
 	{
 		GameObject* go = GameObjects.List[i];
+
 		if (go == NULL)
 			continue;
+
 		BoxCollider col2 = go->collider;
+
+		col2.offset.x *= go->transform->scale.x;
+		col2.offset.y *= go->transform->scale.y;
+
+		col2.size.x *= go->transform->scale.x;
+		col2.size.y *= go->transform->scale.y;
+
 		col2.offset.x += go->transform->position.x;
 		col2.offset.y += go->transform->position.y;
 
