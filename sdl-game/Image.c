@@ -74,7 +74,7 @@ Image* LoadTexture(const char* path, bool sprite_sheet, Vector2 clip_size)
 	cache_image = (texture_cache*)malloc(sizeof(texture_cache));
 
 	cache_image->texture = texture;
-	strcpy(cache_image->path, path, sizeof(cache_image->path));
+	memcpy(cache_image->path, path, sizeof(cache_image->path));
 	cache_image->rect = rect;
 
 	add_member_to_list(&image_list, cache_image);
