@@ -20,4 +20,6 @@ GameObject* create_particle(char* image_directory, Vector2 clip_size, Vector2 sc
 
 void create_enemy(int index, Vector2 position);
 
+void create_trap(int index, Vector2 position);
+
 //#endif // !GAME_H

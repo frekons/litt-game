@@ -69,7 +69,7 @@ GameObject* ammo_update(GameObject* self) {
 
 	self->transform->position.y += self->velocity.y;
 	
-	GameObjectList list = GetInteractsExceptLayer(self, LAYER_EFFECTS);
+	GameObjectList list = GetInteractsExceptLayer(self, LAYER_EFFECTS | LAYER_TRAPS);
 	
 	for (int i = 0; i < list.Count; i++) {
 	
@@ -951,7 +951,7 @@ void attack_boss(GameObject* self)
 
 void boss_start(GameObject* self) {
 
-	self->health = 100;
+	self->health = 500;
 
 	self->velocity = (Vector2) { 0, 0 };
 
@@ -1149,9 +1149,13 @@ void timer(GameObject * self) {
 	while (time > 0) {
 		GameObjectList list=  GetInteractsOnlyLayer(self, LAYER_PLAYER);
 		for (int i = 0; i < list.Count; i++) {
-			if(list.List[i]->health>0)
-			list.List[i]->health -= self->attack_force;
 
+			if (list.List[i]->health > 0)
+			{
+				list.List[i]->health -= self->attack_force;
+				list.List[i]->extra_velocity.y = -3.0f;
+			}
+			
 		}
 		if (list.Count > 0) {
 			break;
@@ -1560,4 +1564,20 @@ void create_enemy(int index, Vector2 position)
 		break;
 	}
 	
+}
+
+void create_trap(int index, Vector2 position)
+{
+	switch (index)
+	{
+	case 0:
+		create_trap_one(position);
+		break;
+
+	case 1:
+		create_trap_two(position);
+		break;
+
+	}
+
 }
