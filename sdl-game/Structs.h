@@ -156,6 +156,7 @@ typedef struct SGameObject {
 	int attack_force;
 	float attack_range;
 	float attack_in_seconds, attack_in_seconds_counter, attack_time, attack_preparation_time; 
+	float projectile_speed;
 
 	float dash_in_seconds, dash_in_seconds_counter, dash_force;
 
@@ -187,8 +188,8 @@ typedef enum{ // upper means top in rendering
 	LAYERS_NONE = 0, // not rendering this
 	LAYERS_ENEMY,
 	LAYERS_PLAYER,
-	LAYERS_GROUND,
 	LAYERS_EFFECTS,
+	LAYERS_GROUND,
 
 }LAYERS;
 

@@ -66,6 +66,8 @@ GameObject* ammo_update(GameObject* self) {
 		return self;
 
 	self->transform->position.x += self->velocity.x * deltaTime;
+
+	self->transform->position.y += self->velocity.y;
 	
 	GameObjectList list = GetInteractsExceptLayer(self, LAYER_EFFECTS);
 	
@@ -84,7 +86,7 @@ GameObject* ammo_update(GameObject* self) {
 
 		play_sound("resources/sounds/boom.wav");
 
-		GameObject* particle = create_particle("resources/effects/bullet-particle.png", (Vector2) { 12, 12 }, (Vector2) {1,1}, point_sum(self->transform->position, vec2_multiply(self->velocity, deltaTime)), 4, 6);
+		GameObject* particle = create_particle("resources/effects/bullet-particle.png", (Vector2) { 12, 12 }, (Vector2) { 1, 1 }, point_sum((Point) { collider_center(self).x, collider_center(self).y }, vec2_multiply(self->velocity, deltaTime)), 4, 6);
 
 		destroy_after(particle, .5f);
 
@@ -96,8 +98,10 @@ GameObject* ammo_update(GameObject* self) {
 }
 
 
-void create_ammo(GameObject * self) {
-	Image* image = LoadTexture("resources/effects/bullet.png", true, (Vector2) {12,12});
+void create_ammo(GameObject * self, char* texture, bool is_sprite_sheet, Vector2 sprite_size, Vector2 offset, Vector2 scale) {
+	
+	Image* image = LoadTexture(texture, is_sprite_sheet, sprite_size);
+	
 	int animation_count = 1;
 
 	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
@@ -116,14 +120,17 @@ void create_ammo(GameObject * self) {
 		animations[0].current_frame = 0;
 		animations[0].wait_frame = 6;
 	}
-	Point ammopos;
-	ammopos.x = self->transform->position.x + (self->transform->left ? -5 : 89);
-	ammopos.y = self->transform->position.y + 35;
+
+	Vector2 center = collider_center(self);
+
+	Point ammoPosition = { center.x + (self->transform->left ? -offset.x : offset.x), center.y + offset.y };
 	
-	GameObject* ammo = GameObject_New(GameObjects.Count, ammopos, (Vector2) { 1, 1 }, (BoxCollider) { 0, 0, 12, 12 }, LAYER_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
+	GameObject* ammo = GameObject_New(GameObjects.Count, ammoPosition, scale, (BoxCollider) { 0, 0, sprite_size.x, sprite_size.y }, LAYER_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
+	
 	ammo->owner = self;
-	ammo->velocity.x = player_speed * (self->transform->left ? -1 : 1);
+	ammo->velocity.x = self->projectile_speed * (self->transform->left ? -1 : 1);
 	ammo->attack_force = self->attack_force;
+	ammo->transform->left = self->transform->left;
 
 } 
 
@@ -134,6 +141,13 @@ void on_collision_enter(GameObject* self, GameObject* other)
 {
 	printf("COLLISION ENTER!\n");
 
+	if (other->layer == LAYER_ENEMY)
+	{
+		self->health -= 5;
+		shake_camera(3.0f, 0.5f);
+
+		self->extra_velocity.x = sign(self->transform->position.x - other->transform->position.x) * 2.0f;
+	}
 }
 
 void on_collision_exit(GameObject* self, GameObject* other)
@@ -157,6 +171,8 @@ void localplayer_start(GameObject* self)
 
 	self->attack_in_seconds = 0.35f;
 	self->attack_time = 0.2f;
+
+	self->projectile_speed = player_speed;
 
 
 	self->dash_in_seconds = 1.0f;
@@ -279,7 +295,7 @@ GameObject* localplayer_update(GameObject* self)
 					set_animator_state(self, "shootonair", self->attack_time, true, 0);
 
 
-				create_ammo(self);
+				create_ammo(self, "resources/effects/bullet.png", true, (Vector2) { 12, 12 }, (Vector2) { 50, -10 }, (Vector2) {1,1});
 
 				self->attack_in_seconds_counter = cur_time + self->attack_in_seconds;
 
@@ -603,7 +619,13 @@ void enemy_two_start(GameObject* self) {
 GameObject* enemy_two_update(GameObject * self) {
 
 	if (self->health == INT_MIN)
+	{
+		if (GetInteractsOnlyLayer(self, LAYER_GROUND).Count <= 0)
+			self->transform->position.y += deltaTime * 100.0f;
+
 		return self;
+	}
+		
 
 	char buffer[12];
 	Vector2 healtbar = collider_center(self);
@@ -718,6 +740,148 @@ void create_enemy_two(Vector2 position) {
 	Point enemypos = *(Point*)&position;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 12,24  }, LAYER_ENEMY, image, animations, animation_count, &enemy_two_start, &enemy_two_update);
+}
+
+void enemy_three_start(GameObject* self) {
+
+	self->health = 20;
+
+	self->velocity = (Vector2) { 0, 0 };
+
+	self->attack_force = 5;
+	self->attack_range = 250;
+	self->attack_in_seconds = 2.0f;
+	self->attack_time = 0.2f;
+	self->attack_preparation_time = 0.05f;
+
+	self->projectile_speed = player_speed * 2.0f;
+
+
+	self->attack_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+}
+
+GameObject* enemy_three_update(GameObject * self) {
+
+	if (self->health == INT_MIN)
+		return self;
+
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y * 1.5;
+
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+
+	if (self->health <= 0) {
+
+		//set_animator_state(self, "die", 999, 1, 1);
+		self->health = INT_MIN;
+		//destroy_after(self, 3.0f);
+
+		create_enemy(2, (Vector2) { 100 + rand() % 401, 464 });
+
+		return NULL;
+	}
+
+	float velx = sign(local_player->transform->position.x - self->transform->position.x);
+
+	self->transform->left = velx < 0;
+
+	if (self->ignore_movement && self->ignore_movement_time >= get_time())
+		return self;
+
+	self->ignore_movement = false;
+
+	float dist = fabs(collider_center(local_player).x - collider_center(self).x);
+
+
+
+	if (dist < self->attack_range) {
+
+		if (local_player->health > 0 && self->attack_in_seconds_counter <= get_time()) {
+
+			set_animator_state(self, "attack", self->attack_in_seconds, 1, 1);
+
+			play_sound("resources/sounds/shoot.wav");
+
+			create_ammo(self, "resources/effects/arrow.png", true, (Vector2) { 16, 5 }, (Vector2) { 30, -15 }, (Vector2) {3,3});
+		}
+
+	}
+	else
+	{
+		set_animator_state(self, "run", 0, 0, 0);
+
+		self->transform->position.x += velx * deltaTime * 150;
+	}
+
+
+
+
+	return self;
+}
+
+
+void create_enemy_three(Vector2 position) {
+	Image* image = LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 });
+	int animation_count = 3;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 0; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "run");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 3; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "attack");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 4; i <= 6; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4.0f, 4.0f }, (BoxCollider) { 8, 0, 16, 32 }, LAYER_ENEMY, image, animations, animation_count, &enemy_three_start, &enemy_three_update);
 }
 
 void Start()
@@ -869,8 +1033,9 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	create_enemy_one((Vector2) { 200, 464 });
-	create_enemy_two((Vector2) { 200, 464 });
+	//create_enemy_one((Vector2) { 200, 464 });
+	//create_enemy_two((Vector2) { 200, 464 });
+	create_enemy_three((Vector2) { 200, 460 });
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
@@ -976,6 +1141,10 @@ void create_enemy(int index, Vector2 position)
 
 	case 1:
 		create_enemy_two(position);
+		break;
+
+	case 2:
+		create_enemy_three(position);
 		break;
 	}
 	
