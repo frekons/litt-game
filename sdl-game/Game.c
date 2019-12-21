@@ -903,12 +903,15 @@ void attack_boss(GameObject* self)
 		timer += deltaTime;
 
 		Vector2 center = collider_center(self);
+		Vector2 size = collider_size(self);
 
 		float forward = self->transform->left ? -1 : 1;
 
 		BoxCollider boxcol;
-		boxcol.size = (Vector2) { (center.x * 1.5f), center.y * 0.5f };
-		boxcol.offset = (Vector2) { forward * (center.x+100), center.y * 0.5f };
+
+		boxcol.size = (Vector2) { (size.x * 0.5f), size.y * 0.5f };
+		boxcol.offset = (Vector2) { forward * (size.x * 0.5f + 10), 0 };
+
 
 		bool to_break = false;
 
@@ -951,11 +954,11 @@ void boss_start(GameObject* self) {
 
 	self->velocity = (Vector2) { 0, 0 };
 
-	self->attack_force = 50;
-	self->attack_range = 180;
-	self->attack_in_seconds = 1.0f;
+	self->attack_force = 30;
+	self->attack_range = 150;
+	self->attack_in_seconds = 1.5f;
 	self->attack_time = 0.2f;
-	self->attack_preparation_time = 0.6f;
+	self->attack_preparation_time = 0.25f;
 
 
 	self->attack_in_seconds_counter = 0;
