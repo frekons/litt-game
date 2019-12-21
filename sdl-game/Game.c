@@ -884,6 +884,242 @@ void create_enemy_three(Vector2 position) {
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4.0f, 4.0f }, (BoxCollider) { 8, 0, 16, 32 }, LAYER_ENEMY, image, animations, animation_count, &enemy_three_start, &enemy_three_update);
 }
 
+void attack_boss(GameObject* self)
+{
+	Sleep((int)(self->attack_preparation_time * 1000));
+
+	if (self->health <= 0)
+		return;
+
+	play_sound("resources/sounds/enemy1_hit.wav");
+
+	float timer = 0;
+
+	while (timer <= self->attack_time)
+	{
+		if (self->health <= 0)
+			break;
+
+		timer += deltaTime;
+
+		Vector2 center = collider_center(self);
+
+		float forward = self->transform->left ? -1 : 1;
+
+		BoxCollider boxcol;
+		boxcol.size = (Vector2) { (center.x * 1.5f), center.y * 0.5f };
+		boxcol.offset = (Vector2) { forward * (center.x + collider_size(self).x*0.5f+5), center.y * 0.5f };
+
+		bool to_break = false;
+
+		
+		Point point = { center.x, center.y };
+
+		GameObjectList list = GetInteractsOfCollider(boxcol, point);
+		for (int i = 0; i < list.Count; i++) {
+
+			if (list.List[i] == NULL)
+				continue;
+
+			GameObject* go = list.List[i];
+
+			if (go == self)
+				continue;
+
+			if (go->health > 0)
+			{
+				go->health -= self->attack_force;
+
+				if (go->layer == LAYER_PLAYER)
+					shake_camera(5.0f, 0.5f);
+			}
+
+
+			to_break = true;
+		}
+
+		if (to_break)
+			break;
+
+		Sleep((int)(deltaTime * 1000));
+	}
+}
+
+void boss_start(GameObject* self) {
+
+	self->health = 1000;
+
+	self->velocity = (Vector2) { 0, 0 };
+
+	self->attack_force = 50;
+	self->attack_range = 180;
+	self->attack_in_seconds = 1.0f;
+	self->attack_time = 0.2f;
+	self->attack_preparation_time = 0.6f;
+
+
+	self->attack_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+}
+
+GameObject* boss_update(GameObject * self) {
+
+	if (self->health == INT_MIN)
+		return self;
+
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y * 1.5;
+
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+
+	if (self->health <= 0) {
+
+		set_animator_state(self, "die", 999, 1, 1);
+		self->health = INT_MIN;
+		destroy_after(self, 3.0f);
+
+		create_enemy(0, (Vector2) { 100 + rand() % 401, 464 });
+
+		return self;
+	}
+
+	if (self->ignore_movement && self->ignore_movement_time >= get_time())
+		return self;
+
+	self->ignore_movement = false;
+
+	float dist = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	float velx = sign(local_player->transform->position.x - self->transform->position.x);
+	if (dist < self->attack_range) {
+
+		if (local_player->health > 0 && self->attack_in_seconds_counter <= get_time()) {
+
+			int attack_type = rand()%2;
+			
+			if(attack_type==0)
+			set_animator_state(self, "attack1", self->attack_in_seconds, 1, 1);
+			
+			if(attack_type==1)
+			set_animator_state(self, "attack2", self->attack_in_seconds, 1, 1);
+
+
+
+			create_thread(&attack_boss, self);
+		}
+
+	}
+	else
+	{
+		set_animator_state(self, "run", 0, 0, 0);
+
+		self->transform->position.x += velx * deltaTime * 150;
+
+		self->transform->left = velx < 0;
+	}
+
+
+
+
+	return self;
+}
+
+
+void create_boss(Vector2 position) {
+	Image* image = LoadTexture("resources/enemies/boss.png", true, (Vector2) { 96, 96 });
+	int animation_count = 5;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 4; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "run");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 9; i <= 16; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "attack1");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 27; i <= 35; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+	
+	cur_anim++;
+
+	strcpy(animations[cur_anim].state_name, "attack2");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 54; i <= 62; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "die");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 81; i <= 86; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4, 4 }, (BoxCollider) { 24, 24, 48,36  }, LAYER_ENEMY, image, animations, animation_count, &boss_start, &boss_update);
+}
+
 void Start()
 {
 	
@@ -1034,8 +1270,11 @@ void Start()
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
 	//create_enemy_one((Vector2) { 200, 464 });
-	//create_enemy_two((Vector2) { 200, 464 });
-	create_enemy_three((Vector2) { 200, 460 });
+//	create_enemy_two((Vector2) { 200, 464 });
+	//create_enemy_three((Vector2) { 200, 460 });
+	create_boss((Vector2) { 200, 464-90*2 });
+
+
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
