@@ -141,7 +141,7 @@ void on_collision_enter(GameObject* self, GameObject* other)
 {
 	printf("COLLISION ENTER!\n");
 
-	if (other->layer == LAYER_ENEMY && !compare_animator_state(self, "dash"))
+	if (other->layer == LAYER_ENEMY && !compare_animator_state(self, "dash") && other->health>0)
 	{
 		self->health -= 5;
 		shake_camera(3.0f, 0.5f);
@@ -604,7 +604,7 @@ void enemy_two_start(GameObject* self) {
 
 	self->velocity = (Vector2) { 0, 0 };
 
-	self->attack_force = 20;
+	self->attack_force = 10;
 	self->attack_range = 45;
 	self->attack_in_seconds = 2.0f;
 	self->attack_time = 0.2f;
@@ -650,11 +650,12 @@ GameObject* enemy_two_update(GameObject * self) {
 
 	self->ignore_movement = false;
 
-	float dist = fabs(collider_center(local_player).x - collider_center(self).x);
+	float distx = fabs(collider_center(local_player).x - collider_center(self).x);
+	float disty = fabs(collider_center(local_player).y - collider_center(self).y);
 
 	float velx = sign(local_player->transform->position.x - self->transform->position.x);
 	float vely = sign(local_player->transform->position.y - self->transform->position.y);
-	if (dist < self->attack_range) {
+	if (distx < self->attack_range && disty < self->attack_range) {
 
 		if (local_player->health > 0 && self->attack_in_seconds_counter <= get_time()) {
 
@@ -950,7 +951,7 @@ void attack_boss(GameObject* self)
 
 void boss_start(GameObject* self) {
 
-	self->health = 1000;
+	self->health = 100;
 
 	self->velocity = (Vector2) { 0, 0 };
 
@@ -984,7 +985,7 @@ GameObject* boss_update(GameObject * self) {
 		self->health = INT_MIN;
 		destroy_after(self, 3.0f);
 
-		create_enemy(0, (Vector2) { 100 + rand() % 401, 464 });
+		
 
 		return self;
 	}
@@ -1029,7 +1030,6 @@ GameObject* boss_update(GameObject * self) {
 
 	return self;
 }
-
 
 void create_boss(Vector2 position) {
 	Image* image = LoadTexture("resources/enemies/boss.png", true, (Vector2) { 96, 96 });
@@ -1122,6 +1122,170 @@ void create_boss(Vector2 position) {
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4, 4 }, (BoxCollider) { 24, 24, 36,36  }, LAYER_ENEMY, image, animations, animation_count, &boss_start, &boss_update);
 }
+
+void trap_one_start(GameObject* self) {
+
+	self->collider.is_trigger = true;
+
+
+	self->velocity = (Vector2) { 0, 0 };
+
+	self->attack_force = 50;
+	self->attack_range = 150;
+	self->attack_in_seconds = 1.5f;
+	self->attack_time = 0.2f;
+	self->attack_preparation_time = 0.25f;
+
+
+	self->attack_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+}
+
+void timer(GameObject * self) {
+	float time = 0.3f;
+	Sleep(500);
+
+	while (time > 0) {
+		GameObjectList list=  GetInteractsOnlyLayer(self, LAYER_PLAYER);
+		for (int i = 0; i < list.Count; i++) {
+			if(list.List[i]->health>0)
+			list.List[i]->health -= self->attack_force;
+
+		}
+		if (list.Count > 0) {
+			break;
+		}
+		time -= deltaTime;
+		Sleep(deltaTime * 1000);
+		
+	}
+
+}
+
+GameObject* trap_one_update(GameObject * self) {
+
+	if (self->health == INT_MIN)
+		return self;
+
+	if (self->ignore_movement && self->ignore_movement_time >= get_time())
+		return self;
+
+	self->ignore_movement = false;
+
+	set_animator_state(self, "attack", 2, 1, 1);
+
+	create_thread(timer, self);
+
+
+
+	return self;
+}
+
+void create_trap_one(Vector2 position) {
+	Image* image = LoadTexture("resources/enemies/trapone.png", true, (Vector2) { 32, 32 });
+	int animation_count = 2;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 0; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	
+
+	
+	strcpy(animations[cur_anim].state_name, "attack");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 1; i <= 13; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+
+	
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 0, 0, 32, 32 }, LAYER_TRAPS, image, animations, animation_count, &trap_one_start, &trap_one_update);
+}
+
+void create_trap_two(Vector2 position) {
+	Image* image = LoadTexture("resources/enemies/traptwo.png", true, (Vector2) { 32, 41 });
+	int animation_count = 2;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 0; i <= 0; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+
+
+
+	strcpy(animations[cur_anim].state_name, "attack");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 1; i <= 13; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+
+
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2,2 }, (BoxCollider) { 0, 0, 32, 41 }, LAYER_TRAPS, image, animations, animation_count, &trap_one_start, &trap_one_update);
+}
+
 
 void Start()
 {
@@ -1272,10 +1436,12 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	create_enemy_one((Vector2) { 600, 464 });
-	create_enemy_two((Vector2) { 100, 800 });
-	create_enemy_three((Vector2) { 300, 460 });
-	create_boss((Vector2) { 200, 464-90*2 });
+	//create_enemy_one((Vector2) { 600, 464 });
+	//create_enemy_two((Vector2) { 100, -50 });
+	//create_enemy_three((Vector2) { 300, 460 });
+	//create_boss((Vector2) { 200, 464-90*2 });
+	create_trap_one((Vector2) { 600, 512 });
+	create_trap_two((Vector2) { 100, 512 });
 
 
 }
@@ -1310,7 +1476,7 @@ void Render()
 
 	////////////
 	
-	for (int i = (int)pow(2, 4); i != 1; i /= 2)
+	for (int i = (int)pow(2, 5); i != 1; i /= 2)
 	{
 		GameObjectList list = GetObjectsOfLayer(i);
 
@@ -1387,6 +1553,10 @@ void create_enemy(int index, Vector2 position)
 
 	case 2:
 		create_enemy_three(position);
+		break;
+	
+	case 3:
+		create_boss(position);
 		break;
 	}
 	

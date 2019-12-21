@@ -189,6 +189,7 @@ typedef enum{ // upper means top in rendering
 	LAYERS_ENEMY,
 	LAYERS_PLAYER,
 	LAYERS_EFFECTS,
+	LAYERS_TRAPS,
 	LAYERS_GROUND,
 
 }LAYERS;
@@ -198,6 +199,7 @@ typedef enum{ // upper means top in rendering
 #define LAYER_PLAYER 1 << LAYERS_PLAYER
 #define LAYER_ENEMY 1 << LAYERS_ENEMY
 #define LAYER_EFFECTS 1 << LAYERS_EFFECTS
+#define LAYER_TRAPS 1 << LAYERS_TRAPS
 
 
 
