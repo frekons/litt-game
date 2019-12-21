@@ -908,7 +908,7 @@ void attack_boss(GameObject* self)
 
 		BoxCollider boxcol;
 		boxcol.size = (Vector2) { (center.x * 1.5f), center.y * 0.5f };
-		boxcol.offset = (Vector2) { forward * (center.x + collider_size(self).x*0.5f+5), center.y * 0.5f };
+		boxcol.offset = (Vector2) { forward * (center.x+100), center.y * 0.5f };
 
 		bool to_break = false;
 
@@ -970,7 +970,7 @@ GameObject* boss_update(GameObject * self) {
 
 	char buffer[12];
 	Vector2 healtbar = collider_center(self);
-	healtbar.y -= self->collider.size.y * 1.5;
+	healtbar.y -= collider_size(self).y * 0.5;
 
 	snprintf(buffer, sizeof(buffer), "%d", self->health);
 	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
@@ -1117,7 +1117,7 @@ void create_boss(Vector2 position) {
 
 	Point enemypos = *(Point*)&position;
 
-	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4, 4 }, (BoxCollider) { 24, 24, 48,36  }, LAYER_ENEMY, image, animations, animation_count, &boss_start, &boss_update);
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4, 4 }, (BoxCollider) { 24, 24, 36,36  }, LAYER_ENEMY, image, animations, animation_count, &boss_start, &boss_update);
 }
 
 void Start()
@@ -1269,9 +1269,9 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	//create_enemy_one((Vector2) { 200, 464 });
-//	create_enemy_two((Vector2) { 200, 464 });
-	//create_enemy_three((Vector2) { 200, 460 });
+	create_enemy_one((Vector2) { 600, 464 });
+	create_enemy_two((Vector2) { 100, 800 });
+	create_enemy_three((Vector2) { 300, 460 });
 	create_boss((Vector2) { 200, 464-90*2 });
 
 
