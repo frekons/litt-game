@@ -495,7 +495,7 @@ GameObject* enemy_one_update(GameObject * self) {
 	{
 		set_animator_state(self, "run", 0, 0, 0);
 
-		self->transform->position.x += velx * deltaTime * 50;
+		self->transform->position.x += velx * deltaTime * 150;
 		
 		self->transform->left = velx < 0;
 	}
@@ -582,6 +582,143 @@ void create_enemy_one(Vector2 position){
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 27, 39 }, LAYER_ENEMY, image, animations, animation_count, &enemy_one_start, &enemy_one_update);
 }
 
+void enemy_two_start(GameObject* self) {
+
+	self->health = 10;
+
+	self->velocity = (Vector2) { 0, 0 };
+
+	self->attack_force = 20;
+	self->attack_range = 45;
+	self->attack_in_seconds = 2.0f;
+	self->attack_time = 0.2f;
+	self->attack_preparation_time = 0.6f;
+
+
+	self->attack_in_seconds_counter = 0;
+	self->ignore_movement_time = 0;
+	self->ignore_movement = false;
+}
+
+GameObject* enemy_two_update(GameObject * self) {
+
+	if (self->health == INT_MIN)
+		return self;
+
+	char buffer[12];
+	Vector2 healtbar = collider_center(self);
+	healtbar.y -= self->collider.size.y * 1.5;
+
+	snprintf(buffer, sizeof(buffer), "%d", self->health);
+	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
+
+	if (self->health <= 0) {
+
+		set_animator_state(self, "die", 999, 1, 1);
+		self->health = INT_MIN;
+		destroy_after(self, 3.0f);
+
+		create_enemy(1, (Vector2) { 100 + rand() % 401, 464 });
+
+		return self;
+	}
+
+	if (self->ignore_movement && self->ignore_movement_time >= get_time())
+		return self;
+
+	self->ignore_movement = false;
+
+	float dist = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	float velx = sign(local_player->transform->position.x - self->transform->position.x);
+	float vely = sign(local_player->transform->position.y - self->transform->position.y);
+	if (dist < self->attack_range) {
+
+		if (local_player->health > 0 && self->attack_in_seconds_counter <= get_time()) {
+
+			set_animator_state(self, "attack", 0.5, 1, 1);
+
+			create_thread(&attack_enemy_one, self);
+		}
+
+	}
+	else
+	{
+		
+		set_animator_state(self, "idle", 0, 0, 0);
+		self->transform->position.x += velx * deltaTime * 200;
+		self->transform->position.y += vely * deltaTime * 50;
+		self->transform->left = velx < 0;
+	}
+
+
+
+
+	return self;
+}
+
+void create_enemy_two(Vector2 position) {
+	Image* image = LoadTexture("resources/enemies/enemytwo.png", true, (Vector2) { 16, 24 });
+	int animation_count = 3;
+
+	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
+
+	int cur_anim = 0;
+
+	strcpy(animations[cur_anim].state_name, "idle");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 5; i <= 9; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+	cur_anim++;
+	
+
+	
+	strcpy(animations[cur_anim].state_name, "die");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 10; i <= 14; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+
+		animations[cur_anim].loop = false;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 4;
+	}
+
+	cur_anim++;
+	strcpy(animations[cur_anim].state_name, "attack");
+	{
+		initialize_int_list(&animations[cur_anim].sprites);
+
+		for (int i = 30; i <= 32; i++)
+			add_int_to_list(&animations[cur_anim].sprites, i);
+
+		animations[cur_anim].loop = true;
+
+		animations[cur_anim].current_index = 0;
+		animations[cur_anim].current_frame = 0;
+		animations[cur_anim].wait_frame = 6;
+	}
+
+
+
+	Point enemypos = *(Point*)&position;
+
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 12,24  }, LAYER_ENEMY, image, animations, animation_count, &enemy_two_start, &enemy_two_update);
+}
 
 void Start()
 {
@@ -733,6 +870,7 @@ void Start()
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
 	create_enemy_one((Vector2) { 200, 464 });
+	create_enemy_two((Vector2) { 200, 464 });
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
@@ -836,6 +974,9 @@ void create_enemy(int index, Vector2 position)
 		create_enemy_one(position);
 		break;
 
+	case 1:
+		create_enemy_two(position);
+		break;
 	}
-
+	
 }
