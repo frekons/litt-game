@@ -484,7 +484,7 @@ GameObject* enemy_one_update(GameObject * self) {
 		self->health = INT_MIN;
 		destroy_after(self, 3.0f);
 
-		create_enemy(0, (Vector2) { 100 + rand() % 401, 464 });
+		
 
 		return self;
 	}
@@ -640,7 +640,7 @@ GameObject* enemy_two_update(GameObject * self) {
 		self->health = INT_MIN;
 		destroy_after(self, 3.0f);
 
-		create_enemy(1, (Vector2) { 100 + rand() % 401, 464 });
+		
 
 		return self;
 	}
@@ -781,7 +781,7 @@ GameObject* enemy_three_update(GameObject * self) {
 		self->health = INT_MIN;
 		//destroy_after(self, 3.0f);
 
-		create_enemy(2, (Vector2) { 100 + rand() % 401, 464 });
+		
 
 		return NULL;
 	}
@@ -1440,10 +1440,10 @@ void Start()
 
 	GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
 
-	//create_enemy_one((Vector2) { 600, 464 });
-	//create_enemy_two((Vector2) { 100, -50 });
-	//create_enemy_three((Vector2) { 300, 460 });
-	//create_boss((Vector2) { 200, 464-90*2 });
+	create_enemy_one((Vector2) { 600, 464 });
+	create_enemy_two((Vector2) { 100, -50 });
+	create_enemy_three((Vector2) { 300, 460 });
+	create_boss((Vector2) { 200, 464-90*2 });
 	create_trap_one((Vector2) { 600, 512 });
 	create_trap_two((Vector2) { 100, 512 });
 
