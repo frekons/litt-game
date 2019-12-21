@@ -1,5 +1,7 @@
 #include "Audio.h"
 
+#include "Globals.h"
+
 typedef struct Music {
 	char file_name[128];
 	Mix_Chunk* music;
@@ -51,6 +53,9 @@ void InitializeSounds()
 	initialize_music_list(&music_list);
 
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 8, 4096);
+
+	Mix_VolumeMusic(0);
+
 }
 
 // TEK BIR ADET MAIN MUSIC OLDUGU VARSAYILARAK YAZILMISTIR VE main_music DEGISKENI HEADER DOSYASINDA TANIMLANMISTIR
@@ -140,6 +145,8 @@ Mix_Chunk* load_sound(char* sound_effect_file_dir)
 int play_sound(char* sound_effect_file_dir)
 {
 	Mix_Chunk* sound_effect = load_sound(sound_effect_file_dir);
+
+	Mix_VolumeChunk(sound_effect, volume);
 
 	int channel = Mix_PlayChannel(-1, sound_effect, 0);
 

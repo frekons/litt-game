@@ -33,6 +33,7 @@ bool renderable_state;
 
 int last_input;
 
+int volume;
 
 typedef enum {
 
