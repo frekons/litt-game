@@ -185,8 +185,8 @@ typedef struct SGameObjectList GameObjectList;
 typedef enum{ // upper means top in rendering
 
 	LAYERS_NONE = 0, // not rendering this
-	LAYERS_PLAYER,
 	LAYERS_ENEMY,
+	LAYERS_PLAYER,
 	LAYERS_GROUND,
 	LAYERS_EFFECTS,
 
