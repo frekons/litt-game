@@ -1,7 +1,7 @@
 #include "Common.h"
 
 
-int volume = 32;
+int volume = 2;
 
 GAME_STATES game_state = INGAME;
 

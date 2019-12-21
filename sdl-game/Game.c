@@ -416,7 +416,7 @@ void attack_enemy_one(GameObject* self)
 				go->health -= self->attack_force;
 
 				if (go->layer == LAYER_PLAYER)
-					shake_camera(2.0f, 0.5f);
+					shake_camera(5.0f, 0.5f);
 			}
 
 
