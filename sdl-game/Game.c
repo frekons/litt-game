@@ -141,7 +141,7 @@ void on_collision_enter(GameObject* self, GameObject* other)
 {
 	printf("COLLISION ENTER!\n");
 
-	if (other->layer == LAYER_ENEMY)
+	if (other->layer == LAYER_ENEMY && !compare_animator_state(self, "dash"))
 	{
 		self->health -= 5;
 		shake_camera(3.0f, 0.5f);
