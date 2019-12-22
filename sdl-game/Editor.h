@@ -44,7 +44,7 @@ void process_pixels();
 *	Puts a pixel on the map.png, 
 *	which determines the coordinates of the objects.
 */
-void put_pixel(int x, int y, Uint32 pixel);
+void put_pixel(int* parameters); // int x, int y, Uint32 pixel
 
 /**
 *	Gets the object color as red, green, blue;
@@ -52,7 +52,7 @@ void put_pixel(int x, int y, Uint32 pixel);
 */
 Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue);
 
-void onclick();
+void onclick(Uint8 object);
 
 /**
 *	For a easier access to get rgba.
