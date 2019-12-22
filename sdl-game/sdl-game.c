@@ -134,7 +134,6 @@ int main(int argc, char* argv[])
 		else if(game_state == INGAME)
 		{
 			Render();
-
 		}
 		else if (game_state == PAUSE)
 		{

@@ -124,6 +124,9 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 
 	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color); 
 
+	if (surfaceMessage == NULL)
+		return NULL;
+
 	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
 	Rect rect;
@@ -150,6 +153,9 @@ SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* 
 	SDL_Color sdl_color = { color.r, color.g, color.b, color.a };
 
 	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
+
+	if (surfaceMessage == NULL)
+		return NULL;
 
 	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
@@ -178,7 +184,7 @@ SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* 
 }
 
 
-void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick)
+void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters)
 {
 	DrawFilledRectangleOnScreen(rect, color);
 
@@ -188,16 +194,16 @@ void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF
 	{
 		if (onClick)
 		{
-			typedef void func(void);
+			typedef void func(void*);
 			func* f = (func*)onClick;
-			f();
+			f(parameters);
 
 			mouse_button_mask = 0;
 		}
 	}
 }
 
-void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick)
+void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters)
 {
 	//DrawFilledRectangleOnScreen(rect, color);
 	Image* image = LoadTexture(img_directory, false, (Vector2) { 0, 0 });
@@ -211,9 +217,9 @@ void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Colo
 	{
 		if (onClick)
 		{
-			typedef void func(void);
+			typedef void func(void*);
 			func* f = (func*)onClick;
-			f();
+			f(parameters);
 
 			mouse_button_mask = 0;
 		}

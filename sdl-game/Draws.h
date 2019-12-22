@@ -21,8 +21,8 @@ void DrawLineInGame(Point A, Point B, Color color);
 SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font* font);
 SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* font);
 
-void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
-void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
+void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters);
+void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters);
 
 void DrawButtonInGame(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
 

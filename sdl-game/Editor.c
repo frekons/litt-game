@@ -31,7 +31,8 @@ void render_map() {
 	for (int y = 0; y < map->h; y++) {
 		for (int x = 0; x < map->w; x++) {
 			//TODO: DrawButtonOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
-			//DrawButtonOnScreen("", (Rect) { x * 5, y * 5, 5, 5 }, (Color) {255,255,255,255}, (Color) { 0, 0, 0, 0 }, Font_Minecraft, put_pixel(x,y,temp));
+			int parameters[3] = { x,y,temp };
+			DrawButtonOnScreen("", (Rect) { x * 5, y * 5, 5, 5 }, (Color) {255,255,255,255}, (Color) { 0, 0, 0, 0 }, Font_Minecraft, put_pixel, parameters);
 		}
 	}
 }
@@ -128,8 +129,12 @@ void process_pixels() {
 //	}
 //}
 
-void put_pixel(int x, int y, Uint32 pixel)
+void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 {
+	int x = (int)parameters[0];
+	int y = (int)parameters[1];
+	Uint32 pixel = (Uint32)parameters[2];
+
 	SDL_LockSurface(map);
 	int bpp = map->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to set */
