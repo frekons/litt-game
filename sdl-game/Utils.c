@@ -4,6 +4,21 @@
 
 #include <Windows.h>
 
+char* uint_to_binary(Uint32 toberesolved)
+{
+	binary[32] = '\0';
+
+	for (int i = 0; i < 31; i++) {
+		int r = toberesolved % 2;
+		binary[32 - i - 1] = r + /*where numbers start*/ +48;
+		if ((toberesolved /= 2) == 1) {
+			binary[0] = toberesolved + 48;
+			break;
+		}
+	}
+
+	return &binary[0];
+}
 
 float point_magnitude(Point point)
 {

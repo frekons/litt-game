@@ -5,6 +5,8 @@
 
 #include "Structs.h"
 
+char* uint_to_binary(Uint32 toberesolved);
+
 float vec2_magnitude(Vector2 point);
 
 Point point_lerp(Point point1, Point point2, float time);
@@ -38,5 +40,6 @@ bool destroy_object(GameObject* object, bool terminate_thread);
 
 Vector2Int mouse_position;
 int mouse_button_mask;
+char binary[33];
 
 //#endif

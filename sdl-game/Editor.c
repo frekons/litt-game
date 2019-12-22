@@ -5,72 +5,135 @@
 
 #include "Game.h"
 
-SDL_Surface* load_image(const char* file)
-{
-	SDL_Surface *surf = IMG_Load(file);
+#include "Draws.h"
 
-	return surf;
+//To hold the temporary pixel info for a GameObject
+//DEFAULT: WHITE
+Uint32 temp = 0xFFFFFFFF;
+
+//Location of the map
+const char* mapLocation = "resources/environment/test.png";
+
+GameObjectList InitializeEditor()
+{
+	map_init();
+	process_pixels();
+	return list;
 }
 
-Point process_pixel_data(SDL_Surface* surface, char* object) {
-	Uint8 red, green, blue, alpha;
+void RenderEditor() {
+	//TODO: DrawButtonWithImageOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
+	//DrawButtonWithImageOnScreen()
+	//TODO
+}
 
-	int bpp = surface->format->BytesPerPixel;
-
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			SDL_GetRGBA(get_pixel_data(surface, x, y), surface->format, &red, &green, &blue, &alpha);
-
-			if (red == 0 && green == 38 && blue == 255 && !memcmp(object, "player", 6)) {
-				return (Point) { x * 10, y * 10 };
-			}
+void render_map() {
+	for (int y = 0; y < map->h; y++) {
+		for (int x = 0; x < map->w; x++) {
+			//TODO: DrawButtonOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
+			//DrawButtonOnScreen("", (Rect) { x * 5, y * 5, 5, 5 }, (Color) {255,255,255,255}, (Color) { 0, 0, 0, 0 }, Font_Minecraft, put_pixel(x,y,temp));
 		}
 	}
 }
 
-GameObject* CreateObject(char* file, Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update)
-{
-	SDL_Surface* surface = load_image(file);
 
-	return GameObject_New(GameObjects.Count, process_pixel_data(surface, "player"), scale, collider, layer, image, animations, animations_size, start, update);
+void map_init()
+{
+	map = IMG_Load(mapLocation);
 }
 
-Uint32 get_pixel_data(SDL_Surface* surface, int x, int y)
-{
-	int bpp = surface->format->BytesPerPixel;
-	/* Here p is the address to the pixel we want to retrieve */
-	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
-
-	switch (bpp) {
+/**
+Obje tipleri:
+	0 - player
+	1 - yarasa
+	2 - iskelet
+	3 - þövalye
+	4 - boss
+	5 - trap1
+	6 - trap2
+	7 - dirt
+	8 - grass
+*/
+void onclick(Uint8 object) {
+	switch (object) {
+	case 0:
+		temp = 0xFF1900FF;
+		break;
 	case 1:
-		return *p;
+		temp = 0xFFFF0010;
 		break;
-
 	case 2:
-		return *(Uint16*)p;
+		temp = 0xFFC1000C;
 		break;
-
 	case 3:
-		if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-			return p[0] << 16 | p[1] << 8 | p[2];
-		else
-			return p[0] | p[1] << 8 | p[2] << 16;
+		temp = 0xFF820008;
 		break;
-
 	case 4:
-		return *(Uint32*)p;
+		temp = 0xFF000000;
 		break;
+	case 5:
+		temp = 0xFF9E5C38;
+		break;
+	case 6:
+		temp = 0xFF00821A;
+		break;
+	case 7:
+		temp = 0xFFFF00FA;
+		break;
+	case 8:
+		temp = 0xFFA300A0;
+		break;
+	}
+}
+void process_pixels() {
+	Uint8 rgba[4]; //0 - r, 1 - g, 2 - b, 3 - a
 
-	default:
-		return 0;       /* shouldn't happen, but avoids warnings */
+	int bpp = map->format->BytesPerPixel;
+
+	for (int y = 0; y < map->h; y++) {
+		for (int x = 0; x < map->w; x++) {
+			
+		}
 	}
 }
 
-void put_pixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
+//Uint32 get_pixel_data(SDL_Surface* surface, int x, int y)
+//{
+//	int bpp = surface->format->BytesPerPixel;
+//	/* Here p is the address to the pixel we want to retrieve */
+//	Uint8* p = (Uint8*)map->pixels + y * map->pitch + x * bpp;
+//
+//	switch (bpp) {
+//	case 1:
+//		return *p;
+//		break;
+//
+//	case 2:
+//		return *(Uint16*)p;
+//		break;
+//
+//	case 3:
+//		if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+//			return p[0] << 16 | p[1] << 8 | p[2];
+//		else
+//			return p[0] | p[1] << 8 | p[2] << 16;
+//		break;
+//
+//	case 4:
+//		return *(Uint32*)p;
+//		break;
+//
+//	default:
+//		return 0;       /* shouldn't happen, but avoids warnings */
+//	}
+//}
+
+void put_pixel(int x, int y, Uint32 pixel)
 {
-	int bpp = surface->format->BytesPerPixel;
+	SDL_LockSurface(map);
+	int bpp = map->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to set */
-	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
+	Uint8* p = (Uint8*)map->pixels + y * map->pitch + x * bpp;
 
 	switch (bpp) {
 	case 1:
@@ -98,6 +161,21 @@ void put_pixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 		*(Uint32*)p = pixel;
 		break;
 	}
+	SDL_UnlockSurface(map);
 }
 
+Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue)
+{
+	Uint32 data = 0;
+	data = (Uint32)255 << 24;
+	data += (Uint32)red << 16;
+	data += (Uint32)green << 8;
+	data += (Uint32)blue << 0;
 
+	return data;
+}
+
+void get_rgba(Uint32 pixel_data, Uint8* rgba)
+{
+	SDL_GetRGBA(pixel_data, map->format, rgba[0], rgba[1], rgba[2], rgba[3]);
+}

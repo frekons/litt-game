@@ -9,6 +9,8 @@
 
 #include "Utils.h"
 
+#include "Editor.h"
+
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>

@@ -51,6 +51,8 @@ typedef struct SDL_Rect Rect;
 
 typedef struct SDL_FPoint Point;
 
+typedef struct SDL_Surface Surface;
+
 Point create_point(float x, float y);
 
 

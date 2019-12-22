@@ -2,18 +2,59 @@
 
 #include <SDL2/SDL.h>
 
-#include "GameObject.h"
-
 #include "Structs.h"
 
-#include "Image.h"
+/////////////////////////////////////////////////////
 
-Point process_pixel_data(SDL_Surface* surface, char* object);
+//The SDL_Surface to hold the map data.
+Surface* map;
 
-GameObject* CreateObject(Vector2 scale, BoxCollider collider, int layer, Image* image, Animation* animations, int animations_size, void* start, void* update);
+//Where the game objects will be stored
+GameObjectList list;
 
-Uint32 get_pixel_data(SDL_Surface *surface, int x, int y);
+////////////////////////////////////////////////////
 
-void put_pixel(SDL_Surface* surface, int x, int y, Uint32 pixel);
+/**
+*	Renders the editor menu
+*/
+void RenderEditor();
 
-SDL_Surface* load_image(const char* file);
+/**
+*	Visualizes the current state of the map
+*/
+void render_map();
+
+/**
+*	Does all the initializations for editor.
+*/
+GameObjectList InitializeEditor();
+
+/**
+*	Initializes the map
+*/
+void map_init();
+
+/**
+*	Processes the incoming pixel data 
+*	and adds it into the GameObjectList stream
+*/
+void process_pixels();
+
+/**
+*	Puts a pixel on the map.png, 
+*	which determines the coordinates of the objects.
+*/
+void put_pixel(int x, int y, Uint32 pixel);
+
+/**
+*	Gets the object color as red, green, blue;
+*	turns it into a Uint32
+*/
+Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue);
+
+void onclick();
+
+/**
+*	For a easier access to get rgba.
+*/
+void get_rgba(Uint32 pixel_data, Uint8* rgba);
