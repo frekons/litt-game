@@ -234,7 +234,7 @@ void DrawButtonOnScreen(char *str, Rect rect, Color color, Color text_color, TTF
 	}
 }
 
-void DrawButtonWithImageOnScreen(char *str, char *img_directory, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick, void *parameters)
+void DrawButtonWithImageOnScreen(char *str, char *img_directory, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick, int parameters)
 {
 	//DrawFilledRectangleOnScreen(rect, color);
 	Image *image = LoadTexture(img_directory, false, (Vector2){0, 0});
@@ -248,7 +248,7 @@ void DrawButtonWithImageOnScreen(char *str, char *img_directory, Rect rect, Colo
 	{
 		if (onClick)
 		{
-			typedef void func(void *);
+			typedef void func(int);
 			func *f = (func *)onClick;
 			f(parameters);
 

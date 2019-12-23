@@ -30,6 +30,11 @@ void render_map();
 void InitializeEditor();
 
 /**
+	Returns an GameObjectList with all the gameobjects that are in the map
+*/
+GameObjectList SaveEditor();
+
+/**
 *	Initializes the map
 */
 void map_init();

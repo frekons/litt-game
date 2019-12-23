@@ -36,9 +36,13 @@ void InitializeEditor()
 
 void RenderEditor() {
 	render_map();
+
+	DrawButtonWithImageOnScreen(NULL, "resources/players/player.png", (Rect) {0,500,80,100}, Black, White, NULL, onclick, 0);
+	DrawButtonWithImageOnScreen(NULL, "resources/enemies/enemytwo.png", (Rect) { 100, 500, 80, 100 }, Black, White, NULL, onclick, 1);
 }
 
-void SaveEditor() {
+GameObjectList SaveEditor() {
+	process_pixels();
 }
 
 void render_map() {
