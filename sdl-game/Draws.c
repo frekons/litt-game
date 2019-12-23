@@ -22,7 +22,7 @@ void InitializeDraws()
 		printf("Error on initializing font, error: %s\n", TTF_GetError());
 }
 
-void DrawRectangleOnScreen(Rect rect, Color color) 
+void DrawRectangleOnScreen(Rect rect, Color color)
 {
 	Color temp_color = get_render_color();
 
@@ -31,9 +31,7 @@ void DrawRectangleOnScreen(Rect rect, Color color)
 	SDL_RenderDrawRect(renderer, &rect);
 
 	set_render_color(temp_color);
-	
 }
-
 
 void DrawRectangleInGame(Rect rect, Color color)
 {
@@ -47,18 +45,18 @@ void DrawRectangleInGame(Rect rect, Color color)
 	SDL_RenderDrawRect(renderer, &rect);
 
 	set_render_color(temp_color);
-
 }
 
-void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void* onClick, void* parameters) {
+void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void *onClick, void *parameters)
+{
 	DrawFilledRectangleOnScreen(rect, color);
 
 	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
 	{
 		if (onClick)
 		{
-			typedef void func(void*);
-			func* f = (func*)onClick;
+			typedef void func(void *);
+			func *f = (func *)onClick;
 			f(parameters);
 
 			mouse_button_mask = 0;
@@ -66,9 +64,9 @@ void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void* onClick, voi
 	}
 }
 
-void DrawInteractiveRectangleWithImageOnScreen(char* img_directory, Rect rect, Color color, void* onClick, void* parameters)
+void DrawInteractiveRectangleWithImageOnScreen(char *img_directory, Rect rect, Color color, void *onClick, void *parameters)
 {
-	Image* image = LoadTexture(img_directory, false, (Vector2) { 0, 0 });
+	Image *image = LoadTexture(img_directory, false, (Vector2){0, 0});
 	DrawImage(image, rect, false);
 
 	UnloadTexture(image);
@@ -77,8 +75,8 @@ void DrawInteractiveRectangleWithImageOnScreen(char* img_directory, Rect rect, C
 	{
 		if (onClick)
 		{
-			typedef void func(void*);
-			func* f = (func*)onClick;
+			typedef void func(void *);
+			func *f = (func *)onClick;
 			f(parameters);
 
 			mouse_button_mask = 0;
@@ -86,11 +84,10 @@ void DrawInteractiveRectangleWithImageOnScreen(char* img_directory, Rect rect, C
 	}
 }
 
-
 void DrawFilledRectangleOnScreen(Rect rect, Color color)
 {
 	//SDL_Surface* pSurface = SDL_GetWindowSurface(game_window);
-	
+
 	//SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, color.r, color.g, color.b));
 
 	Color temp_color = get_render_color();
@@ -122,7 +119,6 @@ void DrawFilledRectangleInGame(Rect rect, Color color)
 	//SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, color.r, color.g, color.b));
 
 	//SDL_FreeSurface(pSurface);
-
 }
 
 void DrawLineOnScreen(Point A, Point B, Color color)
@@ -153,17 +149,16 @@ void DrawLineInGame(Point A, Point B, Color color)
 	set_render_color(temp_color);
 }
 
-
-SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font* font)
+SDL_Texture *DrawTextOnScreen(char *str, Vector2 position, Color color, TTF_Font *font)
 {
-	SDL_Color sdl_color = { color.r, color.g, color.b, color.a };  
+	SDL_Color sdl_color = {color.r, color.g, color.b, color.a};
 
-	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color); 
+	SDL_Surface *surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
 
 	if (surfaceMessage == NULL)
 		return NULL;
 
-	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+	SDL_Texture *Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
 	Rect rect;
 
@@ -173,7 +168,7 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 	rect.x = position.x - rect.w / 2;
 	rect.y = position.y - rect.h / 2;
 
-	SDL_RenderCopy(renderer, Message, NULL, &rect); 
+	SDL_RenderCopy(renderer, Message, NULL, &rect);
 
 	SDL_FreeSurface(surfaceMessage);
 	//SDL_DestroyTexture(Message);
@@ -184,17 +179,16 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 	return Message;
 }
 
-
-SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* font)
+SDL_Texture *DrawTextInGame(char *str, Vector2 position, Color color, TTF_Font *font)
 {
-	SDL_Color sdl_color = { color.r, color.g, color.b, color.a };
+	SDL_Color sdl_color = {color.r, color.g, color.b, color.a};
 
-	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
+	SDL_Surface *surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
 
 	if (surfaceMessage == NULL)
 		return NULL;
 
-	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+	SDL_Texture *Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
 	Rect rect;
 
@@ -221,19 +215,18 @@ SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* 
 	return Message;
 }
 
-
-void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters)
+void DrawButtonOnScreen(char *str, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick, void *parameters)
 {
 	DrawFilledRectangleOnScreen(rect, color);
 
-	DrawTextOnScreen(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+	DrawTextOnScreen(str, (Vector2){rect.x + rect.w / 2, rect.y + rect.h / 2}, text_color, Font_Minecraft);
 
 	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
 	{
 		if (onClick)
 		{
-			typedef void func(void*);
-			func* f = (func*)onClick;
+			typedef void func(void *);
+			func *f = (func *)onClick;
 			f(parameters);
 
 			mouse_button_mask = 0;
@@ -241,22 +234,22 @@ void DrawButtonOnScreen(char* str, Rect rect, Color color, Color text_color, TTF
 	}
 }
 
-void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick, void* parameters)
+void DrawButtonWithImageOnScreen(char *str, char *img_directory, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick, void *parameters)
 {
 	//DrawFilledRectangleOnScreen(rect, color);
-	Image* image = LoadTexture(img_directory, false, (Vector2) { 0, 0 });
+	Image *image = LoadTexture(img_directory, false, (Vector2){0, 0});
 	DrawImage(image, rect, false);
 
 	UnloadTexture(image);
 
-	DrawTextOnScreen(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+	DrawTextOnScreen(str, (Vector2){rect.x + rect.w / 2, rect.y + rect.h / 2}, text_color, Font_Minecraft);
 
 	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
 	{
 		if (onClick)
 		{
-			typedef void func(void*);
-			func* f = (func*)onClick;
+			typedef void func(void *);
+			func *f = (func *)onClick;
 			f(parameters);
 
 			mouse_button_mask = 0;
@@ -264,11 +257,11 @@ void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Colo
 	}
 }
 
-void DrawButtonInGame(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick)
+void DrawButtonInGame(char *str, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick)
 {
 	DrawFilledRectangleInGame(rect, color);
 
-	DrawTextInGame(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+	DrawTextInGame(str, (Vector2){rect.x + rect.w / 2, rect.y + rect.h / 2}, text_color, Font_Minecraft);
 
 	rect.x -= (camera->position.x - camera->width / 2);
 	rect.y -= (camera->position.y - camera->height / 2);
@@ -278,7 +271,7 @@ void DrawButtonInGame(char* str, Rect rect, Color color, Color text_color, TTF_F
 		if (onClick)
 		{
 			typedef void func(void);
-			func* f = (func*)onClick;
+			func *f = (func *)onClick;
 			f();
 
 			mouse_button_mask = 0;

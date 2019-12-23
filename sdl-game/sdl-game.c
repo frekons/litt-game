@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
 	InitializeSounds();
 	InitializeDraws();
 	InitializeImage();
+	InitializeEditor();
 
 	deltaTime = 0.016;
 
@@ -140,7 +141,7 @@ int main(int argc, char* argv[])
 			Render();
 		}
 		else if (game_state == EDITOR) {
-			InitializeEditor();
+			RenderEditor();
 		}
 		else if (game_state == PAUSE)
 		{

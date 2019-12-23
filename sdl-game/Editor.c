@@ -31,13 +31,11 @@ void InitializeEditor()
 		init++;
 		map_init();
 	}
-	render_map();
+	camera->position.x += 30;
 }
 
 void RenderEditor() {
-	//TODO: DrawButtonWithImageOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
-	//DrawButtonWithImageOnScreen()
-	//TODO
+	render_map();
 }
 
 void SaveEditor() {
@@ -55,7 +53,7 @@ void render_map() {
 
 			if (!once++) printf("%X", get_pixel_data(7, 6));
 
-			DrawInteractiveRectangleOnScreen((Rect) {x*scale, y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
+			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
 			
 			//DrawRectangleOnScreen((Rect){ x * scale, y * scale, scale, scale }, White);
 		}
