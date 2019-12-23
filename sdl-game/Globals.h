@@ -48,5 +48,7 @@ typedef enum {
 
 GAME_STATES game_state;
 
+PointerList ToBeDestroyedTextures;
+
 
 //#endif // !GLOBALS_H

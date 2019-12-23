@@ -67,4 +67,6 @@ void set_up_things()
 	renderer = SDL_CreateRenderer(game_window, -1, SDL_RENDERER_ACCELERATED);
 
 	camera = create_camera(screen_width, screen_height);
+
+	initialize_list(&ToBeDestroyedTextures);
 }

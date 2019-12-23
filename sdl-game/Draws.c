@@ -176,7 +176,8 @@ SDL_Texture* DrawTextOnScreen(char* str, Vector2 position, Color color, TTF_Font
 	SDL_RenderCopy(renderer, Message, NULL, &rect); 
 
 	SDL_FreeSurface(surfaceMessage);
-	SDL_DestroyTexture(Message);
+	//SDL_DestroyTexture(Message);
+	add_member_to_list(&ToBeDestroyedTextures, Message);
 
 	//add_member_to_list(&texture_list_to_be_destroyed, Message);
 
@@ -212,7 +213,8 @@ SDL_Texture* DrawTextInGame(char* str, Vector2 position, Color color, TTF_Font* 
 	SDL_RenderCopy(renderer, Message, NULL, &rect);
 
 	SDL_FreeSurface(surfaceMessage);
-	SDL_DestroyTexture(Message);
+	//SDL_DestroyTexture(Message);
+	add_member_to_list(&ToBeDestroyedTextures, Message);
 
 	//add_member_to_list(&texture_list_to_be_destroyed, Message);
 
