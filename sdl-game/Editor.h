@@ -27,7 +27,7 @@ void render_map();
 /**
 *	Does all the initializations for editor.
 */
-GameObjectList InitializeEditor();
+void InitializeEditor();
 
 /**
 *	Initializes the map
@@ -52,13 +52,18 @@ void put_pixel(int* parameters); // int x, int y, Uint32 pixel
 */
 Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue);
 
+/**
+	Get the pixel data of the pixel at x,y
+*/
 Uint32 get_pixel_data(int x, int y);
 
 void onclick(Uint8 object);
 
-/**
-*	For a easier access to get rgba.
-*/
-void get_rgba(Uint32 pixel_data, Uint8* rgba);
+//Easier access for locking and unlocking surfaces
+void Unlock(SDL_Surface* surface);
+void Lock(SDL_Surface* surface);
 
+/**
+Turns Uint32 to Color
+*/
 Color to_color(Uint32 pixel_data);

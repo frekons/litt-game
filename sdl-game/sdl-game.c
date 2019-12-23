@@ -7,6 +7,8 @@
 
 #include "Audio.h"
 
+#include "Menu.h"
+
 #include "Utils.h"
 
 #include "Editor.h"
@@ -37,6 +39,8 @@
 
 int main(int argc, char* argv[])
 {
+	game_state = MENU;
+
 	set_up_things();
 
 	set_background_color(create_color(0, 0, 255, 255));
@@ -129,10 +133,13 @@ int main(int argc, char* argv[])
 
 		if (game_state == MENU)
 		{
-
+			RenderMenu();
 		}
 		else if(game_state == INGAME)
 		{
+			Render();
+		}
+		else if (game_state == EDITOR) {
 			InitializeEditor();
 		}
 		else if (game_state == PAUSE)

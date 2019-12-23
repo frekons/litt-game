@@ -23,20 +23,24 @@ int scale = 15;
 
 _Bool init = 0;
 
-GameObjectList InitializeEditor()
+int once = 0;
+
+void InitializeEditor()
 {
 	if (!init) {
 		init++;
 		map_init();
 	}
 	render_map();
-	return list;
 }
 
 void RenderEditor() {
 	//TODO: DrawButtonWithImageOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
 	//DrawButtonWithImageOnScreen()
 	//TODO
+}
+
+void SaveEditor() {
 }
 
 void render_map() {
@@ -46,11 +50,14 @@ void render_map() {
 	}
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
-			//TODO: DrawButtonOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
-			int parameters[3] = { x,y, BLACK};
-			//printf("%X\n", get_pixel_data(12,10));
+
+			int parameters[3] = { x,y, temp};
+
+			if (!once++) printf("%X", get_pixel_data(7, 6));
+
 			DrawInteractiveRectangleOnScreen((Rect) {x*scale, y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
-			//DrawRectangleOnScreen((Rect){ x * scale, y * scale, scale, scale }, Black);
+			
+			//DrawRectangleOnScreen((Rect){ x * scale, y * scale, scale, scale }, White);
 		}
 	}
 	SDL_FreeSurface(maps);
@@ -120,12 +127,7 @@ void process_pixels() {
 
 Uint32 get_pixel_data(int x, int y)
 {
-	if (SDL_MUSTLOCK(maps)) {
-		if (SDL_LockSurface(maps) < 0) {
-			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
-			return;
-		}
-	}
+	Lock(maps);
 	int bpp = maps->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to retrieve */
 	Uint8* p = (Uint8*)maps->pixels + y * maps->pitch + x * bpp;
@@ -153,9 +155,7 @@ Uint32 get_pixel_data(int x, int y)
 	default:
 		return 0;       /* shouldn't happen, but avoids warnings */
 	}
-	if (SDL_MUSTLOCK(maps)) {
-		SDL_UnlockSurface(maps);
-	}
+	Unlock(maps);
 }
 
 void put_pixel(int* parameters) // int x, int y, Uint32 pixel
@@ -163,13 +163,8 @@ void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 	int x = (int)parameters[0];
 	int y = (int)parameters[1];
 	Uint32 pixel = (Uint32)parameters[2];
-	//printf("%X", pixel);
-	if (SDL_MUSTLOCK(maps)) {
-		if (SDL_LockSurface(maps) < 0) {
-			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
-			return;
-		}
-	}
+
+	Lock(maps);
 	int bpp = maps->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to set */
 	Uint8* p = (Uint8*)maps->pixels + y * maps->pitch + x * bpp;
@@ -200,14 +195,14 @@ void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 		*(Uint32*)p = pixel;
 		break;
 	}
-	printf("%X", *(Uint32*)p);
-	if (SDL_MUSTLOCK(maps)) {
-		SDL_UnlockSurface(maps);
-	}
-	SDL_LockSurface(maps);
+
+	Unlock(maps);
+
+	//Lock(maps);
 
 	SavePNG(maps, mapLocation);
-		SDL_UnlockSurface(maps);
+
+	//Unlock(maps);
 }
 
 Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue)
@@ -219,11 +214,6 @@ Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue)
 	data += (Uint32)blue << 0;
 
 	return data;
-}
-
-void get_rgba(Uint32 pixel_data, Uint8* rgba)
-{
-	SDL_GetRGBA(pixel_data, maps->format, rgba[0], rgba[1], rgba[2], rgba[3]);
 }
 
 Color to_color(Uint32 pixel_data)
@@ -238,10 +228,25 @@ Color to_color(Uint32 pixel_data)
 	}
 	else {
 		temp.a = (pixel_data >> 24) & 0xff;
-		temp.b = (pixel_data >> 16) & 0xff;
+		temp.r = (pixel_data >> 16) & 0xff;
 		temp.g = (pixel_data >> 8) & 0xff;
-		temp.r = pixel_data & 0xff;
+		temp.b = pixel_data & 0xff;
 	}
 	
 	return temp;
+}
+
+void Unlock(SDL_Surface* surface) {
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_UnlockSurface(surface);
+	}
+}
+
+void Lock(SDL_Surface* surface) {
+	if (SDL_MUSTLOCK(surface)) {
+		if (SDL_LockSurface(surface) < 0) {
+			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+			return;
+		}
+	}
 }

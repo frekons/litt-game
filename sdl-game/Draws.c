@@ -66,6 +66,26 @@ void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void* onClick, voi
 	}
 }
 
+void DrawInteractiveRectangleWithImageOnScreen(char* img_directory, Rect rect, Color color, void* onClick, void* parameters)
+{
+	Image* image = LoadTexture(img_directory, false, (Vector2) { 0, 0 });
+	DrawImage(image, rect, false);
+
+	UnloadTexture(image);
+
+	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
+	{
+		if (onClick)
+		{
+			typedef void func(void*);
+			func* f = (func*)onClick;
+			f(parameters);
+
+			mouse_button_mask = 0;
+		}
+	}
+}
+
 
 void DrawFilledRectangleOnScreen(Rect rect, Color color)
 {

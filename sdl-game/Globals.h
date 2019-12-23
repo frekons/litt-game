@@ -38,6 +38,7 @@ int volume;
 typedef enum {
 
 	MENU = 0,
+	EDITOR,
 	INGAME,
 	PAUSE,
 	QUIT
