@@ -128,6 +128,12 @@ int main(int argc, char* argv[])
 
 		// clear screen
 		SDL_RenderClear(renderer);
+
+		for (int i = 0; i < ToBeDestroyedTextures.Count; i++)
+		{
+			SDL_DestroyTexture(ToBeDestroyedTextures.List[0]);
+			delete_member_at(&ToBeDestroyedTextures, 0);
+		}
 		
 		// draw processes
 		renderable_state = true;
