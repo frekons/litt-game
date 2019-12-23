@@ -7,7 +7,7 @@
 /////////////////////////////////////////////////////
 
 //The SDL_Surface to hold the map data.
-Surface* map;
+Surface* maps;
 
 //Where the game objects will be stored
 GameObjectList list;
@@ -52,9 +52,13 @@ void put_pixel(int* parameters); // int x, int y, Uint32 pixel
 */
 Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue);
 
+Uint32 get_pixel_data(int x, int y);
+
 void onclick(Uint8 object);
 
 /**
 *	For a easier access to get rgba.
 */
 void get_rgba(Uint32 pixel_data, Uint8* rgba);
+
+Color to_color(Uint32 pixel_data);

@@ -12,6 +12,8 @@ void InitializeDraws();
 void DrawRectangleOnScreen(Rect rect, Color color);
 void DrawRectangleInGame(Rect rect, Color color);
 
+void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void* onClick, void* parameters);
+
 void DrawFilledRectangleOnScreen(Rect rect, Color color);
 void DrawFilledRectangleInGame(Rect rect, Color color);
 

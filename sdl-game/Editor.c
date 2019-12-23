@@ -7,6 +7,11 @@
 
 #include "Draws.h"
 
+#include "Colors.h"
+
+#define SavePNG(surface, file) \
+        SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "rb+"), 1)
+
 //To hold the temporary pixel info for a GameObject
 //DEFAULT: WHITE
 Uint32 temp = 0xFFFFFFFF;
@@ -14,10 +19,17 @@ Uint32 temp = 0xFFFFFFFF;
 //Location of the map
 const char* mapLocation = "resources/environment/test.png";
 
+int scale = 15;
+
+_Bool init = 0;
+
 GameObjectList InitializeEditor()
 {
-	map_init();
-	process_pixels();
+	if (!init) {
+		init++;
+		map_init();
+	}
+	render_map();
 	return list;
 }
 
@@ -28,19 +40,27 @@ void RenderEditor() {
 }
 
 void render_map() {
-	for (int y = 0; y < map->h; y++) {
-		for (int x = 0; x < map->w; x++) {
+	if (!init) {
+		init++;
+		map_init();
+	}
+	for (int y = 0; y < maps->h; y++) {
+		for (int x = 0; x < maps->w; x++) {
 			//TODO: DrawButtonOnScreen için parametreleri olan bir fonksiyonu alan varyantýný yap.
-			int parameters[3] = { x,y,temp };
-			DrawButtonOnScreen("", (Rect) { x * 5, y * 5, 5, 5 }, (Color) {255,255,255,255}, (Color) { 0, 0, 0, 0 }, Font_Minecraft, put_pixel, parameters);
+			int parameters[3] = { x,y, BLACK};
+			//printf("%X\n", get_pixel_data(12,10));
+			DrawInteractiveRectangleOnScreen((Rect) {x*scale, y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
+			//DrawRectangleOnScreen((Rect){ x * scale, y * scale, scale, scale }, Black);
 		}
 	}
+	SDL_FreeSurface(maps);
+	init--;
 }
 
 
 void map_init()
 {
-	map = IMG_Load(mapLocation);
+	maps = IMG_Load(mapLocation);
 }
 
 /**
@@ -89,56 +109,70 @@ void onclick(Uint8 object) {
 void process_pixels() {
 	Uint8 rgba[4]; //0 - r, 1 - g, 2 - b, 3 - a
 
-	int bpp = map->format->BytesPerPixel;
+	int bpp = maps->format->BytesPerPixel;
 
-	for (int y = 0; y < map->h; y++) {
-		for (int x = 0; x < map->w; x++) {
+	for (int y = 0; y < maps->h; y++) {
+		for (int x = 0; x < maps->w; x++) {
 			
 		}
 	}
 }
 
-//Uint32 get_pixel_data(SDL_Surface* surface, int x, int y)
-//{
-//	int bpp = surface->format->BytesPerPixel;
-//	/* Here p is the address to the pixel we want to retrieve */
-//	Uint8* p = (Uint8*)map->pixels + y * map->pitch + x * bpp;
-//
-//	switch (bpp) {
-//	case 1:
-//		return *p;
-//		break;
-//
-//	case 2:
-//		return *(Uint16*)p;
-//		break;
-//
-//	case 3:
-//		if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-//			return p[0] << 16 | p[1] << 8 | p[2];
-//		else
-//			return p[0] | p[1] << 8 | p[2] << 16;
-//		break;
-//
-//	case 4:
-//		return *(Uint32*)p;
-//		break;
-//
-//	default:
-//		return 0;       /* shouldn't happen, but avoids warnings */
-//	}
-//}
+Uint32 get_pixel_data(int x, int y)
+{
+	if (SDL_MUSTLOCK(maps)) {
+		if (SDL_LockSurface(maps) < 0) {
+			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+			return;
+		}
+	}
+	int bpp = maps->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to retrieve */
+	Uint8* p = (Uint8*)maps->pixels + y * maps->pitch + x * bpp;
+
+	switch (bpp) {
+	case 1:
+		return *p;
+		break;
+
+	case 2:
+		return *(Uint16*)p;
+		break;
+
+	case 3:
+		if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+			return p[0] << 16 | p[1] << 8 | p[2];
+		else
+			return p[0] | p[1] << 8 | p[2] << 16;
+		break;
+
+	case 4:
+		return *(Uint32*)p;
+		break;
+
+	default:
+		return 0;       /* shouldn't happen, but avoids warnings */
+	}
+	if (SDL_MUSTLOCK(maps)) {
+		SDL_UnlockSurface(maps);
+	}
+}
 
 void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 {
 	int x = (int)parameters[0];
 	int y = (int)parameters[1];
 	Uint32 pixel = (Uint32)parameters[2];
-
-	SDL_LockSurface(map);
-	int bpp = map->format->BytesPerPixel;
+	//printf("%X", pixel);
+	if (SDL_MUSTLOCK(maps)) {
+		if (SDL_LockSurface(maps) < 0) {
+			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+			return;
+		}
+	}
+	int bpp = maps->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to set */
-	Uint8* p = (Uint8*)map->pixels + y * map->pitch + x * bpp;
+	Uint8* p = (Uint8*)maps->pixels + y * maps->pitch + x * bpp;
 
 	switch (bpp) {
 	case 1:
@@ -166,7 +200,14 @@ void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 		*(Uint32*)p = pixel;
 		break;
 	}
-	SDL_UnlockSurface(map);
+	printf("%X", *(Uint32*)p);
+	if (SDL_MUSTLOCK(maps)) {
+		SDL_UnlockSurface(maps);
+	}
+	SDL_LockSurface(maps);
+
+	SavePNG(maps, mapLocation);
+		SDL_UnlockSurface(maps);
 }
 
 Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue)
@@ -182,5 +223,25 @@ Uint32 get_object_color(Uint8 red, Uint8 green, Uint8 blue)
 
 void get_rgba(Uint32 pixel_data, Uint8* rgba)
 {
-	SDL_GetRGBA(pixel_data, map->format, rgba[0], rgba[1], rgba[2], rgba[3]);
+	SDL_GetRGBA(pixel_data, maps->format, rgba[0], rgba[1], rgba[2], rgba[3]);
+}
+
+Color to_color(Uint32 pixel_data)
+{
+	Color temp;
+
+	if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+		temp.b = (pixel_data >> 24) & 0xff;
+		temp.g = (pixel_data >> 16) & 0xff;
+		temp.r = (pixel_data >> 8) & 0xff;
+		temp.a = pixel_data & 0xff;
+	}
+	else {
+		temp.a = (pixel_data >> 24) & 0xff;
+		temp.b = (pixel_data >> 16) & 0xff;
+		temp.g = (pixel_data >> 8) & 0xff;
+		temp.r = pixel_data & 0xff;
+	}
+	
+	return temp;
 }

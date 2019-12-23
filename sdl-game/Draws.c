@@ -50,6 +50,22 @@ void DrawRectangleInGame(Rect rect, Color color)
 
 }
 
+void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void* onClick, void* parameters) {
+	DrawFilledRectangleOnScreen(rect, color);
+
+	if ((SDL_BUTTON_LMASK & mouse_button_mask) && IsInteractingRect(rect, mouse_position))
+	{
+		if (onClick)
+		{
+			typedef void func(void*);
+			func* f = (func*)onClick;
+			f(parameters);
+
+			mouse_button_mask = 0;
+		}
+	}
+}
+
 
 void DrawFilledRectangleOnScreen(Rect rect, Color color)
 {

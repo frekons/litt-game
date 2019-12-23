@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 		}
 		else if(game_state == INGAME)
 		{
-			Render();
+			InitializeEditor();
 		}
 		else if (game_state == PAUSE)
 		{
