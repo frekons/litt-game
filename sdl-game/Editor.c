@@ -9,6 +9,8 @@
 
 #include "Colors.h"
 
+#include "json/JSON_checker.h"
+
 #define SavePNG(surface, file) \
         SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "rb+"), 1)
 
@@ -37,13 +39,25 @@ void InitializeEditor()
 void RenderEditor() {
 	render_map();
 
-	DrawButtonWithImageOnScreen(NULL, "resources/players/player.png", (Rect) {0,500,80,100}, Black, White, NULL, onclick, 0);
-	DrawButtonWithImageOnScreen(NULL, "resources/enemies/enemytwo.png", (Rect) { 100, 500, 80, 100 }, Black, White, NULL, onclick, 1);
+	int parameters[] = { 0 };
+	DrawButtonWithImageOnScreen(NULL, "resources/players/player.png", (Rect) { 0, 500, 80, 100 }, Black, White, NULL, onclick, parameters);
+	
+	parameters[0] = 1;
+	DrawButtonWithImageOnScreen(NULL, "resources/enemies/enemytwo.png", (Rect) { 100, 500, 80, 100 }, Black, White, NULL, onclick, parameters);
 }
 
 GameObjectList SaveEditor() {
 	process_pixels();
 }
+
+PointerList GetMap(char* png_path)
+{
+	PointerList list;
+	initialize_list(&list);
+
+	
+}
+
 
 void render_map() {
 	if (!init) {
@@ -84,8 +98,8 @@ Obje tipleri:
 	7 - dirt
 	8 - grass
 */
-void onclick(Uint8 object) {
-	switch (object) {
+void onclick(int* object) {
+	switch (object[0]) {
 	case 0:
 		temp = 0xFF1900FF;
 		break;

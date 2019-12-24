@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
 	set_background_color(create_color(0, 0, 255, 255));
 
-	Start(); // don't use Game::GameObjects before this!
+	//Start(); // don't use Game::GameObjects before this!
 
 	InitializeSounds();
 	InitializeDraws();

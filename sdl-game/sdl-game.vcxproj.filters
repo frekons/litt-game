@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\Enemies">
       <UniqueIdentifier>{fff0e481-9431-4446-b9b4-6ab5adaa8158}</UniqueIdentifier>
     </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{b949647f-3b2e-4156-a89d-f42f9de407b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h">
@@ -66,6 +69,15 @@
     <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json\JSON_checker.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\utf8_decode.h">
+      <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="json\utf8_to_utf16.h">
+      <Filter>json</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdl-game.c">
@@ -106,6 +118,15 @@
     </ClCompile>
     <ClCompile Include="Menu.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="json\JSON_checker.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="json\utf8_decode.c">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="json\utf8_to_utf16.c">
+      <Filter>json</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

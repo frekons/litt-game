@@ -5,6 +5,9 @@
 #include "Game.h"
 
 void play() {
+
+	Start(); // don't use Game::GameObjects before this!
+
 	game_state = INGAME;
 }
 
