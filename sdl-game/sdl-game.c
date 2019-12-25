@@ -35,6 +35,7 @@
 #pragma comment(lib, "SDL2_mixer.lib")
 #pragma comment(lib, "SDL2_ttf.lib")
 
+float curFrame = 1.0f;
 
 #undef main
 
@@ -148,9 +149,37 @@ int main(int argc, char* argv[])
 		{
 			RenderMenu();
 		}
-		else if(game_state == INGAME)
+		else if(game_state == INGAME || game_state == END || game_state == DIE)
 		{
 			Render();
+
+			if (game_state == END)
+			{
+				float height = camera->height;
+
+				static Rect rect = { 0, 0,  0, 0 };
+
+				rect = (Rect) { 0, -height * curFrame, camera->width, camera->height };
+
+				DrawFilledRectangleOnScreen(rect, (Color) { 0, 0, 0, 255 });
+				DrawTextOnScreen("Oyunu basariyla bitirdin, TEBRIKLER!!!", (Vector2) { camera->width / 2, +camera->height / 2 - camera->height * curFrame }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+
+				curFrame = float_lerp(curFrame, 0, deltaTime);
+			}
+			else if (game_state == DIE)
+			{
+				float height = camera->height;
+
+				static Rect rect = { 0, 0,  0, 0 };
+
+				rect = (Rect) { 0, -height * curFrame, camera->width, camera->height };
+
+				DrawFilledRectangleOnScreen(rect, (Color) { 0, 0, 0, 255 });
+				DrawTextOnScreen("Daha yetenekli olduguna inaniyorum, lutfen bir daha dene!", (Vector2) { camera->width / 2, +camera->height / 2 - camera->height * curFrame }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+				DrawTextOnScreen("Menuye yonlendiriyorum...", (Vector2) { camera->width / 2, +camera->height / 2 - camera->height * curFrame + 50 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+
+				curFrame = float_lerp(curFrame, 0, deltaTime);
+			}
 		}
 		else if (game_state == EDITOR) {
 			RenderEditor();
@@ -174,6 +203,7 @@ int main(int argc, char* argv[])
 			DrawButtonOnScreen("Anladim!", (Rect) { camera->width / 2 - 300, camera->height / 2 + 200, 600, 100 }, (Color) { 50, 50, 50, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, _back_to_mainmenu, NULL);
 
 		}
+
 
 		renderable_state = false;
 		// show

@@ -9,8 +9,6 @@
 
 #include "Colors.h"
 
-#include "json/JSON_checker.h"
-
 #include "Image.h"
 
 #include "Globals.h"
@@ -331,12 +329,12 @@ void render_map() {
 				free(image);
 			}
 			else if (compare_colors(color, Stone2)) {
-				image = LoadTexture("resources/enemies/stone_ground_left.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_left.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}
 			else if (compare_colors(color, Stone3)) {
-				image = LoadTexture("resources/enemies/stone_ground_right.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_right.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}

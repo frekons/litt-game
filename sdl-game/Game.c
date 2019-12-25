@@ -200,11 +200,24 @@ void onClick(void)
 	local_player->velocity.y = -jump_force;
 }
 
+#include "Pause.h"
+void OnPlayerDead()
+{
+	curFrame = 1.0f;
+	game_state = DIE;
+
+	Sleep(5000);
+	
+	game_state = MENU;
+}
 
 GameObject* localplayer_update(GameObject* self)
 {
 	//DrawButtonInGame("button", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
 	//DrawButtonWithImageOnScreen("button", "resources/enemies/enemy.png", (Rect) { 200, 350, 100, 50 }, (Color) { 0, 0, 0, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, &onClick);
+
+	if (game_state == END)
+		return self;
 
 	Vector2 healtbar_position = collider_center(self);
 	healtbar_position.y -= self->collider.size.y*1.5;
@@ -215,6 +228,9 @@ GameObject* localplayer_update(GameObject* self)
 	DrawTextInGame(buffer, healtbar_position, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
 
 	
+	if (self->transform->position.y > 3000)
+		self->health = 0;
+
 	float cur_time = get_time();
 
 	if (self->health > 0) // alive
@@ -366,8 +382,14 @@ GameObject* localplayer_update(GameObject* self)
 	}
 	else // dead
 	{
-		set_animator_state(self, "die", 0, false, 0);
+		if (!(self->ignore_movement && self->ignore_movement_time > cur_time))
+		{
+			create_thread(OnPlayerDead, 0);
+
+			set_animator_state(self, "die", 999, true, 0);
+		}
 	}
+
 	return self;
 }
 
@@ -843,6 +865,11 @@ GameObject* enemy_three_update(GameObject * self) {
 
 	self->transform->position.y += self->velocity.y * deltaTime;
 
+	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	if (distance > enemy_distance_tolerance)
+		return self;
+
 	if (self->health == INT_MIN)
 		return self;
 
@@ -960,7 +987,7 @@ void create_enemy_three(Vector2 position) {
 
 	Point enemypos = *(Point*)&position;
 
-	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4.0f, 4.0f }, (BoxCollider) { 8, 0, 16, 32 }, LAYER_ENEMY, image, animations, animation_count, &enemy_three_start, &enemy_three_update);
+	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4.0f, 4.0f }, (BoxCollider) { 8, 0, 16, 21 }, LAYER_ENEMY, image, animations, animation_count, &enemy_three_start, &enemy_three_update);
 }
 
 void attack_boss(GameObject* self)
@@ -1078,6 +1105,9 @@ GameObject* boss_update(GameObject * self) {
 	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
 
 	if (self->health <= 0) {
+
+		curFrame = 1.0f;
+		game_state = END;
 
 		set_animator_state(self, "die", 999, 1, 1);
 		self->health = INT_MIN;
@@ -1527,7 +1557,7 @@ void _create_ground(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) {0, 0, image->rect.w, image->rect.h - 40}, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) {-5, 0, image->rect.w + 10, image->rect.h}, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 void create_ground_corner_left(Vector2 position) {
@@ -1535,7 +1565,7 @@ void create_ground_corner_left(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h}, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { -5, 0, image->rect.w + 10, image->rect.h}, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 void create_ground_corner_right(Vector2 position) {
@@ -1543,7 +1573,7 @@ void create_ground_corner_right(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { -5, 0, image->rect.w + 10, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
 
 }
 
@@ -1552,7 +1582,7 @@ void create_ground_right(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { -5, 0, image->rect.w + 10, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 void create_ground_left(Vector2 position) {
@@ -1560,7 +1590,7 @@ void create_ground_left(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { -5, 0, image->rect.w + 10, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 
@@ -1574,162 +1604,17 @@ void Start()
 		free(ToBeDestroyed.List);
 	}
 
+	for (int i = 0; i < GameObjects.Count; i++)
+	{
+		destroy_object(GameObjects.List[i], 1);
+		delete_game_object_at(&GameObjects, 0);
+	}
+
 	initialize_game_object_list(&GameObjects);
 	initialize_list(&ToBeDestroyed);
 
 	InitializeMap("resources/map/map1.png");
-	//
 	
-	//Image* image = LoadTexture("resources/players/player.png", true, create_vec2(48, 48)); // local_player creation
-	//{
-	//	Point spawn_position = { 50,400 };
-	//	Vector2 spawn_scale = { 2.0f, 2.0f };
-
-	//	int animation_count = 7;
-
-	//	Animation* animations = (Animation*)malloc(sizeof(Animation) * animation_count);
-
-	//	strcpy(animations[0].state_name, "idle");
-	//	{
-	//		initialize_int_list(&animations[0].sprites);
-
-	//		add_int_to_list(&animations[0].sprites, 0);
-	//		add_int_to_list(&animations[0].sprites, 1);
-	//		add_int_to_list(&animations[0].sprites, 2);
-	//		add_int_to_list(&animations[0].sprites, 3);
-	//		add_int_to_list(&animations[0].sprites, 4);
-
-	//		animations[0].loop = true;
-
-	//		animations[0].current_index = 0;
-	//		animations[0].current_frame = 0;
-	//		animations[0].wait_frame = 6;
-	//	}
-
-	//	strcpy(animations[1].state_name, "run");
-	//	{
-	//		initialize_int_list(&animations[1].sprites);
-
-	//		add_int_to_list(&animations[1].sprites, 8);
-	//		add_int_to_list(&animations[1].sprites, 9);
-	//		add_int_to_list(&animations[1].sprites, 10);
-	//		add_int_to_list(&animations[1].sprites, 11);
-	//		add_int_to_list(&animations[1].sprites, 12);
-	//		add_int_to_list(&animations[1].sprites, 13);
-	//		add_int_to_list(&animations[1].sprites, 14);
-	//		add_int_to_list(&animations[1].sprites, 15);
-
-
-	//		animations[1].loop = true;
-
-	//		animations[1].current_index = 0;
-	//		animations[1].current_frame = 0;
-	//		animations[1].wait_frame = 6;
-	//	}
-
-	//	strcpy(animations[2].state_name, "shoot");
-	//	{
-	//		initialize_int_list(&animations[2].sprites);
-
-	//		add_int_to_list(&animations[2].sprites, 16);
-	//		add_int_to_list(&animations[2].sprites, 17);
-	//		add_int_to_list(&animations[2].sprites, 18);
-	//		add_int_to_list(&animations[2].sprites, 19);
-	//		add_int_to_list(&animations[2].sprites, 20);
-
-	//		animations[2].loop = false;
-
-	//		animations[2].current_index = 0;
-	//		animations[2].current_frame = 0;
-	//		animations[2].wait_frame = 6;
-	//	}
-
-	//	strcpy(animations[3].state_name, "die");
-	//	{
-	//		initialize_int_list(&animations[3].sprites);
-
-	//		add_int_to_list(&animations[3].sprites, 24);
-	//		add_int_to_list(&animations[3].sprites, 25);
-	//		add_int_to_list(&animations[3].sprites, 26);
-	//		add_int_to_list(&animations[3].sprites, 27);
-	//		add_int_to_list(&animations[3].sprites, 28);
-	//		add_int_to_list(&animations[3].sprites, 29);
-	//		add_int_to_list(&animations[3].sprites, 30);
-	//		add_int_to_list(&animations[3].sprites, 31);
-
-
-	//		animations[3].loop = false;
-
-	//		animations[3].current_index = 0;
-	//		animations[3].current_frame = 0;
-	//		animations[3].wait_frame = 6;
-	//	}
-	//	
-	//	
-	//	strcpy(animations[4].state_name, "jump");
-	//	{
-	//		initialize_int_list(&animations[4].sprites);
-
-	//		add_int_to_list(&animations[4].sprites, 33);
-	//		
-
-
-	//		animations[4].loop = true;
-
-	//		animations[4].current_index = 0;
-	//		animations[4].current_frame = 0;
-	//		animations[4].wait_frame = 6;
-	//	}
-
-	//	strcpy(animations[5].state_name, "shootonair");
-	//	{
-	//		initialize_int_list(&animations[5].sprites);
-
-	//		add_int_to_list(&animations[5].sprites, 40);
-	//		add_int_to_list(&animations[5].sprites, 41);
-	//		add_int_to_list(&animations[5].sprites, 42);
-	//		add_int_to_list(&animations[5].sprites, 43);
-	//		add_int_to_list(&animations[5].sprites, 44);
-
-	//		animations[5].loop = false;
-
-	//		animations[5].current_index = 0;
-	//		animations[5].current_frame = 0;
-	//		animations[5].wait_frame = 6;
-	//	}
-	//	strcpy(animations[6].state_name, "dash");
-	//	{
-	//		initialize_int_list(&animations[6].sprites);
-
-	//		add_int_to_list(&animations[6].sprites, 34);
-
-
-
-	//		animations[6].loop = false;
-
-	//		animations[6].current_index = 0;
-	//		animations[6].current_frame = 0;
-	//		animations[6].wait_frame = 6;
-	//	}
-
-	//	
-
-	//	GameObject* gameObject = GameObject_New(GameObjects.Count, spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 35 }, LAYER_PLAYER, image, animations, animation_count, &localplayer_start, &localplayer_update); // spawning local player
-
-	//}
-
-	//image = LoadTexture("resources/environment/ground.png", false, (Vector2) { 0, 0 });
-
-	//GameObject_New(GameObjects.Count, create_point(0, 500), (Vector2) { 1, 1 }, (BoxCollider) { 0, 40, image->rect.w, image->rect.h - 40 }, LAYER_GROUND, image, NULL, 0, 0, 0); // ground
-
-	//create_enemy_one((Vector2) { 600, 464 });
-	//create_enemy_two((Vector2) { 100, -50 });
-	//create_enemy_three((Vector2) { 300, 460 });
-	//create_boss((Vector2) { 200, 464-90*2 });
-	//create_trap_one((Vector2) { 600, 512 });
-	//create_trap_two((Vector2) { 100, 512 });
-
-
 }
 
 GameObjectList GetObjectsOfLayer(int layer)
@@ -1766,7 +1651,7 @@ void Render()
 
 	Uint8* keystate = SDL_GetKeyboardState(NULL);
 
-	if (keystate[SDL_SCANCODE_ESCAPE])
+	if (keystate[SDL_SCANCODE_ESCAPE] && game_state != DIE && game_state != END)
 	{
 		game_state = PAUSE;
 	}

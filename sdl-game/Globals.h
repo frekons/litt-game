@@ -42,6 +42,8 @@ typedef enum {
 	INGAME,
 	PAUSE,
 	HOWTOPLAY,
+	DIE,
+	END,
 	QUIT
 
 }GAME_STATES;
@@ -51,5 +53,6 @@ GAME_STATES game_state;
 
 PointerList ToBeDestroyedTextures;
 
+float curFrame;
 
 //#endif // !GLOBALS_H
