@@ -1596,19 +1596,19 @@ void create_ground_left(Vector2 position) {
 
 void Start()
 {
-	if (ToBeDestroyed.List != NULL)
-	{
-		for (int i = 0; i < ToBeDestroyed.Count; i++)
-			free(ToBeDestroyed.List[i]);
+	//if (ToBeDestroyed.List != NULL)
+	//{
+	//	for (int i = 0; i < ToBeDestroyed.Count; i++)
+	//		free(ToBeDestroyed.List[i]);
 
-		free(ToBeDestroyed.List);
-	}
+	//	free(ToBeDestroyed.List);
+	//}
 
-	for (int i = 0; i < GameObjects.Count; i++)
-	{
-		destroy_object(GameObjects.List[i], 1);
-		delete_game_object_at(&GameObjects, 0);
-	}
+	//for (int i = 0; i < GameObjects.Count; i++)
+	//{
+	//	destroy_object(GameObjects.List[i], 1);
+	//	delete_game_object_at(&GameObjects, 0);
+	//}
 
 	initialize_game_object_list(&GameObjects);
 	initialize_list(&ToBeDestroyed);
