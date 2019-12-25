@@ -165,6 +165,8 @@ typedef struct SGameObject {
 	struct GameObject* last_object, *owner;
 
 	void* destroy_thread_handle;
+
+	bool grounded;
 }GameObject;
 
 
