@@ -204,7 +204,7 @@ void InitializeMap(char* map_location)
 
 	map_init(map_location);
 
-	int scaleFactor = 80;
+	int scaleFactor = 82;
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {

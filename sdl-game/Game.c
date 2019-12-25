@@ -1743,6 +1743,16 @@ void Render()
 	////////////
 
 	render_background();
+
+	Uint8* keystate = SDL_GetKeyboardState(NULL);
+
+	if (keystate[SDL_SCANCODE_ESCAPE])
+	{
+		game_state = PAUSE;
+	}
+
+	////////////
+
 	
 	for (int i = (int)pow(2, 5); i != 1; i /= 2)
 	{

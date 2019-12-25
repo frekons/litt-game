@@ -13,6 +13,8 @@
 
 #include "Editor.h"
 
+#include "Pause.h"
+
 #include <stdbool.h>
 
 #include <SDL2/SDL.h>
@@ -151,7 +153,7 @@ int main(int argc, char* argv[])
 		}
 		else if (game_state == PAUSE)
 		{
-
+			RenderPauseMenu();
 		}
 
 		renderable_state = false;

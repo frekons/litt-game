@@ -81,6 +81,9 @@
     <ClInclude Include="Colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdl-game.c">
@@ -132,6 +135,9 @@
       <Filter>json</Filter>
     </ClCompile>
     <ClCompile Include="Color.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pause.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
