@@ -16,6 +16,9 @@ void init_colors() {
 	Archer = (Color) { 130,0,8,255 };
 	Boss = (Color) { 0,0,0,255 };
 
+	Trap1 = (Color) {255,0,242,255};
+	Trap2 = (Color) {255,0,168,255};
+
 	Dirt = (Color) { 158,92,56,255 };
 	Grass = (Color) { 0,130,26,255 };
 

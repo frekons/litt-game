@@ -22,4 +22,6 @@ void create_enemy(int index, Vector2 position);
 
 void create_trap(int index, Vector2 position);
 
+void create_player(Vector2 position);
+
 //#endif // !GAME_H
