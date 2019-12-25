@@ -55,6 +55,8 @@ GameObject* create_particle(char* image_directory, Vector2 clip_size, Vector2 sc
 
 	GameObject* ammo_particle = GameObject_New(GameObjects.Count, position, scale, (BoxCollider) { 0, 0, 0, 0 }, LAYER_EFFECTS, image, animations, 1, 0, 0);
 
+	free(image);
+
 	return ammo_particle;
 }
 
@@ -131,6 +133,8 @@ void create_ammo(GameObject * self, char* texture, bool is_sprite_sheet, Vector2
 	
 	GameObject* ammo = GameObject_New(GameObjects.Count, ammoPosition, scale, (BoxCollider) { 0, 0, sprite_size.x, sprite_size.y }, LAYER_EFFECTS, image, animations, animation_count, &ammo_start, &ammo_update);
 	
+	free(image);
+
 	ammo->owner = self;
 	ammo->velocity.x = self->projectile_speed * (self->transform->left ? -1 : 1);
 	ammo->attack_force = self->attack_force;
@@ -563,6 +567,7 @@ GameObject* enemy_one_update(GameObject * self) {
 
 
 void create_enemy_one(Vector2 position){
+
 	Image* image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 43 , 39 });
 	int animation_count = 4;
 
@@ -635,6 +640,8 @@ void create_enemy_one(Vector2 position){
 	Point enemypos = *(Point*)&position;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 27, 39 }, LAYER_ENEMY, image, animations, animation_count, &enemy_one_start, &enemy_one_update);
+
+	free(image);
 }
 
 void enemy_two_start(GameObject* self) {
@@ -798,6 +805,8 @@ void create_enemy_two(Vector2 position) {
 	Point enemypos = *(Point*)&position;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 2, 2 }, (BoxCollider) { 8, 0, 12,24  }, LAYER_ENEMY, image, animations, animation_count, &enemy_two_start, &enemy_two_update);
+	
+	free(image);
 }
 
 void enemy_three_start(GameObject* self) {
@@ -952,6 +961,8 @@ void create_enemy_three(Vector2 position) {
 	Point enemypos = *(Point*)&position;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4.0f, 4.0f }, (BoxCollider) { 8, 0, 16, 32 }, LAYER_ENEMY, image, animations, animation_count, &enemy_three_start, &enemy_three_update);
+
+	free(image);
 }
 
 void attack_boss(GameObject* self)
@@ -1208,6 +1219,8 @@ void create_boss(Vector2 position) {
 	Point enemypos = *(Point*)&position;
 
 	GameObject* enemy = GameObject_New(GameObjects.Count, enemypos, (Vector2) { 4, 4 }, (BoxCollider) { 24, 24, 36,36  }, LAYER_ENEMY, image, animations, animation_count, &boss_start, &boss_update);
+
+	free(image);
 }
 
 void trap_one_start(GameObject* self) {
@@ -1507,6 +1520,7 @@ void create_player(Vector2 position) {
 
 		GameObject* gameObject = GameObject_New(GameObjects.Count, spawn_position, spawn_scale, (BoxCollider) { 12, 4, 24, 35 }, LAYER_PLAYER, image, animations, animation_count, & localplayer_start, & localplayer_update); // spawning local player
 
+		free(image);
 	}
 }
 
@@ -1516,6 +1530,7 @@ void _create_ground(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) {0, 0, image->rect.w, image->rect.h - 40}, LAYER_GROUND, image, NULL, 0, 0, 0);
+	free(image);
 }
 
 void create_ground_corner_left(Vector2 position) {
@@ -1524,6 +1539,7 @@ void create_ground_corner_left(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h}, LAYER_GROUND, image, NULL, 0, 0, 0);
+	free(image);
 }
 
 void create_ground_corner_right(Vector2 position) {
@@ -1532,6 +1548,8 @@ void create_ground_corner_right(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+
+	free(image);
 }
 
 void create_ground_right(Vector2 position) {
@@ -1540,6 +1558,8 @@ void create_ground_right(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+
+	free(image);
 }
 
 void create_ground_left(Vector2 position) {
@@ -1548,6 +1568,8 @@ void create_ground_left(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+
+	free(image);
 }
 
 

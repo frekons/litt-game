@@ -52,21 +52,30 @@ void is_selected(Color object_color, Rect object_rect) {
 
 void draw_selector_box(int* parameters, char* path, Rect object, Vector2 clip, Rect rect, Rect clip_rect, Color property, bool is_sprite) 
 {
+	Image* image = LoadTexture(path, is_sprite, clip);
+
 	DrawInteractiveRectangleOnScreen(object, Invisible, onclick, parameters);
 	is_selected(property, object);
-	DrawClipImage(LoadTexture(path, is_sprite, clip), rect, clip_rect, 0, false);
+	DrawClipImage(image, rect, clip_rect, 0, false);
 	DrawFilledRectangleOnScreen((Rect) { object.x + 32, object.y + scale * 8, scale, scale }, property);
 	DrawRectangleOnScreen((Rect) { object.x + 32, object.y + scale * 8, scale, scale }, White);
+
+	free(image);
 }
 
 
 void render_background() {
+
+	Image* image = LoadTexture("resources/environment/stone_back_darker.png", false, create_vec2(417, 417));
+
 	int scale = 82;
 	for (int y = 0; y < 32; y++) {
 		for (int x = 0; x < 512; x++) {
-			DrawImage(LoadTexture("resources/environment/stone_back_darker.png", false, create_vec2(417, 417)), (Rect) { x* scale, y* scale, scale, scale }, false);
+			DrawImage(image, (Rect) { x* scale, y* scale, scale, scale }, false);
 		}
 	}
+
+	free(image);
 }
 
 /**
@@ -158,14 +167,21 @@ void navigator_onclick(int* dir) {
 
 void render_navigator() {
 	int parameters[1] = { 0 };
+
+	Image* image = LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 });
 	//Left
 	DrawInteractiveRectangleOnScreen((Rect) { 0, 650, 40, 40 }, (Color) { 0, 0, 0, 0 }, navigator_onclick, parameters);
-	DrawImage(LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 }), (Rect) { 0, 650, 40, 40 }, true);
+	DrawImage(image, (Rect) { 0, 650, 40, 40 }, true);
 
+	UnloadTexture(image);
+
+	image = LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 });
 	parameters[0] = 1;
 	//Right
 	DrawInteractiveRectangleOnScreen((Rect) { camera->width-60, 650, 40, 40 }, (Color) { 0, 0, 0, 0 }, navigator_onclick, parameters);
-	DrawImage(LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 }), (Rect) { camera->width - 60, 650, 40, 40 }, false);
+	DrawImage(image, (Rect) { camera->width - 60, 650, 40, 40 }, false);
+
+	UnloadTexture(image);
 
 	//Back
 	parameters[0] = 2;
@@ -284,8 +300,14 @@ void render_map() {
 			Color color = to_color(get_pixel_data(x, y));
 			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, color, put_pixel, parameters);
 			
+			Image* image = NULL;
+
 			if (compare_colors(color, Player))
-				DrawClipImage(LoadTexture("resources/players/player.png", true, (Vector2) { 48, 48 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 48, 48 }, 0, false);
+			{
+				image = LoadTexture("resources/players/player.png", true, (Vector2) { 48, 48 });
+				DrawClipImage(image, (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 48, 48 }, 0, false);
+				free(image);
+			}
 			else if(compare_colors(color, Bat))
 				DrawClipImage(LoadTexture("resources/enemies/enemytwo.png", true, (Vector2) { 16, 16 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 16, 16 }, 0, false);
 			else if (compare_colors(color, Archer))
