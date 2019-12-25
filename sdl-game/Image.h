@@ -15,6 +15,6 @@ bool UnloadTexture(Image * img);
 //SDL_Texture** SplitTexture(Image* texture, Vector2 split_size, int *size);
 
 void DrawImage(Image* image, Rect rect, bool left);
-void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index, bool);
+void DrawClipImage(Image* image, Rect rect, Rect clipRect, int index, bool left);
 
 //#endif // !IMAGE_H
