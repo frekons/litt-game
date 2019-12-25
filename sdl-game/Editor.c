@@ -131,7 +131,7 @@ void navigator_onclick(int* dir) {
 		break;
 	case 2:
 		game_state = MENU;
-		SDL_FreeSurface(maps);
+		//SDL_FreeSurface(maps);
 	}
 }
 
@@ -170,30 +170,34 @@ void SaveMap()
 
 void InitializeMap(char* map_location)
 {
+	init_colors();
+
 	map_init(map_location);
+
+	int scaleFactor = 30;
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
 			if (compare_colors(to_color(get_pixel_data(x, y)), Player)) {
-				create_player(create_vec2(x * 40, x * 40));
+				create_player(create_vec2(x * scaleFactor, x * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Skeleton)) {
-				create_enemy(0, create_vec2(x * 40, y * 40));
+				create_enemy(0, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Bat)) {
-				create_enemy(1, create_vec2(x * 40, y * 40));
+				create_enemy(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Archer)) {
-				create_enemy(2, create_vec2(x * 40, y * 40));
+				create_enemy(2, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Boss)) {
-				create_enemy(3, create_vec2(x * 40, y * 40));
+				create_enemy(3, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Trap1)) {
-				create_trap(0, create_vec2(x * 40, y * 40));
+				create_trap(0, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Trap2)) {
-				create_trap(1, create_vec2(x * 40, y * 40));
+				create_trap(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 		}
 	}
@@ -232,7 +236,25 @@ void render_map() {
 			
 			int parameters[3] = { x,y, temp};
 
-			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
+			Color color = to_color(get_pixel_data(x, y));
+			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, color, put_pixel, parameters);
+			
+			if (compare_colors(color, Player))
+				DrawClipImage(LoadTexture("resources/players/player.png", true, (Vector2) { 48, 48 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 48, 48 }, 0, false);
+			else if(compare_colors(color, Bat))
+				DrawClipImage(LoadTexture("resources/enemies/enemytwo.png", true, (Vector2) { 16, 16 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 16, 16 }, 0, false);
+			else if (compare_colors(color, Archer))
+				DrawClipImage(LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 32, 32 }, 0, false);
+			else if (compare_colors(color, Skeleton))
+				DrawClipImage(LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 43, 38 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 43, 38 }, 0, false);
+			else if (compare_colors(color, Boss))
+				DrawClipImage(LoadTexture("resources/enemies/boss.png", true, (Vector2) { 96, 96 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 96, 96 }, 0, false);
+			else if (compare_colors(color, Stone2))
+				DrawClipImage(LoadTexture("resources/environment/stone_ground_corner_left.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
+			else if (compare_colors(color, Stone3))
+				DrawClipImage(LoadTexture("resources/environment/stone_ground_corner_right.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
+			else if (compare_colors(color, Stone1))
+				DrawClipImage(LoadTexture("resources/environment/stone_ground.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
 		}
 	}
 }
