@@ -1181,8 +1181,6 @@ GameObject* trap_one_update(GameObject * self) {
 
 	create_thread(timer, self);
 
-
-
 	return self;
 }
 
