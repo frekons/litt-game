@@ -1543,7 +1543,7 @@ void create_ground_right(Vector2 position) {
 }
 
 void create_ground_left(Vector2 position) {
-	Image* image = LoadTexture("resources/environment/stone_ground_right.png", false, create_vec2(417, 417));
+	Image* image = LoadTexture("resources/environment/stone_ground_left.png", false, create_vec2(417, 417));
 
 	Point ground_position = *(Point*)&position;
 
