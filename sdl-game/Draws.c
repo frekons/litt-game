@@ -59,7 +59,7 @@ void DrawInteractiveRectangleOnScreen(Rect rect, Color color, void *onClick, voi
 			func *f = (func *)onClick;
 			f(parameters);
 
-			mouse_button_mask = 0;
+			//mouse_button_mask = 0;
 		}
 	}
 }

@@ -175,7 +175,7 @@ void render_map() {
 		}
 	}
 	SDL_FreeSurface(maps);
-	init--;
+	//init--;
 }
 
 void map_init()
@@ -246,6 +246,9 @@ void process_pixels() {
 
 Uint32 get_pixel_data(int x, int y)
 {
+	if (maps == NULL || maps->format == NULL)
+		return 0;
+
 	Lock(maps);
 	int bpp = maps->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to retrieve */
@@ -319,7 +322,7 @@ void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 
 	//Lock(maps);
 
-	SavePNG(maps, mapLocation);
+	//SavePNG(maps, mapLocation);
 
 	//Unlock(maps);
 }
