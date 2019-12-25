@@ -469,7 +469,12 @@ void enemy_one_start(GameObject* self) {
 }
 
 GameObject* enemy_one_update(GameObject * self) {
-	
+
+	float distance = fabs(local_player->transform->position.x - self->transform->position.x);
+
+	if (distance > 200)
+		return self;
+
 	if (self->health == INT_MIN)
 		return self;
 	
@@ -619,6 +624,11 @@ void enemy_two_start(GameObject* self) {
 }
 
 GameObject* enemy_two_update(GameObject * self) {
+
+	float distance = fabs(local_player->transform->position.x - self->transform->position.x);
+
+	if (distance > 200)
+		return self;
 
 	if (self->health == INT_MIN)
 	{
@@ -970,6 +980,11 @@ void boss_start(GameObject* self) {
 }
 
 GameObject* boss_update(GameObject * self) {
+
+	float distance = fabs(local_player->transform->position.x - self->transform->position.x);
+
+	if (distance > 200)
+		return self;
 
 	if (self->health == INT_MIN)
 		return self;
