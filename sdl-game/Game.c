@@ -1742,6 +1742,15 @@ void Render()
 	DrawTextInGame("litt-game", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 	////////////
+	Uint8* keystate = SDL_GetKeyboardState(NULL);
+
+	if (keystate[SDL_SCANCODE_ESCAPE])
+	{
+		game_state = PAUSE;
+	}
+
+	////////////
+
 	
 	for (int i = (int)pow(2, 5); i != 1; i /= 2)
 	{

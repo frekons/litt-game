@@ -194,12 +194,12 @@ void InitializeMap(char* map_location)
 
 	map_init(map_location);
 
-	int scaleFactor = 80;
+	int scaleFactor = 82;
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
 			if (compare_colors(to_color(get_pixel_data(x, y)), Player)) {
-				create_player(create_vec2(x * scaleFactor, x * scaleFactor));
+				create_player(create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Skeleton)) {
 				create_enemy(0, create_vec2(x * scaleFactor, y * scaleFactor));
