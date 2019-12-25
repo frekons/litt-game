@@ -28,6 +28,8 @@ int max_jump_count = 2, jump_count = 2;
 
 float on_ground_tolerance = 0.1f;
 
+float enemy_distance_tolerance = 640;
+
 GameObject* create_particle(char* image_directory, Vector2 clip_size, Vector2 scale, Point position, int sprite_count, int wait_frame) 
 {
 	Image* image = LoadTexture(image_directory, true, clip_size);
@@ -469,7 +471,12 @@ void enemy_one_start(GameObject* self) {
 }
 
 GameObject* enemy_one_update(GameObject * self) {
-	
+
+	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	if (distance > enemy_distance_tolerance)
+		return self;
+
 	if (self->health == INT_MIN)
 		return self;
 	
@@ -619,6 +626,11 @@ void enemy_two_start(GameObject* self) {
 }
 
 GameObject* enemy_two_update(GameObject * self) {
+
+	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	if (distance > enemy_distance_tolerance)
+		return self;
 
 	if (self->health == INT_MIN)
 	{
@@ -970,6 +982,11 @@ void boss_start(GameObject* self) {
 }
 
 GameObject* boss_update(GameObject * self) {
+
+	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
+
+	if (distance > enemy_distance_tolerance)
+		return self;
 
 	if (self->health == INT_MIN)
 		return self;
