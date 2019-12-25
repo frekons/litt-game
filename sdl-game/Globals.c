@@ -55,7 +55,7 @@ void set_up_things()
 
 	SDL_Init(SDL_INIT_VIDEO);
 
-	int screen_width = 1280, screen_height = 720;
+	int screen_width = 1200, screen_height = 720;
 
 	int windows_resolution_width, windows_resolution_height;
 	GetDesktopResolution(&windows_resolution_width, &windows_resolution_height);

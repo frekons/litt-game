@@ -90,6 +90,10 @@ void DrawFilledRectangleOnScreen(Rect rect, Color color)
 
 	//SDL_FillRect(pSurface, NULL, SDL_MapRGB(pSurface->format, color.r, color.g, color.b));
 
+	if (color.a == 0) {
+		return;
+	}
+
 	Color temp_color = get_render_color();
 
 	set_render_color(color);

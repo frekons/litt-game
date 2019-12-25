@@ -30,9 +30,9 @@ void render_map();
 void InitializeEditor();
 
 /**
-	Returns an GameObjectList with all the gameobjects that are in the map
+	Returns an Pointer with all the gameobjects that are in the map
 */
-GameObjectList SaveEditor();
+void GetMap(char* png_path);
 
 /**
 *	Initializes the map

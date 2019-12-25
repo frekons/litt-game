@@ -2,29 +2,37 @@
 
 #include "Structs.h"
 
-//HEX
-Uint32 BLACK = 0xFF000000;
-Uint32 WHITE = 0xFFFFFFFF;
+#include "SDL2/SDL_image.h"
 
-//Additional
-Color Black = {0,0,0,255};
-Color White = { 255,255,255,255 };
+// HEX
+Uint32 BLACK;
+Uint32 WHITE;
 
-//Characters
-Color Character = {25,0,255,255};
+// Additional
+Color Black;
+Color White;
+Color Red;
+Color Invisible;
 
-//Enemies
-Color Bat = {255,0,16,255};
-Color Knight = {193,0,12,255};
-Color Skeleton = {130,0,8,255};
-Color Boss = { 0,0,0,255 };
+// Characters
+Color Player;
 
-//Terrain
-Color Dirt = {158,92,56,255};
-Color Grass = {0,130,26,255};
+// Enemies
+Color Bat;
+Color Archer;
+Color Skeleton;
+Color Boss;
 
-Color Stone1 = {188,188,188,255};
-Color Stone2 = {155,155,155,255};
-Color Stone3 = {119,119,119,255};
-Color Stone4 = {96,96,96,255};
-Color Stone5 = {61,61,61,255};
+// Terrain
+Color Dirt;
+Color Grass;
+
+Color Stone1;
+Color Stone2;
+Color Stone3;
+Color Stone4;
+Color Stone5;
+
+void init_colors();
+
+bool compare_colors(Color color1, Color color2);

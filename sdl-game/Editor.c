@@ -11,6 +11,10 @@
 
 #include "json/JSON_checker.h"
 
+#include "Image.h"
+
+#include "Globals.h"
+
 #define SavePNG(surface, file) \
         SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "rb+"), 1)
 
@@ -19,13 +23,11 @@
 Uint32 temp = 0xFFFFFFFF;
 
 //Location of the map
-const char* mapLocation = "resources/environment/test.png";
+const char* mapLocation = "resources/map/test.png";
 
 int scale = 15;
 
 _Bool init = 0;
-
-int once = 0;
 
 void InitializeEditor()
 {
@@ -33,31 +35,131 @@ void InitializeEditor()
 		init++;
 		map_init();
 	}
-	camera->position.x += 30;
+	init_colors();
+	camera->position.x = 600.0;
+}
+
+void is_selected(Color object_color, Rect object_rect) {
+	if (compare_colors(object_color, to_color(temp))) {
+		DrawRectangleOnScreen(object_rect, Red);
+	}
+	else {
+		DrawRectangleOnScreen(object_rect, Black);
+	}
+}
+
+void draw_selector_box(int* parameters, char* path, Rect object, Vector2 clip, Rect rect, Rect clip_rect, Color property, bool is_sprite) 
+{
+	DrawInteractiveRectangleOnScreen(object, Invisible, onclick, parameters);
+	is_selected(property, object);
+	DrawClipImage(LoadTexture(path, is_sprite, clip), rect, clip_rect, 0, false);
+	DrawFilledRectangleOnScreen((Rect) { object.x + 32, object.y + scale * 8, scale, scale }, property);
+	DrawRectangleOnScreen((Rect) { object.x + 32, object.y + scale * 8, scale, scale }, White);
+}
+
+/**
+Obje tipleri:
+	0 - player
+	1 - yarasa
+	2 - iskelet
+	3 - archer
+	4 - boss
+	5 - trap1
+	6 - trap2
+	7 - dirt
+	8 - grass
+*/
+void render_selector() {
+	// Player
+	int parameters[] = { 0 };
+	Rect object = {0,500,80,100};
+	draw_selector_box(parameters, "resources/players/player.png", object, (Vector2) { 48, 48 }, (Rect) { 0, 500, 80, 100 }, (Rect) { 0, 0, 48, 48 }, Player, true);
+
+	// Bat
+	parameters[0] = 1;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/enemies/enemytwo.png", object, (Vector2) { 16, 16 }, (Rect) { 100, 500, 80, 100 }, (Rect) { 0, 0, 16, 16 }, Bat, true);
+
+	// Skeleton
+	parameters[0] = 2;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/enemies/enemy.png", object, (Vector2) { 43, 38 }, (Rect) { 200, 500, 80, 100 }, (Rect) { 0, 0, 43, 38 }, Skeleton, true);
+
+	// Archer
+	parameters[0] = 3;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/enemies/enemy3.png", object, (Vector2) { 32, 32 }, (Rect) { 270, 480, 130, 150 }, (Rect) { 0, 0, 32, 32 }, Archer, true);
+
+	//Boss
+	parameters[0] = 4;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/enemies/boss.png", object, (Vector2) { 96, 96 }, (Rect) { 350, 460, 192, 200 }, (Rect) { 0, 0, 96, 96 }, Boss, true);
+
+	// Stone-Ground
+	parameters[0] = 9;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/environment/stone_ground.png", object, (Vector2) { 417, 417 }, (Rect) { 513, 525, 50, 50 }, (Rect) { 0, 0, 417, 417 }, Stone1, false);
+
+	// Stone - Left Corner
+	parameters[0] = 10;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/environment/stone_ground_corner_left.png", object, (Vector2) { 417, 417 }, (Rect) { 613, 525, 50, 50 }, (Rect) { 0, 0, 417, 417 }, Stone2, false);
+
+	// Stone - Right Corner
+	parameters[0] = 11;
+	object.x += 100;
+	draw_selector_box(parameters, "resources/environment/stone_ground_corner_right.png", object, (Vector2) { 417, 417 }, (Rect) { 713, 525, 50, 50 }, (Rect) { 0, 0, 417, 417 }, Stone3, false);
+
+
+	// Delete
+	parameters[0] = 14;
+	object.x = camera->width - 100;
+	object.h = 80;
+	DrawButtonOnScreen("Sil", object, Black, White, Font_Minecraft, onclick, parameters);
+	is_selected(White, object);
+}
+
+void navigator_onclick(int* dir) {
+	switch (dir[0]) {
+	case 0:
+		if(camera->position.x <= 600.0) camera->position.x += scale*32;
+		printf("%f\n", camera->position.x);
+		break;
+	case 1:
+		if (camera->position.x >= -6120.0) camera->position.x -= scale * 32;
+		printf("%f\n", camera->position.x);
+		break;
+	case 2:
+		game_state = MENU;
+	}
+}
+
+void render_navigator() {
+	int parameters[1] = { 0 };
+	//Left
+	DrawInteractiveRectangleOnScreen((Rect) { 0, 650, 40, 40 }, (Color) { 0, 0, 0, 0 }, navigator_onclick, parameters);
+	DrawImage(LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 }), (Rect) { 0, 650, 40, 40 }, true);
+
+	parameters[0] = 1;
+	//Right
+	DrawInteractiveRectangleOnScreen((Rect) { camera->width-60, 650, 40, 40 }, (Color) { 0, 0, 0, 0 }, navigator_onclick, parameters);
+	DrawImage(LoadTexture("resources/additional/arrow.png", false, (Vector2) { 512, 512 }), (Rect) { camera->width - 60, 650, 40, 40 }, false);
+
+	//Back
+	parameters[0] = 2;
+	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
 }
 
 void RenderEditor() {
-	render_map();
-
-	int parameters[] = { 0 };
-	DrawButtonWithImageOnScreen(NULL, "resources/players/player.png", (Rect) { 0, 500, 80, 100 }, Black, White, NULL, onclick, parameters);
-	
-	parameters[0] = 1;
-	DrawButtonWithImageOnScreen(NULL, "resources/enemies/enemytwo.png", (Rect) { 100, 500, 80, 100 }, Black, White, NULL, onclick, parameters);
+	render_navigator();
+	render_map();	
+	render_selector();
 }
 
-GameObjectList SaveEditor() {
-	process_pixels();
-}
-
-PointerList GetMap(char* png_path)
+void GetMap(char* png_path)
 {
-	PointerList list;
-	initialize_list(&list);
-
 	
 }
-
 
 void render_map() {
 	if (!init) {
@@ -69,63 +171,64 @@ void render_map() {
 
 			int parameters[3] = { x,y, temp};
 
-			if (!once++) printf("%X", get_pixel_data(7, 6));
-
 			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
-			
-			//DrawRectangleOnScreen((Rect){ x * scale, y * scale, scale, scale }, White);
 		}
 	}
 	SDL_FreeSurface(maps);
 	init--;
 }
 
-
 void map_init()
 {
 	maps = IMG_Load(mapLocation);
 }
 
-/**
-Obje tipleri:
-	0 - player
-	1 - yarasa
-	2 - iskelet
-	3 - þövalye
-	4 - boss
-	5 - trap1
-	6 - trap2
-	7 - dirt
-	8 - grass
-*/
 void onclick(int* object) {
 	switch (object[0]) {
 	case 0:
-		temp = 0xFF1900FF;
+		temp = 0xFF1900FF; // Player
 		break;
 	case 1:
-		temp = 0xFFFF0010;
+		temp = 0xFFFF0010; // Bat
 		break;
 	case 2:
-		temp = 0xFFC1000C;
+		temp = 0xFFC1000C; // Skeleton
 		break;
 	case 3:
-		temp = 0xFF820008;
+		temp = 0xFF820008; // Archer
 		break;
 	case 4:
-		temp = 0xFF000000;
+		temp = 0xFF000000; // Boss
 		break;
 	case 5:
-		temp = 0xFF9E5C38;
+		temp = 0xFF9E5C38; // Trap1
 		break;
 	case 6:
-		temp = 0xFF00821A;
+		temp = 0xFF00821A; // Trap2
 		break;
 	case 7:
-		temp = 0xFFFF00FA;
+		temp = 0xFFFF00FA; // Dirt
 		break;
 	case 8:
-		temp = 0xFFA300A0;
+		temp = 0xFFA300A0; // Grass
+		break;
+	case 9:
+		temp = 0xFFBCBCBC; // Stone1
+		break;
+	case 10:
+		temp = 0xFF9B9B9B; // Stone2
+		break;
+	case 11:
+		temp = 0xFF777777; // Stone3
+		break;
+	case 12:
+		temp = 0xFF606060; // Stone4
+		break;
+	case 13:
+		temp = 0xFF3D3D3D; // Stone5
+		break;
+	case 14:
+		temp = 0xFFFFFFFF; // Delete
 		break;
 	}
 }
@@ -261,7 +364,7 @@ void Unlock(SDL_Surface* surface) {
 void Lock(SDL_Surface* surface) {
 	if (SDL_MUSTLOCK(surface)) {
 		if (SDL_LockSurface(surface) < 0) {
-			fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+			fprintf(stderr, "Can't lock surface: %s\n", SDL_GetError());
 			return;
 		}
 	}
