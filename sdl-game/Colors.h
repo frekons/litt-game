@@ -23,6 +23,10 @@ Color Archer;
 Color Skeleton;
 Color Boss;
 
+// Traps
+Color Trap1;
+Color Trap2;
+
 // Terrain
 Color Dirt;
 Color Grass;

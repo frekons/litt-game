@@ -32,18 +32,12 @@ void InitializeEditor();
 /**
 	Returns an Pointer with all the gameobjects that are in the map
 */
-void GetMap(char* png_path);
+void ProcessMap();
 
 /**
 *	Initializes the map
 */
 void map_init();
-
-/**
-*	Processes the incoming pixel data 
-*	and adds it into the GameObjectList stream
-*/
-void process_pixels();
 
 /**
 *	Puts a pixel on the map.png, 

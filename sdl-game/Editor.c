@@ -122,11 +122,11 @@ void render_selector() {
 void navigator_onclick(int* dir) {
 	switch (dir[0]) {
 	case 0:
-		if(camera->position.x <= 600.0) camera->position.x += scale*32;
+		if(camera->position.x <= 600.0f) camera->position.x += scale*32;
 		printf("%f\n", camera->position.x);
 		break;
 	case 1:
-		if (camera->position.x >= -6120.0) camera->position.x -= scale * 32;
+		if (camera->position.x >= -6120.0f) camera->position.x -= scale * 32;
 		printf("%f\n", camera->position.x);
 		break;
 	case 2:
@@ -147,7 +147,10 @@ void render_navigator() {
 
 	//Back
 	parameters[0] = 2;
-	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
+	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 300, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
+
+	parameters[0] = 2;
+	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, ProcessMap, NULL);
 }
 
 void RenderEditor() {
@@ -156,9 +159,40 @@ void RenderEditor() {
 	render_selector();
 }
 
-void GetMap(char* png_path)
+void ProcessMap()
 {
-	
+	if (!init) {
+		init++;
+		map_init();
+	}
+	for (int y = 0; y < maps->h; y++) {
+		for (int x = 0; x < maps->w; x++) {
+			if (compare_colors(to_color(get_pixel_data(x, y)), Player)) {
+				create_player(create_vec2(x * 40, x * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Skeleton)) {
+				create_enemy(0, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Bat)) {
+				create_enemy(1, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Archer)) {
+				create_enemy(2, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Boss)) {
+				create_enemy(3, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Trap1)) {
+				create_trap(0, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Trap2)) {
+				create_trap(1, create_vec2(x * 40, y * 40));
+			}
+		}
+	}
+
+	SDL_FreeSurface(maps);
+	init--;
 }
 
 void render_map() {
@@ -230,17 +264,6 @@ void onclick(int* object) {
 	case 14:
 		temp = 0xFFFFFFFF; // Delete
 		break;
-	}
-}
-void process_pixels() {
-	Uint8 rgba[4]; //0 - r, 1 - g, 2 - b, 3 - a
-
-	int bpp = maps->format->BytesPerPixel;
-
-	for (int y = 0; y < maps->h; y++) {
-		for (int x = 0; x < maps->w; x++) {
-			
-		}
 	}
 }
 
