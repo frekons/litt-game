@@ -173,8 +173,6 @@ void GameObject_Physics(GameObject* self, PointerList before_interacts)
 			f(obj, self);
 		}
 	}
-
-	free(interacts.List);
 }
 
 void shake_camera(float force, float time)
@@ -215,8 +213,6 @@ void GameObject_Draw(GameObject* self)
 	{
 		rect.w = self->image->clip_size.x *self->transform->scale.x;
 		rect.h = self->image->clip_size.y *  self->transform->scale.y;
-
-
 
 		Animation* animation = get_animation_sprites(self, self->current_state);
 

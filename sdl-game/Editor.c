@@ -287,6 +287,7 @@ void map_init(char* location)
 		printf("Successfull!\n");
 }
 
+
 void render_map() {
 
 	//if (maps == NULL)
@@ -308,24 +309,52 @@ void render_map() {
 				DrawClipImage(image, (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 48, 48 }, 0, false);
 				free(image);
 			}
-			else if(compare_colors(color, Bat))
-				DrawClipImage(LoadTexture("resources/enemies/enemytwo.png", true, (Vector2) { 16, 16 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 16, 16 }, 0, false);
-			else if (compare_colors(color, Archer))
-				DrawClipImage(LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 32, 32 }, 0, false);
-			else if (compare_colors(color, Skeleton))
-				DrawClipImage(LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 43, 38 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 43, 38 }, 0, false);
-			else if (compare_colors(color, Boss))
-				DrawClipImage(LoadTexture("resources/enemies/boss.png", true, (Vector2) { 96, 96 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 96, 96 }, 0, false);
-			else if (compare_colors(color, Stone2))
-				DrawClipImage(LoadTexture("resources/environment/stone_ground_corner_left.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
-			else if (compare_colors(color, Stone3))
-				DrawClipImage(LoadTexture("resources/environment/stone_ground_corner_right.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
-			else if (compare_colors(color, Stone1))
-				DrawClipImage(LoadTexture("resources/environment/stone_ground.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
-			else if (compare_colors(color, Stone4))
-				DrawClipImage(LoadTexture("resources/environment/stone_ground_left.png", true, (Vector2) { 417, 417 }), (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
-			else if (compare_colors(color, Stone5))
-				DrawClipImage(LoadTexture("resources/environment/stone_ground_right.png", true, (Vector2) { 417, 417 }), (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
+			else if (compare_colors(color, Bat)) {
+				image = LoadTexture("resources/enemies/enemytwo.png", true, (Vector2) { 16, 16 });
+				DrawClipImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 16, 16 }, 0, false);
+				free(image);
+			}
+			else if (compare_colors(color, Archer)) {
+				image = LoadTexture("resources/enemies/enemy3.png", true, (Vector2) { 32, 32 });
+				DrawClipImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 32, 32 }, 0, false);
+				free(image);
+			}
+			else if (compare_colors(color, Skeleton)) {
+				image = LoadTexture("resources/enemies/enemy.png", true, (Vector2) { 43, 38 });
+				DrawClipImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 43, 38 }, 0, false);
+				free(image);
+			}
+				
+			else if (compare_colors(color, Boss)) {
+				image = LoadTexture("resources/enemies/boss.png", true, (Vector2) { 96, 96 });
+				DrawClipImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 96, 96 }, 0, false);
+				free(image);
+			}
+			else if (compare_colors(color, Stone2)) {
+				image = LoadTexture("resources/enemies/stone_ground_left.png", false, (Vector2) { 417, 417 });
+				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
+				free(image);
+			}
+			else if (compare_colors(color, Stone3)) {
+				image = LoadTexture("resources/enemies/stone_ground_right.png", false, (Vector2) { 417, 417 });
+				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
+				free(image);
+			}
+			else if (compare_colors(color, Stone1)) {
+				image = LoadTexture("resources/environment/stone_ground.png", false, (Vector2) { 417, 417 });
+				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
+				free(image);
+			}
+			else if (compare_colors(color, Stone4)) {
+				image = LoadTexture("resources/environment/stone_ground_corner_left.png", false, (Vector2) { 417, 417 });
+				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
+				free(image);
+			}
+			else if (compare_colors(color, Stone5)) {
+				image = LoadTexture("resources/environment/stone_ground_corner_right.png", false, (Vector2) { 417, 417 });
+				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
+				free(image);
+			}
 		}
 	}
 }
