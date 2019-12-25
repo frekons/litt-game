@@ -1551,7 +1551,6 @@ void create_ground_left(Vector2 position) {
 }
 
 
-
 void Start()
 {
 	
@@ -1742,6 +1741,8 @@ void Render()
 	DrawTextInGame("litt-game", (Vector2) { 100, 400 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 	////////////
+
+	render_background();
 	
 	for (int i = (int)pow(2, 5); i != 1; i /= 2)
 	{

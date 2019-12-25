@@ -25,6 +25,11 @@ void RenderEditor();
 void render_map();
 
 /**
+	Renders Background for ingame
+*/
+void render_background();
+
+/**
 *	Does all the initializations for editor.
 */
 void InitializeEditor(char* location);

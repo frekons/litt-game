@@ -59,6 +59,16 @@ void draw_selector_box(int* parameters, char* path, Rect object, Vector2 clip, R
 	DrawRectangleOnScreen((Rect) { object.x + 32, object.y + scale * 8, scale, scale }, White);
 }
 
+
+void render_background() {
+	int scale = 82;
+	for (int y = 0; y < 32; y++) {
+		for (int x = 0; x < 512; x++) {
+			DrawImage(LoadTexture("resources/environment/stone_back_darker.png", false, create_vec2(417, 417)), (Rect) { x* scale, y* scale, scale, scale }, false);
+		}
+	}
+}
+
 /**
 Obje tipleri:
 	0 - player
@@ -199,7 +209,7 @@ void InitializeMap(char* map_location)
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
 			if (compare_colors(to_color(get_pixel_data(x, y)), Player)) {
-				create_player(create_vec2(x * scaleFactor, x * scaleFactor));
+				create_player(create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Skeleton)) {
 				create_enemy(0, create_vec2(x * scaleFactor, y * scaleFactor));
