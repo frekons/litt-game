@@ -15,6 +15,8 @@
 
 #include "Globals.h"
 
+#include <Windows.h>
+
 #define SavePNG(surface, file) \
         SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "wb+"), 1)
 
@@ -157,10 +159,11 @@ void render_navigator() {
 
 	//Back
 	parameters[0] = 2;
-	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 300, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
+	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 220, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
 
 	parameters[0] = 2;
-	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, SaveMap, NULL);
+	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2, 650, 200, 40 }, Black, White, Font_Minecraft, SaveMap, NULL);
+	
 }
 
 void RenderEditor() {
@@ -171,10 +174,18 @@ void RenderEditor() {
 
 void SaveMap()
 {
+	temp = 0xFFFFFF00;
+
 	int result = SavePNG(maps, mapLocation);
+
+	is_selected(create_color(255, 255, 0, 255), (Rect) { camera->width - camera->width / 2, 650, 200, 40 });
 
 	if (result != 0)
 		printf("Error when saving file, Error: %s\n", SDL_GetError());
+
+	Sleep(100);
+
+	temp = 0xFFFFFFFF;
 }
 
 void InitializeMap(char* map_location)
@@ -183,7 +194,7 @@ void InitializeMap(char* map_location)
 
 	map_init(map_location);
 
-	int scaleFactor = 30;
+	int scaleFactor = 80;
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
@@ -209,19 +220,19 @@ void InitializeMap(char* map_location)
 				create_trap(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone1)) {
-				create_ground(0, create_vec2(x * 83, y * 83));
+				create_ground(0, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone2)) {
-				create_ground(1, create_vec2(x * 83, y * 83));
+				create_ground(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone3)) {
-				create_ground(2, create_vec2(x * 83, y * 83));
+				create_ground(2, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone4)) {
-				create_ground(3, create_vec2(x * 83, y * 83));
+				create_ground(3, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone5)) {
-				create_ground(4, create_vec2(x * 83, y * 83));
+				create_ground(4, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 		}
 	}
@@ -279,6 +290,10 @@ void render_map() {
 				DrawClipImage(LoadTexture("resources/environment/stone_ground_corner_right.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
 			else if (compare_colors(color, Stone1))
 				DrawClipImage(LoadTexture("resources/environment/stone_ground.png", true, (Vector2) { 417, 417 }), (Rect) { x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
+			else if (compare_colors(color, Stone4))
+				DrawClipImage(LoadTexture("resources/environment/stone_ground_left.png", true, (Vector2) { 417, 417 }), (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
+			else if (compare_colors(color, Stone5))
+				DrawClipImage(LoadTexture("resources/environment/stone_ground_right.png", true, (Vector2) { 417, 417 }), (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, (Rect) { 0, 0, 417, 417 }, 0, false);
 		}
 	}
 }
