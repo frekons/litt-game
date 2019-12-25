@@ -24,4 +24,6 @@ void create_trap(int index, Vector2 position);
 
 void create_player(Vector2 position);
 
+void create_ground(int index, Vector2 position);
+
 //#endif // !GAME_H

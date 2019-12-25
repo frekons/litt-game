@@ -195,6 +195,15 @@ void InitializeMap(char* map_location)
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Trap2)) {
 				create_trap(1, create_vec2(x * 40, y * 40));
 			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone1)) {
+				create_ground(0, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone3)) {
+				create_ground(1, create_vec2(x * 40, y * 40));
+			}
+			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone3)) {
+				create_ground(2, create_vec2(x * 40, y * 40));
+			}
 		}
 	}
 
