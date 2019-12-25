@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	InitializeSounds();
 	InitializeDraws();
 	InitializeImage();
-	InitializeEditor();
+	//InitializeEditor();
 
 	deltaTime = 0.016;
 

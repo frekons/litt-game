@@ -16,25 +16,25 @@
 #include "Globals.h"
 
 #define SavePNG(surface, file) \
-        SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "rb+"), 1)
+        SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "wb+"), 1)
 
 //To hold the temporary pixel info for a GameObject
 //DEFAULT: WHITE
 Uint32 temp = 0xFFFFFFFF;
 
 //Location of the map
-const char* mapLocation = "resources/map/test.png";
+char* mapLocation = NULL;
 
 int scale = 15;
 
 _Bool init = 0;
 
-void InitializeEditor()
+void InitializeEditor(char* location)
 {
-	if (!init) {
-		init++;
-		map_init();
-	}
+	mapLocation = location;
+
+	map_init(location);
+
 	init_colors();
 	camera->position.x = 600.0;
 }
@@ -131,6 +131,7 @@ void navigator_onclick(int* dir) {
 		break;
 	case 2:
 		game_state = MENU;
+		SDL_FreeSurface(maps);
 	}
 }
 
@@ -150,7 +151,7 @@ void render_navigator() {
 	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 300, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
 
 	parameters[0] = 2;
-	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, ProcessMap, NULL);
+	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2 - 80, 650, 120, 40 }, Black, White, Font_Minecraft, SaveMap, NULL);
 }
 
 void RenderEditor() {
@@ -159,12 +160,18 @@ void RenderEditor() {
 	render_selector();
 }
 
-void ProcessMap()
+void SaveMap()
 {
-	if (!init) {
-		init++;
-		map_init();
-	}
+	int result = SavePNG(maps, mapLocation);
+
+	if (result != 0)
+		printf("Error when saving file, Error: %s\n", SDL_GetError());
+}
+
+void InitializeMap(char* map_location)
+{
+	map_init(map_location);
+
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
 			if (compare_colors(to_color(get_pixel_data(x, y)), Player)) {
@@ -192,30 +199,44 @@ void ProcessMap()
 	}
 
 	SDL_FreeSurface(maps);
-	init--;
+}
+ 
+
+void map_init(char* location)
+{
+	maps = IMG_Load(location);
+
+	if (maps == NULL)
+	{
+		maps = SDL_CreateRGBSurface(0, 512, 32, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+		if (maps != NULL)
+		{
+			Rect rect = { 0,0,512,32 };
+			SDL_FillRect(maps, &rect, 0xFFFFFFFF);
+		}
+		else
+			printf("Error when creating maps surface!\n");
+	}
+	else
+		printf("Successfull!\n");
 }
 
 void render_map() {
-	if (!init) {
-		init++;
-		map_init();
-	}
+
+	//if (maps == NULL)
+	//	return;
+
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
-
+			
 			int parameters[3] = { x,y, temp};
 
 			DrawInteractiveRectangleOnScreen((Rect) {x*scale + (camera->position.x - camera->width / 2), y*scale, scale, scale}, to_color(get_pixel_data(x,y)), put_pixel, parameters);
 		}
 	}
-	SDL_FreeSurface(maps);
-	//init--;
 }
 
-void map_init()
-{
-	maps = IMG_Load(mapLocation);
-}
 
 void onclick(int* object) {
 	switch (object[0]) {
@@ -270,10 +291,15 @@ void onclick(int* object) {
 Uint32 get_pixel_data(int x, int y)
 {
 	if (maps == NULL || maps->format == NULL)
+	{
+		printf("error when getting pixel data!\n");
 		return 0;
+	}
+		
 
 	Lock(maps);
 	int bpp = maps->format->BytesPerPixel;
+	//printf("bpp: %d\n", bpp);
 	/* Here p is the address to the pixel we want to retrieve */
 	Uint8* p = (Uint8*)maps->pixels + y * maps->pitch + x * bpp;
 
@@ -341,7 +367,7 @@ void put_pixel(int* parameters) // int x, int y, Uint32 pixel
 		break;
 	}
 
-	Unlock(maps);
+	//Unlock(maps);
 
 	//Lock(maps);
 

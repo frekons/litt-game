@@ -27,17 +27,19 @@ void render_map();
 /**
 *	Does all the initializations for editor.
 */
-void InitializeEditor();
+void InitializeEditor(char* location);
 
 /**
 	Returns an Pointer with all the gameobjects that are in the map
 */
-void ProcessMap();
+void SaveMap();
+
+void InitializeMap(char* map_location);
 
 /**
 *	Initializes the map
 */
-void map_init();
+void map_init(char* location);
 
 /**
 *	Puts a pixel on the map.png, 

@@ -4,6 +4,8 @@
 
 #include "Game.h"
 
+#include "Editor.h"
+
 void play() {
 
 	Start(); // don't use Game::GameObjects before this!
@@ -12,7 +14,11 @@ void play() {
 }
 
 void editor() {
+
+	InitializeEditor("resources/map/map1.png");
+
 	game_state = EDITOR;
+
 }
 
 void instructions() {

@@ -13,6 +13,8 @@
 
 #include "Time.h"
 
+#include "Editor.h"
+
 #include <Windows.h>
 
 
@@ -1429,6 +1431,8 @@ void Start()
 	
 	initialize_game_object_list(&GameObjects);
 	initialize_list(&ToBeDestroyed);
+
+	InitializeMap("resources/map/map1.png");
 	//
 	
 	//Image* image = LoadTexture("resources/players/player.png", true, create_vec2(48, 48)); // local_player creation
