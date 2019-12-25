@@ -183,7 +183,7 @@ void InitializeMap(char* map_location)
 
 	map_init(map_location);
 
-	int scaleFactor = 30;
+	int scaleFactor = 80;
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
@@ -209,19 +209,19 @@ void InitializeMap(char* map_location)
 				create_trap(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone1)) {
-				create_ground(0, create_vec2(x * 83, y * 83));
+				create_ground(0, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone2)) {
-				create_ground(1, create_vec2(x * 83, y * 83));
+				create_ground(1, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone3)) {
-				create_ground(2, create_vec2(x * 83, y * 83));
+				create_ground(2, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone4)) {
-				create_ground(3, create_vec2(x * 83, y * 83));
+				create_ground(3, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 			else if (compare_colors(to_color(get_pixel_data(x, y)), Stone5)) {
-				create_ground(4, create_vec2(x * 83, y * 83));
+				create_ground(4, create_vec2(x * scaleFactor, y * scaleFactor));
 			}
 		}
 	}
