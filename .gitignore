@@ -1,6 +1,8 @@
 
 [Dd]ebug/
+[Rr]elease/
 sdl-game/Debug/
+sdl-game/Release/
 *.obj
 *.pdb
 *.ilk

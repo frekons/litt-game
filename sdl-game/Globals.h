@@ -41,6 +41,7 @@ typedef enum {
 	EDITOR,
 	INGAME,
 	PAUSE,
+	HOWTOPLAY,
 	QUIT
 
 }GAME_STATES;

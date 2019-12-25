@@ -38,6 +38,10 @@
 
 #undef main
 
+void _back_to_mainmenu()
+{
+	game_state = MENU;
+}
 
 int main(int argc, char* argv[])
 {
@@ -154,6 +158,21 @@ int main(int argc, char* argv[])
 		else if (game_state == PAUSE)
 		{
 			RenderPauseMenu();
+		}
+		else if (game_state == HOWTOPLAY)
+		{
+			DrawFilledRectangleOnScreen((Rect) { camera->width / 2 - 300, camera->height / 2 - 200, 600,400 }, (Color) { 0, 0, 0, 255 });
+
+			int index = 2;
+			DrawTextOnScreen("Saga dogru hareket:  Sag ok tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("Sola dogru hareket:  Sol ok tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("Ziplama:  Yukari ok tusu (iki kere ziplanabilir)", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("Ates etme:  X tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("Kayma:  Z tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+
+
+			DrawButtonOnScreen("Anladim!", (Rect) { camera->width / 2 - 300, camera->height / 2 + 200, 600, 100 }, (Color) { 50, 50, 50, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, _back_to_mainmenu, NULL);
+
 		}
 
 		renderable_state = false;

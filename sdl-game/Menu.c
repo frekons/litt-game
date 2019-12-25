@@ -22,7 +22,7 @@ void editor() {
 }
 
 void instructions() {
-	game_state = MENU;
+	game_state = HOWTOPLAY;
 }
 
 void exit_game() {
