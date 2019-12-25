@@ -10,6 +10,14 @@ PointerList image_list;
 
 void InitializeImage()
 {
+	if (image_list.List != NULL)
+	{
+		for (int i = 0; i < image_list.Count; i++)
+			free(image_list.List[i]);
+
+		free(image_list.List);
+	}
+
 	initialize_list(&image_list);
 }
 

@@ -68,5 +68,13 @@ void set_up_things()
 
 	camera = create_camera(screen_width, screen_height);
 
+	if (ToBeDestroyedTextures.List != NULL)
+	{
+		for (int i = 0; i < ToBeDestroyedTextures.Count; i++)
+			free(ToBeDestroyedTextures.List[i]);
+
+		free(ToBeDestroyedTextures.List);
+	}
+
 	initialize_list(&ToBeDestroyedTextures);
 }

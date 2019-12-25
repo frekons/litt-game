@@ -173,6 +173,8 @@ void GameObject_Physics(GameObject* self, PointerList before_interacts)
 			f(obj, self);
 		}
 	}
+
+	free(interacts.List);
 }
 
 void shake_camera(float force, float time)

@@ -402,6 +402,8 @@ GameObject* is_on_platform(GameObject* self, int platform_layermask, float toler
 			{
 				self->transform->position.y = ground_left_up.y - collider_size(self).y;
 
+				free(list.List);
+
 				return go;
 			}
 
@@ -432,6 +434,8 @@ GameObject* is_on_something(GameObject* self, int layermask, float tolerance)
 
 			if (float_compare(player_left_down.y, ground_left_up.y, tolerance)) // eğer ayağın platformun üstündeyse
 			{
+				free(list.List);
+
 				return go;
 			}
 
@@ -459,12 +463,17 @@ bool is_collides_except(GameObject* self, GameObject* except)
 			continue;
 
 		if (list.List[i] == except || list.List[i]->collider.is_trigger)
+		{
+			free(list.List);
 			return false;
+		}
+			
 
 		result = true;
 		break;
 	}
 
+	free(list.List);
 
 	return result;
 }

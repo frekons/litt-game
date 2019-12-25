@@ -14,6 +14,14 @@ void InitializeDraws()
 {
 	TTF_Init();
 
+	if (texture_list_to_be_destroyed.List != NULL)
+	{
+		for (int i = 0; i < texture_list_to_be_destroyed.Count; i++)
+			free(texture_list_to_be_destroyed.List[i]);
+
+		free(texture_list_to_be_destroyed.List);
+	}
+	
 	initialize_list(&texture_list_to_be_destroyed);
 
 	Font_Minecraft = TTF_OpenFont("resources/fonts/Minecraft.ttf", 24);
@@ -155,6 +163,7 @@ void DrawLineInGame(Point A, Point B, Color color)
 
 SDL_Texture *DrawTextOnScreen(char *str, Vector2 position, Color color, TTF_Font *font)
 {
+
 	SDL_Color sdl_color = {color.r, color.g, color.b, color.a};
 
 	SDL_Surface *surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
@@ -185,6 +194,7 @@ SDL_Texture *DrawTextOnScreen(char *str, Vector2 position, Color color, TTF_Font
 
 SDL_Texture *DrawTextInGame(char *str, Vector2 position, Color color, TTF_Font *font)
 {
+
 	SDL_Color sdl_color = {color.r, color.g, color.b, color.a};
 
 	SDL_Surface *surfaceMessage = TTF_RenderText_Solid(font, str, sdl_color);
