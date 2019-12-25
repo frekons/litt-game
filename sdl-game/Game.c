@@ -1447,7 +1447,7 @@ void _create_ground(Vector2 position) {
 
 	Point ground_position = *(Point*)&position;
 
-	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) {0, 0, image->rect.w, image->rect.h - 40}, LAYER_GROUND, image, NULL, 0, 0, 0);
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) {0, 3, image->rect.w, image->rect.h - 40}, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 void create_ground_corner_left(Vector2 position) {
@@ -1464,6 +1464,22 @@ void create_ground_corner_right(Vector2 position) {
 	Point ground_position = *(Point*)&position;
 
 	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+}
+
+void create_ground_right(Vector2 position) {
+	Image* image = LoadTexture("resources/environment/stone_ground_right.png", false, create_vec2(417, 417));
+
+	Point ground_position = *(Point*)&position;
+
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 0, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
+}
+
+void create_ground_left(Vector2 position) {
+	Image* image = LoadTexture("resources/environment/stone_ground_right.png", false, create_vec2(417, 417));
+
+	Point ground_position = *(Point*)&position;
+
+	GameObject* gameobject = GameObject_New(GameObjects.Count, ground_position, create_vec2(0.2f, 0.2f), (BoxCollider) { 0, 3, image->rect.w, image->rect.h }, LAYER_GROUND, image, NULL, 0, 0, 0);
 }
 
 
@@ -1771,6 +1787,12 @@ void create_ground(int index, Vector2 position) {
 		break;
 	case 2:
 		create_ground_corner_right(position);
+		break;
+	case 3:
+		create_ground_left(position);
+		break;
+	case 4:
+		create_ground_right(position);
 		break;
 	}
 }
