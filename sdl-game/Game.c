@@ -143,7 +143,7 @@ void create_ammo(GameObject * self, char* texture, bool is_sprite_sheet, Vector2
 
 void on_collision_enter(GameObject* self, GameObject* other)
 {
-	printf("COLLISION ENTER!\n");
+	//printf("COLLISION ENTER!\n");
 
 	if (other->layer == LAYER_ENEMY && !compare_animator_state(self, "dash") && other->health>0)
 	{
@@ -156,7 +156,7 @@ void on_collision_enter(GameObject* self, GameObject* other)
 
 void on_collision_exit(GameObject* self, GameObject* other)
 {
-	printf("COLLISION EXIT!\n");
+	//printf("COLLISION EXIT!\n");
 
 }
 
@@ -452,7 +452,30 @@ void attack_enemy_one(GameObject* self)
 
 void create_enemy_one(Vector2);
 
+
+void on_enemy_collision_enter(GameObject* self, GameObject* other)
+{
+	if (other->layer == LAYER_GROUND)
+	{
+		self->grounded = true;
+	}
+}
+
+void on_enemy_collision_exit(GameObject* self, GameObject* other)
+{
+	//if (other->layer == LAYER_GROUND)
+	//{
+	//	self->grounded = false;
+	//}
+}
+
+
 void enemy_one_start(GameObject* self) {
+
+	self->grounded = false;
+
+	add_member_to_list(&self->collider.onEnter, on_enemy_collision_enter);
+	add_member_to_list(&self->collider.onExit, on_enemy_collision_exit);
 
 	self->health = 50;
 
@@ -471,6 +494,15 @@ void enemy_one_start(GameObject* self) {
 }
 
 GameObject* enemy_one_update(GameObject * self) {
+
+
+	if (!self->grounded)
+		self->velocity.y += gravity * 18.0f;
+	else
+		self->velocity.y = 0;
+
+	self->transform->position.y += self->velocity.y * deltaTime;
+
 
 	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
 
@@ -526,8 +558,6 @@ GameObject* enemy_one_update(GameObject * self) {
 	}
 
 	
-
-
 	return self;
 }
 
@@ -609,6 +639,12 @@ void create_enemy_one(Vector2 position){
 
 void enemy_two_start(GameObject* self) {
 
+	self->grounded = false;
+
+	add_member_to_list(&self->collider.onEnter, on_enemy_collision_enter);
+	add_member_to_list(&self->collider.onExit, on_enemy_collision_exit);
+
+
 	self->health = 10;
 
 	self->velocity = (Vector2) { 0, 0 };
@@ -626,6 +662,13 @@ void enemy_two_start(GameObject* self) {
 }
 
 GameObject* enemy_two_update(GameObject * self) {
+
+	if (!self->grounded)
+		self->velocity.y += gravity * 18.0f;
+	else
+		self->velocity.y = 0;
+
+	self->transform->position.y += self->velocity.y * deltaTime;
 
 	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
 
@@ -759,6 +802,11 @@ void create_enemy_two(Vector2 position) {
 
 void enemy_three_start(GameObject* self) {
 
+	self->grounded = false;
+
+	add_member_to_list(&self->collider.onEnter, on_enemy_collision_enter);
+	add_member_to_list(&self->collider.onExit, on_enemy_collision_exit);
+
 	self->health = 20;
 
 	self->velocity = (Vector2) { 0, 0 };
@@ -778,6 +826,13 @@ void enemy_three_start(GameObject* self) {
 }
 
 GameObject* enemy_three_update(GameObject * self) {
+
+	if (!self->grounded)
+		self->velocity.y += gravity * 18.0f;
+	else
+		self->velocity.y = 0;
+
+	self->transform->position.y += self->velocity.y * deltaTime;
 
 	if (self->health == INT_MIN)
 		return self;
@@ -965,6 +1020,12 @@ void attack_boss(GameObject* self)
 
 void boss_start(GameObject* self) {
 
+	self->grounded = false;
+
+	add_member_to_list(&self->collider.onEnter, on_enemy_collision_enter);
+	add_member_to_list(&self->collider.onExit, on_enemy_collision_exit);
+
+
 	self->health = 500;
 
 	self->velocity = (Vector2) { 0, 0 };
@@ -982,6 +1043,13 @@ void boss_start(GameObject* self) {
 }
 
 GameObject* boss_update(GameObject * self) {
+
+	if (!self->grounded)
+		self->velocity.y += gravity * 18.0f;
+	else
+		self->velocity.y = 0;
+
+	self->transform->position.y += self->velocity.y * deltaTime;
 
 	float distance = fabs(collider_center(local_player).x - collider_center(self).x);
 
