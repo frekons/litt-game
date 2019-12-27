@@ -5,6 +5,8 @@
 
 #include "Structs.h"
 
+bool file_exists(char* path);
+
 char* uint_to_binary(Uint32 toberesolved);
 
 float vec2_magnitude(Vector2 point);

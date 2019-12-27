@@ -4,6 +4,12 @@
 
 #include <Windows.h>
 
+bool file_exists(char * path)
+{
+	struct stat buffer;
+	return (stat(path, &buffer) == 0);
+}
+
 char* uint_to_binary(Uint32 toberesolved)
 {
 	binary[32] = '\0';

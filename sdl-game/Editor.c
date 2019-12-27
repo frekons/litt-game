@@ -13,6 +13,8 @@
 
 #include "Globals.h"
 
+#include "Utils.h"
+
 #include <Windows.h>
 
 #define SavePNG(surface, file) \
@@ -29,8 +31,11 @@ int scale = 15;
 
 _Bool init = 0;
 
-void InitializeEditor(char* location)
+InputBox inputBox = { "map1", false };
+
+void InitializeEditor(char* location, char* mapName)
 {
+	strcpy(inputBox.buffer, mapName);
 	mapLocation = location;
 
 	map_init(location);
@@ -163,6 +168,7 @@ void navigator_onclick(int* dir) {
 	}
 }
 
+
 void render_navigator() {
 	int parameters[1] = { 0 };
 
@@ -185,8 +191,9 @@ void render_navigator() {
 	parameters[0] = 2;
 	DrawButtonOnScreen("Geri Don", (Rect) { camera->width - camera->width / 2 - 220, 650, 120, 40 }, Black, White, Font_Minecraft, navigator_onclick, parameters);
 
+	DrawInputBoxOnScreen("map_name", &inputBox, (Rect) { camera->width / 2, 650, 200, 40 }, Black, White, Font_Minecraft);
 	parameters[0] = 2;
-	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width - camera->width / 2, 650, 200, 40 }, Black, White, Font_Minecraft, SaveMap, NULL);
+	DrawButtonOnScreen("Haritayi Kaydet", (Rect) { camera->width / 2 + 210, 650, 200, 40 }, Black, White, Font_Minecraft, SaveMap, NULL);
 	
 }
 
@@ -200,7 +207,12 @@ void SaveMap()
 {
 	temp = 0xFFFFFF00;
 
-	int result = SavePNG(maps, mapLocation);
+	char save_location[512];
+	strcpy(save_location, "resources\\map\\");
+	strcat(save_location, inputBox.buffer);
+	strcat(save_location, ".png");
+
+	int result = SavePNG(maps, save_location);
 
 	is_selected(create_color(255, 255, 0, 255), (Rect) { camera->width - camera->width / 2, 650, 200, 40 });
 
@@ -288,8 +300,26 @@ void map_init(char* location)
 
 void render_map() {
 
-	//if (maps == NULL)
-	//	return;
+	static bool clicked = false;
+	static Vector2Int start_mouse_position;
+	if (mouse_button_mask & SDL_BUTTON_MMASK)
+	{
+		if (!clicked)
+		{
+			start_mouse_position = mouse_position;
+
+			clicked = true;
+		}
+
+		Vector2Int delta_mouse_position = { mouse_position.x - start_mouse_position.x,  mouse_position.y - start_mouse_position.y };
+
+		camera->position.x += delta_mouse_position.x;
+
+		start_mouse_position = mouse_position;
+	}
+	else
+		clicked = false;
+
 
 	for (int y = 0; y < maps->h; y++) {
 		for (int x = 0; x < maps->w; x++) {
@@ -329,12 +359,12 @@ void render_map() {
 				free(image);
 			}
 			else if (compare_colors(color, Stone2)) {
-				image = LoadTexture("resources/environment/stone_ground_left.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_corner_left.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}
 			else if (compare_colors(color, Stone3)) {
-				image = LoadTexture("resources/environment/stone_ground_right.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_corner_right.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}
@@ -344,12 +374,12 @@ void render_map() {
 				free(image);
 			}
 			else if (compare_colors(color, Stone4)) {
-				image = LoadTexture("resources/environment/stone_ground_corner_left.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_left.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}
 			else if (compare_colors(color, Stone5)) {
-				image = LoadTexture("resources/environment/stone_ground_corner_right.png", false, (Vector2) { 417, 417 });
+				image = LoadTexture("resources/environment/stone_ground_right.png", false, (Vector2) { 417, 417 });
 				DrawImage(image, (Rect) { x* scale + (camera->position.x - camera->width / 2), y* scale, scale, scale }, false);
 				free(image);
 			}

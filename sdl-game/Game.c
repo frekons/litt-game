@@ -15,7 +15,12 @@
 
 #include "Editor.h"
 
+#include "Colors.h"
+
+#include "Menu.h"
+
 #include <Windows.h>
+
 
 
 GameObject* local_player = NULL;
@@ -1099,7 +1104,7 @@ GameObject* boss_update(GameObject * self) {
 
 	char buffer[12];
 	Vector2 healtbar = collider_center(self);
-	healtbar.y -= collider_size(self).y * 0.5;
+	healtbar.y -= collider_size(self).y * 0.5f;
 
 	snprintf(buffer, sizeof(buffer), "%d", self->health);
 	DrawTextInGame(buffer, healtbar, (Color) { 234, 213, 142, 255 }, Font_Minecraft);
@@ -1613,7 +1618,12 @@ void Start()
 	initialize_game_object_list(&GameObjects);
 	initialize_list(&ToBeDestroyed);
 
-	InitializeMap("resources/map/map1.png");
+	char load_location[512];
+	strcpy(load_location, "resources\\map\\");
+	strcat(load_location, MapInputBox.buffer);
+	strcat(load_location, ".png");
+
+	InitializeMap(load_location);
 	
 }
 
@@ -1637,7 +1647,9 @@ bool wait_to_process_on_to_be_destroyed = false;
 
 
 void Render()
-{
+{	
+	render_background();
+
 	// UI things
 	char fps_str[16];
 	snprintf(fps_str, sizeof(fps_str), "%d fps", (int)(1.0f / deltaTime));
@@ -1647,7 +1659,6 @@ void Render()
 
 	////////////
 
-	render_background();
 
 	Uint8* keystate = SDL_GetKeyboardState(NULL);
 

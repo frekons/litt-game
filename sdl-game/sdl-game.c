@@ -192,12 +192,14 @@ int main(int argc, char* argv[])
 		{
 			DrawFilledRectangleOnScreen((Rect) { camera->width / 2 - 300, camera->height / 2 - 200, 600,400 }, (Color) { 0, 0, 0, 255 });
 
-			int index = 2;
+			int index = 1;
 			DrawTextOnScreen("Saga dogru hareket:  Sag ok tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 			DrawTextOnScreen("Sola dogru hareket:  Sol ok tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 			DrawTextOnScreen("Ziplama:  Yukari ok tusu (iki kere ziplanabilir)", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 			DrawTextOnScreen("Ates etme:  X tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 			DrawTextOnScreen("Kayma:  Z tusu", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("Editorde mousenin orta tikine basarak", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
+			DrawTextOnScreen("gezebilirsiniz", (Vector2) { camera->width / 2, camera->height / 2 - 200 + 50 * index++}, (Color) { 255, 255, 255, 255 }, Font_Minecraft);
 
 
 			DrawButtonOnScreen("Anladim!", (Rect) { camera->width / 2 - 300, camera->height / 2 + 200, 600, 100 }, (Color) { 50, 50, 50, 255 }, (Color) { 255, 255, 255, 255 }, Font_Minecraft, _back_to_mainmenu, NULL);

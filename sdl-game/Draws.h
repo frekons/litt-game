@@ -29,6 +29,15 @@ void DrawButtonWithImageOnScreen(char* str, char* img_directory, Rect rect, Colo
 
 void DrawButtonInGame(char* str, Rect rect, Color color, Color text_color, TTF_Font* font, void* onClick);
 
+typedef struct {
+
+	char buffer[512];
+	bool focus;
+
+}InputBox;
+
+void DrawInputBoxOnScreen(char *str, InputBox* inputBox, Rect rect, Color color, Color text_color, TTF_Font *font);
+
 TTF_Font* Font_Minecraft;
 
 PointerList texture_list_to_be_destroyed;

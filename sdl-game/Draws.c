@@ -10,6 +10,8 @@
 
 #include "Image.h"
 
+#include "Colors.h"
+
 void InitializeDraws()
 {
 	TTF_Init();
@@ -227,6 +229,70 @@ SDL_Texture *DrawTextInGame(char *str, Vector2 position, Color color, TTF_Font *
 	//add_member_to_list(&texture_list_to_be_destroyed, Message);
 
 	return Message;
+}
+
+void DrawInputBoxOnScreen(char *str, InputBox* inputBox, Rect rect, Color color, Color text_color, TTF_Font *font)
+{
+	DrawFilledRectangleOnScreen(rect, color);
+	 
+	if (inputBox->buffer[0] == NULL)
+		DrawTextOnScreen(str, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+	else
+		DrawTextOnScreen(inputBox->buffer, (Vector2) { rect.x + rect.w / 2, rect.y + rect.h / 2 }, text_color, Font_Minecraft);
+
+	if ((SDL_BUTTON_LMASK & mouse_button_mask))
+	{
+		if (IsInteractingRect(rect, mouse_position))
+		{
+			inputBox->focus = true;
+
+			mouse_button_mask = 0;
+		}
+		else 
+		{
+			inputBox->focus = false;
+		}
+	}
+
+	if (inputBox->focus)
+	{
+		DrawRectangleOnScreen(rect, Red);
+
+		int i;
+		Uint8* keys = SDL_GetKeyboardState(NULL);
+		for (i = 0; i < SDL_NUM_SCANCODES; i++)
+		{
+			if (keys[i])
+			{
+				int key_code = SDL_GetKeyFromScancode(i);
+
+				if (key_code > 2048)
+					continue;
+
+				//printf("pressed key: %d\n", key_code);
+
+				if (key_code == 8) // remove key
+				{
+					int str_len = strlen(inputBox->buffer);
+
+					if (str_len < 1)
+						str_len = 1;
+
+					inputBox->buffer[str_len - 1] = '\0';
+
+					keys[i] = NULL;
+
+					continue;
+				}
+
+				char str[2] = { key_code, '\0' };
+				strcat(inputBox->buffer, str);
+
+				keys[i] = NULL;
+			}
+		}
+	}
+		
 }
 
 void DrawButtonOnScreen(char *str, Rect rect, Color color, Color text_color, TTF_Font *font, void *onClick, void *parameters)
