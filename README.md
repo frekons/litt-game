@@ -16,7 +16,7 @@
 - other arts are mostly from https://opengameart.org/
 
 <b>
-<p align="center" font-size="18">
+<p align="center" style="font-size:18px">
   - thanks everyone that has a hand in this project -
 </p>
 </b>
