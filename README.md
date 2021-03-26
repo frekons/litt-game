@@ -15,6 +15,6 @@
 - some of the arts are created from: Elthen (https://twitter.com/pixelthen) (not for this project)
 - other arts are mostly from https://opengameart.org/
 
-<p align="center">
-  ## - thanks everyone that has a hand in this project -
-</p>
+<b align="center" font-size="18">
+  - thanks everyone that has a hand in this project -
+</b>
