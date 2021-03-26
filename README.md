@@ -1,4 +1,6 @@
 # a little game with c sdl
+this were our university final project
+
 ### TODO
 - bug fix?
 
