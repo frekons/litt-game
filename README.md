@@ -1,5 +1,5 @@
 # a little game with c sdl
-this was our university final project
+this game was our university final project
 
 ### TODO
 - bug fix?
